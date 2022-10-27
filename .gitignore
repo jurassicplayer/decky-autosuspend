@@ -31,6 +31,10 @@ bower_components
 .DS_Store
 Thumbs.db
 
+# Ignore package manager locks
+package-lock.json
+pnpm-lock.yaml
+
 # Ignore built ts files
 dist/
 
