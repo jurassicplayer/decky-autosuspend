@@ -1,6 +1,6 @@
 ## Decky-AutoSuspend Plugin
 A plugin to notify and automatically suspend your steamdeck console when passing a battery percentage threshold.
-![Main View](./assets/thumbnail.png)
+![Main View](./assets/thumbnail.jpg)
 
 ## Overview
 This plugin provides audible and toast notifications when reaching a warning and critical battery level. The warning and critical thresholds are user-defined and the audible notification can be turned off if a silent auto-suspend is preferred. The warning threshold slider is disabled if it below the current selected critical threshold, and the `Apply Settings` button is specifically for the warning/critical sliders (to prevent suddenly suspending the console while fiddling with the sliders). The audible notification toggle is instantly applied.
