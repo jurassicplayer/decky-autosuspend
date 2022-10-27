@@ -1,10 +1,10 @@
 {
-  "name": "Example Plugin",
-  "author": "John Doe",
-  "flags": ["debug", "_root"],
+  "name": "AutoSuspend",
+  "author": "jurassicplayer",
+  "flags": ["root"],
   "publish": {
-    "tags": ["template", "root"],
-    "description": "Decky example plugin.",
+    "tags": ["battery", "power-management", "utility", "suspend"],
+    "description": "Automatically suspend on low power. Root permission is for suspending (systemctl suspend).",
     "image": "https://opengraph.githubassets.com/1/SteamDeckHomebrew/PluginLoader"
   }
 }

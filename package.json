@@ -1,7 +1,7 @@
 {
-  "name": "decky-plugin-template",
-  "version": "0.0.1",
-  "description": "A template to quickly create decky plugins from scratch, based on TypeScript and webpack",
+  "name": "AutoSuspend",
+  "version": "1.0.0",
+  "description": "Automatically suspend on low power",
   "scripts": {
     "build": "shx rm -rf dist && rollup -c",
     "watch": "rollup -c -w",
@@ -18,7 +18,7 @@
     "steam-deck",
     "deck"
   ],
-  "author": "Jonas Dellinger <jonas@dellinger.dev>",
+  "author": "jurassicplayer",
   "license": "BSD-3-Clause",
   "bugs": {
     "url": "https://github.com/SteamDeckHomebrew/decky-plugin-template/issues"
@@ -40,7 +40,8 @@
   },
   "dependencies": {
     "decky-frontend-lib": "^3.6.1",
-    "react-icons": "^4.4.0"
+    "react-icons": "^4.4.0",
+    "typescript-json-serializer": "^4.2.0"
   },
   "pnpm": {
     "peerDependencyRules": {
