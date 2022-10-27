@@ -9,7 +9,7 @@ import {
   staticClasses,
 } from "decky-frontend-lib";
 import { VFC, useState, useEffect } from "react";
-import { FaShip } from "react-icons/fa";
+import { FaBatteryQuarter } from "react-icons/fa";
 import { loadSettingsFromLocalStorage, Settings, saveSettingsToLocalStorage } from "./settings";
 import { Backend } from "./utils";
 
@@ -136,6 +136,6 @@ export default definePlugin((serverApi: ServerAPI) => {
   return {
     title: <div className={staticClasses.Title}>AutoSuspend</div>,
     content: <Content settings={settings} />,
-    icon: <FaShip />,
+    icon: <FaBatteryQuarter />,
   };
 });
