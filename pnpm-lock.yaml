@@ -9,16 +9,19 @@ specifiers:
   '@types/react': 16.14.0
   '@types/webpack': ^5.28.0
   decky-frontend-lib: ^3.6.1
+  pnpm: ^7.14.0
   react-icons: ^4.4.0
   rollup: ^2.77.1
   rollup-plugin-import-assets: ^1.1.1
   shx: ^0.3.4
   tslib: ^2.4.0
   typescript: ^4.7.4
+  typescript-json-serializer: ^5.0.0
 
 dependencies:
   decky-frontend-lib: 3.6.1
   react-icons: 4.4.0
+  typescript-json-serializer: 5.0.0
 
 devDependencies:
   '@rollup/plugin-commonjs': 21.1.0_rollup@2.77.1
@@ -28,6 +31,7 @@ devDependencies:
   '@rollup/plugin-typescript': 8.3.3_ekpmegaybmymq5m2rlmygb35zm
   '@types/react': 16.14.0
   '@types/webpack': 5.28.0
+  pnpm: 7.14.0
   rollup: 2.77.1
   rollup-plugin-import-assets: 1.1.1_rollup@2.77.1
   shx: 0.3.4
@@ -676,6 +680,12 @@ packages:
     engines: {node: '>=8.6'}
     dev: true
 
+  /pnpm/7.14.0:
+    resolution: {integrity: sha512-yUKSckJLBIw8ByqMKJF9497kzwrevuQhdL6o2eYbky7woAictxoGX9veBdQYCdBemuC239X2FJq/LGTpCjQ55w==}
+    engines: {node: '>=14.6'}
+    hasBin: true
+    dev: true
+
   /punycode/2.1.1:
     resolution: {integrity: sha512-XRsRjdf+j5ml+y/6GKHPZbrF/8p2Yga0JPtdqTIY2Xe5ohJPD9saDJJLPvp9+NSBprVvevdXZybnj2cv8OEd0A==}
     engines: {node: '>=6'}
@@ -702,6 +712,10 @@ packages:
     dependencies:
       resolve: 1.22.1
     dev: true
+
+  /reflect-metadata/0.1.13:
+    resolution: {integrity: sha512-Ts1Y/anZELhSsjMcU605fU9RE4Oi3p5ORujwbIKXfWa+0Zxs510Qrmrce5/Jowq3cHSZSJqBjypxmHarc+vEWg==}
+    dev: false
 
   /resolve/1.22.1:
     resolution: {integrity: sha512-nBpuuYuY5jFsli/JIs1oldw6fOQCBioohqWZg/2hiaOybXOft4lonv85uDOKXdf8rhyK159cxU5cDcK/NKk8zw==}
@@ -844,7 +858,13 @@ packages:
 
   /tslib/2.4.0:
     resolution: {integrity: sha512-d6xOpEDfsi2CZVlPQzGeux8XMwLT9hssAsaPYExaQMuYskwb+x1x7J371tWlbBdWHroy99KnVB6qIkUbs5X3UQ==}
-    dev: true
+
+  /typescript-json-serializer/5.0.0:
+    resolution: {integrity: sha512-OnyapnhcsPYMOJ0Qm4S8gqWFNulRD1vbPqLClyvNheA6WY+pSbbhHmCq1agDwIJ+F7uQCTuwzXLpQq2XN77rKQ==}
+    dependencies:
+      reflect-metadata: 0.1.13
+      tslib: 2.4.0
+    dev: false
 
   /typescript/4.7.4:
     resolution: {integrity: sha512-C0WQT0gezHuw6AdY1M2jxUO83Rjf0HP7Sk1DtXj6j1EwkQNZrHAg2XPWlq62oqEhYvONq5pkC2Y9oPljWToLmQ==}
