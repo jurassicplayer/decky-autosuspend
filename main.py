@@ -8,39 +8,23 @@ logger=logging.getLogger()
 logger.setLevel(logging.INFO) # can be changed to logging.DEBUG for debugging issues
 
 
-import subprocess, re, os
-def parse_value(report, field):
-    regex_result = re.search(f'{field}:[^a-zA-Z0-9]+([a-zA-Z0-9.% ]+)', str(report))
-    if regex_result:
-        return regex_result.groups()[0]
-    return "N/A"
 
-def battery_report():
-    report = subprocess.check_output(["upower", "-i", "/org/freedesktop/UPower/devices/battery_BAT1"])
-    return {
-        "model": parse_value(report, "model"),
-        "percentage": float(parse_value(report, "percentage").strip('%')),
-        "capacity": parse_value(report, "capacity"),
-        "warningLevel": parse_value(report, "warning-level"),
-        "state": parse_value(report, "state"),
-        "energy": parse_value(report, "energy"),
-        "energyEmpty": parse_value(report, "energy-empty"),
-        "energyFull": parse_value(report, "energy-full"),
-        "energyFullDesign": parse_value(report, "energy-full-design"),
-        "energyRate": parse_value(report, "energy-rate"),
-        "timeToEmpty": parse_value(report, "time to empty"),
-        "timeToFull": parse_value(report, "time to full"),
-        "voltage": parse_value(report, "voltage"),
-    }
-
+import asyncio
 class Plugin:
-    async def log(self, msg):
-        logger.info('{}'.format(msg))
-
-    async def get_value(self, key):
-        report = battery_report()
-        return report[key]
-    
     async def suspend(self):
-        #os.system("/home/deck/.steam/root/ubuntu12_32/steam -ifrunning steam://shortpowerpress")
-        os.system("systemctl suspend")
+        logger.info("Calling suspend")
+        # Fails with steam giving an exit code of -11 (no idea what it means)
+        out = await self.run('/home/deck/.steam/root/ubuntu12_32/steam steam://shortpowerpress')
+        logger.info("{}".format(out))
+    
+    async def run(command):
+        proc = await asyncio.create_subprocess_shell(command,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE)
+
+        stdout, stderr = await proc.communicate()
+        if (proc.returncode != 0):
+            logger.info(f"Process exited with error code {proc.returncode}")
+            logger.info(stderr.decode())
+
+        return stdout.decode()

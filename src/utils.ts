@@ -7,17 +7,11 @@ export class Backend {
 
   constructor(serverAPI: ServerAPI) {
     this.serverAPI = serverAPI;
-    this.warnAudio = new Audio(warnAudioData);
+    this.warnAudio = new Audio(warnAudioData); // "/sounds_custom/low-battery-sound.mp3");
   }
 
-  async log(msg: any) {
-    this.serverAPI.callPluginMethod("log", { "msg" : msg });
-  }
   async suspend() {
     this.serverAPI.callPluginMethod("suspend", {});
-  }
-  async getValue(key: string) {
-    return this.serverAPI.callPluginMethod("get_value", { "key" : key });
   }
   async notify(title: string, msg: string, audioEnabled?: boolean, toast_ms?: number) {
     let duration = 8000
@@ -38,7 +32,7 @@ export class Backend {
           duration: duration,
         });
       } catch (e) {
-        this.log("Toaster Error: "+e);
+        console.log("Toaster Error: "+e);
       }
     })();
   }
