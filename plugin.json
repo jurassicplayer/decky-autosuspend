@@ -1,10 +1,10 @@
 {
   "name": "AutoSuspend",
   "author": "jurassicplayer",
-  "flags": ["root"],
+  "flags": [],
   "publish": {
     "tags": ["battery", "power-management", "utility", "suspend"],
     "description": "Automatically suspend on low power. Root permission is for suspending (systemctl suspend).",
-    "image": "https://opengraph.githubassets.com/1/SteamDeckHomebrew/PluginLoader"
+    "image": "https://github.com/jurassicplayer/decky-autosuspend/blob/main/assets/thumbnail.jpg"
   }
 }
