@@ -4,7 +4,7 @@
   "flags": [],
   "publish": {
     "tags": ["battery", "power-management", "utility", "suspend"],
-    "description": "Automatically suspend on low power. Root permission is for suspending (systemctl suspend).",
+    "description": "Automatically suspend on low power.",
     "image": "https://github.com/jurassicplayer/decky-autosuspend/blob/main/assets/thumbnail.jpg"
   }
 }

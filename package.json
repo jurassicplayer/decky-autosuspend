@@ -1,6 +1,6 @@
 {
   "name": "AutoSuspend",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Automatically suspend on low power",
   "scripts": {
     "build": "shx rm -rf dist && rollup -c",
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/SteamDeckHomebrew/decky-plugin-template.git"
+    "url": "git+https://github.com/jurassicplayer/decky-autosuspend.git"
   },
   "keywords": [
     "decky",
@@ -21,27 +21,28 @@
   "author": "jurassicplayer",
   "license": "BSD-3-Clause",
   "bugs": {
-    "url": "https://github.com/SteamDeckHomebrew/decky-plugin-template/issues"
+    "url": "https://github.com/jurassicplayer/decky-autosuspend/issues"
   },
-  "homepage": "https://github.com/SteamDeckHomebrew/decky-plugin-template#readme",
+  "homepage": "https://github.com/jurassicplayer/decky-autosuspend#readme",
   "devDependencies": {
     "@rollup/plugin-commonjs": "^21.1.0",
     "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-node-resolve": "^13.3.0",
     "@rollup/plugin-replace": "^4.0.0",
-    "@rollup/plugin-typescript": "^8.3.3",
+    "@rollup/plugin-typescript": "^8.5.0",
     "@types/react": "16.14.0",
     "@types/webpack": "^5.28.0",
-    "rollup": "^2.77.1",
+    "pnpm": "^7.14.2",
+    "rollup": "^2.79.1",
     "rollup-plugin-import-assets": "^1.1.1",
     "shx": "^0.3.4",
-    "tslib": "^2.4.0",
-    "typescript": "^4.7.4"
+    "tslib": "^2.4.1",
+    "typescript": "^4.8.4"
   },
   "dependencies": {
-    "decky-frontend-lib": "^3.6.1",
-    "react-icons": "^4.4.0",
-    "typescript-json-serializer": "^4.2.0"
+    "decky-frontend-lib": "^3.7.14",
+    "react-icons": "^4.6.0",
+    "typescript-json-serializer": "^4.3.0"
   },
   "pnpm": {
     "peerDependencyRules": {
