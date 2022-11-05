@@ -80,6 +80,14 @@
             "problemMatcher": []
         },
         {
+            "label": "restartdecky",
+            "detail": "restart decky plugin_loader service",
+            "type": "shell",
+            "group": "none",
+            "command": "ssh deck@${config:deckip} -p ${config:deckport} ${config:deckkey} 'echo '${config:deckpass}' | sudo -S systemctl restart plugin_loader'",
+            "problemMatcher": []
+        },
+        {
             "label": "deployall",
             "dependsOrder": "sequence",
             "group": "none",
@@ -97,7 +105,8 @@
             "group": "test",
             "dependsOn": [
                 "buildall",
-                "deployall"
+                "deployall",
+                "restartdecky"
             ],
             "problemMatcher": []
         }
