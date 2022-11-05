@@ -7,21 +7,26 @@ This plugin provides audible and toast notifications when reaching a warning and
 
 ## Installation
 1. [Install decky-loader](https://github.com/SteamDeckHomebrew/decky-loader#installation)
-2. Use the built in plugin store to download the AutoSuspend plugin (WIP)
+2. Use the built in plugin store to download the AutoSuspend plugin
 
 ## Notes
-- Toasts do not appear in-game. There is nothing I can do about this at the current time (it's just not something decky-loader can do atm)
-- The plugin relies on `upower` for battery information, which updates roughly every 2min.
+- The plugin is basically feature complete until someone broadens my horizons.
+- This plugin is integrated with SteamOS and utilizes Valve's functions to suspend/play notifications sounds
+   - The notification sound effect is currently not customizable (possible to add though), but will follow any applied sound packs from [SDH-AudioLoader](https://github.com/EMERALD0874/SDH-AudioLoader)
+   - Suspending shouldn't cause any issues unforseen issues that aren't already present when using SteamOS's suspend.
 - The warning threshold slider is disabled if below the currently selected critical threshold
 - The `Apply Settings` button is specifically for the warning/critical sliders (to prevent suddenly suspending the console while changing settings)
 - The audible notification toggle is instantly applied.
-- The plugin calls `systemctl suspend`, and is NOT the same suspend as when you hit the power button which means:
-   - No suspend animation when triggered
-   - Requires root
-   - May or may not play nicely with other applications/plugins due to suspend method (in particular the `pause games` plugin maybe? Can't really tell)
 - I basically don't know ReactJS, so if there is a glaring flaw feel free to create an issue, PR, or w/e.
 
-## Assets Used:
-- Included (aka hard-coded) into the plugin is a base64 encoded `Low Battery Sound` by Spanac from FreeSoundsLibrary.com
-   - Modified to remove silent sections and repeated once.
-   - License is included in the repository as `LICENSE.low-battery-sound.md` if it wasn't obvious
+## Future Plans
+- Customizable Notification SoundFX (?)
+- Maybe look into finding SteamOS's battery warning toasts
+   - See if I can change their internal levels from the default 10%, 5%, 3%
+- Bugfixes
+
+## Thanks
+- [@AAGaming00](https://github.com/AAGaming00)
+- [@Beebles](https://github.com/beebls)
+- [@EMERALD0874](https://github.com/EMERALD0874)
+- All the other plugin devs (without their plugins as examples, I wouldn't have known what I was doing)
