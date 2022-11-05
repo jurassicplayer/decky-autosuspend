@@ -8,15 +8,11 @@ import {
   ServerAPI,
   staticClasses
 } from "decky-frontend-lib";
-import { SteamClient, BatteryState } from "./lib/SteamClient";
+import { BatteryState } from "./lib/SteamClient";
 import { VFC, useState, useEffect } from "react";
 import { FaBatteryQuarter } from "react-icons/fa";
 import { loadSettingsFromLocalStorage, Settings, saveSettingsToLocalStorage } from "./settings";
 import { Backend } from "./utils";
-
-declare global {
-  var SteamClient: SteamClient;
-}
 
 let settings: Settings;
 
@@ -30,14 +26,12 @@ const Content: VFC<{ settings: Settings }> = ({ settings }) => {
     if (!saveButton) return
     settings.warningLevel = warningLevel;
     settings.criticalLevel = criticalLevel;
-    // backend.toast("AutoSuspend", "Updated AutoSuspend settings")
     saveSettingsToLocalStorage(settings);
     setSaveButton(false);
   }, [saveButton]);
   useEffect(() => {
     if (settings.audioEnabled == audioEnabled) return
     settings.audioEnabled = audioEnabled;
-    // backend.toast("AutoSuspend", "Updated AutoSuspend settings2")
     saveSettingsToLocalStorage(settings);
   }, [audioEnabled]);
   
@@ -108,11 +102,6 @@ export default definePlugin((serverApi: ServerAPI) => {
   // load settings
   settings = loadSettingsFromLocalStorage();
 
-  const suspend = () => {
-    SteamClient.User.PrepareForSystemSuspend();
-    SteamClient.System.SuspendPC();
-  }
-
   // percentage check loop
   SteamClient.System.RegisterForBatteryStateChanges((batteryState: BatteryState)=> {
     let batteryPercent = Math.round(batteryState.flLevel * 100)
@@ -123,12 +112,10 @@ export default definePlugin((serverApi: ServerAPI) => {
       ' critical: '+settings.criticalLevel);
     //*/
     if (!criticalNotifiedState && batteryPercent < settings.criticalLevel ) {
-      // console.log('batt: '+batteryPercent+' < warn: '+settings.criticalLevel)
       backend.notify("AutoSuspend", "Critical limit exceeded, suspending device", settings.audioEnabled, 5000);
-      setTimeout(() => {suspend();}, 5000);
+      setTimeout(() => {backend.suspend();}, 12000);
       criticalNotifiedState = true;
     } else if (!warnNotifiedState && batteryPercent < settings.warningLevel && settings.warningLevel > settings.criticalLevel) {
-      // console.log('batt: '+batteryPercent+' < warn: '+settings.warningLevel)
       backend.notify("AutoSuspend", "Warning limit exceeded", settings.audioEnabled);
       warnNotifiedState = true;
     }
