@@ -113,7 +113,7 @@ export default definePlugin((serverApi: ServerAPI) => {
     //*/
     if (!criticalNotifiedState && batteryPercent < settings.criticalLevel ) {
       backend.notify("AutoSuspend", "Critical limit exceeded, suspending device", settings.audioEnabled, 5000);
-      setTimeout(() => {backend.suspend();}, 12000);
+      setTimeout(() => {backend.suspend();}, 6000);
       criticalNotifiedState = true;
     } else if (!warnNotifiedState && batteryPercent < settings.warningLevel && settings.warningLevel > settings.criticalLevel) {
       backend.notify("AutoSuspend", "Warning limit exceeded", settings.audioEnabled);
