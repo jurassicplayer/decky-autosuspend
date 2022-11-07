@@ -42,6 +42,7 @@ const Content: VFC<{ settings: Settings }> = ({ settings }) => {
       <PanelSectionRow>
         <ToggleField
           label="Notification"
+          description="Display a toast notification"
           checked={notificationEnabled}
           onChange={(notificationEnabled) => {
             setNotificationEnabled(notificationEnabled);
@@ -51,6 +52,7 @@ const Content: VFC<{ settings: Settings }> = ({ settings }) => {
       <PanelSectionRow>
         <ToggleField
           label="Sound"
+          description="Play an audible notification"
           checked={soundEnabled}
           onChange={(soundEnabled) => {
             setSoundEnabled(soundEnabled);
