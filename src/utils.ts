@@ -28,15 +28,15 @@ export class Backend {
   async suspend() {
     SleepParent.OnSuspendRequest()
   }
-  async notify(title: string, msg: string, audioEnabled?: boolean, toast_ms?: number) {
+  async notify(title: string, msg: string, notificationEnabled?: boolean, soundEnabled?: boolean, toast_ms?: number) {
     let duration = 8000
-    let soundfx = NavSoundMap?.ToastMisc // maybe make customizable?
     if (toast_ms) {
       duration = toast_ms
     }
-    this.toast(title, msg, duration);
-    if(audioEnabled && soundfx){
-      AudioParent.GamepadUIAudio.PlayNavSound(soundfx)
+    if(notificationEnabled){
+      this.toast(title, msg, duration);
+    } else if(soundEnabled){
+      AudioParent.GamepadUIAudio.PlayNavSound(NavSoundMap.ToastMisc)
     }
   }
   async toast(title: string, message: string, duration: number) {

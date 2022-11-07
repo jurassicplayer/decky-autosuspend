@@ -16,11 +16,10 @@ This plugin provides audible and toast notifications when reaching a warning and
    - Suspending shouldn't cause any issues unforseen issues that aren't already present when using SteamOS's suspend.
 - The warning threshold slider is disabled if below the currently selected critical threshold
 - The `Apply Settings` button is specifically for the warning/critical sliders (to prevent suddenly suspending the console while changing settings)
-- The audible notification toggle is instantly applied.
+- The notification/sound mode is instantly applied (currently notifications always have a sound effect associated with it).
 - I basically don't know ReactJS, so if there is a glaring flaw feel free to create an issue, PR, or w/e.
 
 ## Future Plans
-- Customizable Notification SoundFX (?)
 - Maybe look into finding SteamOS's battery warning toasts
    - See if I can change their internal levels from the default 10%, 5%, 3%
 - Bugfixes

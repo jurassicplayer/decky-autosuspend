@@ -7,7 +7,9 @@ const serializer = new JsonSerializer();
 @JsonObject()
 export class Settings {
   @JsonProperty()
-  audioEnabled: boolean = false;
+  notificationEnabled: boolean = false;
+  @JsonProperty()
+  soundEnabled: boolean = false;
   @JsonProperty()
   warningLevel: number = 20;
   @JsonProperty()

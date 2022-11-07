@@ -17,7 +17,8 @@ import { Backend } from "./utils";
 let settings: Settings;
 
 const Content: VFC<{ settings: Settings }> = ({ settings }) => {
-  const [audioEnabled, setAudioEnabled] = useState<boolean>(settings.audioEnabled);
+  const [notificationEnabled, setNotificationEnabled] = useState<boolean>(settings.notificationEnabled);
+  const [soundEnabled, setSoundEnabled] = useState<boolean>(settings.soundEnabled);
   const [warningLevel, setWarningLevel] = useState<number>(settings.warningLevel);
   const [criticalLevel, setCriticalLevel] = useState<number>(settings.criticalLevel);
   const [saveButton, setSaveButton] = useState<boolean>(false);
@@ -30,21 +31,27 @@ const Content: VFC<{ settings: Settings }> = ({ settings }) => {
     setSaveButton(false);
   }, [saveButton]);
   useEffect(() => {
-    if (settings.audioEnabled == audioEnabled) return
-    settings.audioEnabled = audioEnabled;
+    settings.notificationEnabled = notificationEnabled;
+    settings.soundEnabled = soundEnabled;
     saveSettingsToLocalStorage(settings);
-  }, [audioEnabled]);
+  }, [notificationEnabled, soundEnabled]);
   
 
   return (
     <PanelSection>
       <PanelSectionRow>
         <ToggleField
-          label="Audible Notification"
-          description="Enable audible notifications at warning/critical levels"
-          checked={audioEnabled}
-          onChange={(audioEnabled) => {
-            setAudioEnabled(audioEnabled);
+          label="Notification"
+          checked={notificationEnabled}
+          onChange={(notificationEnabled) => {
+            setNotificationEnabled(notificationEnabled);
+          }}
+        />
+        <ToggleField
+          label="Sound"
+          checked={soundEnabled}
+          onChange={(soundEnabled) => {
+            setSoundEnabled(soundEnabled);
           }}
         />
       </PanelSectionRow>
@@ -107,16 +114,16 @@ export default definePlugin((serverApi: ServerAPI) => {
     let batteryPercent = Math.round(batteryState.flLevel * 100)
     /*
     console.log('batt:'+batteryPercent+
-      ' audio: '+settings.audioEnabled+
+      ' audio: '+settings.soundEnabled+
       ' warn: '+settings.warningLevel+
       ' critical: '+settings.criticalLevel);
     //*/
     if (!criticalNotifiedState && batteryPercent < settings.criticalLevel ) {
-      backend.notify("AutoSuspend", "Critical limit exceeded, suspending device", settings.audioEnabled, 5000);
+      backend.notify("AutoSuspend", "Critical limit exceeded, suspending device", settings.notificationEnabled, settings.soundEnabled, 5000);
       setTimeout(() => {backend.suspend();}, 6000);
       criticalNotifiedState = true;
     } else if (!warnNotifiedState && batteryPercent < settings.warningLevel && settings.warningLevel > settings.criticalLevel) {
-      backend.notify("AutoSuspend", "Warning limit exceeded", settings.audioEnabled);
+      backend.notify("AutoSuspend", "Warning limit exceeded", settings.notificationEnabled, settings.soundEnabled);
       warnNotifiedState = true;
     }
     if (criticalNotifiedState && batteryPercent > settings.criticalLevel) {
