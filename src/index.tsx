@@ -47,6 +47,8 @@ const Content: VFC<{ settings: Settings }> = ({ settings }) => {
             setNotificationEnabled(notificationEnabled);
           }}
         />
+      </PanelSectionRow>
+      <PanelSectionRow>
         <ToggleField
           label="Sound"
           checked={soundEnabled}
