@@ -63,7 +63,7 @@ const Content: VFC<{ settings: Settings }> = ({ settings }) => {
       <PanelSectionRow>
         <SliderField
           label="Warning Level"
-          description="Control the threshold before sending warning notification"
+          description="Threshold before sending warning notification"
           value={warningLevel}
           step={5}
           max={100}
@@ -80,7 +80,7 @@ const Content: VFC<{ settings: Settings }> = ({ settings }) => {
       <PanelSectionRow>
         <SliderField
           label="Critical Level"
-          description="Control the threshold before suspending device"
+          description="Threshold before suspending device"
           value={criticalLevel}
           step={5}
           max={100}
