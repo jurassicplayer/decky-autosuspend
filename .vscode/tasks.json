@@ -112,6 +112,14 @@
         },
         // Publish: Add required files to zip
         {
+            "label": "pnpmCheck",
+            "type": "shell",
+            "group": "none",
+            "detail": "Check pnpm lockfile",
+            "command": "pnpm i --frozen-lockfile",
+            "problemMatcher": []
+        },
+        {
             "label": "Publish:Clean",
             "detail": "Delete previous zip",
             "type": "shell",
@@ -191,6 +199,7 @@
             "dependsOrder": "sequence",
             "group": "test",
             "dependsOn": [
+                "Publish:pnpmCheck",
                 "Publish:Clean",
                 "Publish:Required",
                 "Publish:PythonBackend",
