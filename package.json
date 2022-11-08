@@ -1,5 +1,5 @@
 {
-  "name": "AutoSuspend",
+  "name": "decky-autosuspend",
   "version": "1.1.0",
   "description": "Automatically suspend on low power",
   "scripts": {
