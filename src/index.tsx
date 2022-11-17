@@ -1,6 +1,7 @@
 import {
   definePlugin,
-  ToggleField,
+  Focusable,
+  Toggle,
   SliderField,
   ButtonItem,
   PanelSection,
@@ -39,27 +40,6 @@ const Content: VFC<{ settings: Settings }> = ({ settings }) => {
 
   return (
     <PanelSection>
-      <PanelSectionRow>
-        <ToggleField
-          label="Notification"
-          description="Display a toast notification"
-          checked={notificationEnabled}
-          onChange={(notificationEnabled) => {
-            setNotificationEnabled(notificationEnabled);
-          }}
-        />
-      </PanelSectionRow>
-      <PanelSectionRow>
-        <ToggleField
-          label="Sound"
-          description="Play an audible notification"
-          checked={soundEnabled}
-          onChange={(soundEnabled) => {
-            setSoundEnabled(soundEnabled);
-          }}
-        />
-      </PanelSectionRow>
-
       <PanelSectionRow>
         <SliderField
           label="Warning Level"
@@ -100,6 +80,30 @@ const Content: VFC<{ settings: Settings }> = ({ settings }) => {
             setSaveButton(true);
           }}
         >Apply Changes</ButtonItem>
+      </PanelSectionRow>
+
+      <div className={staticClasses.PanelSectionTitle}>Notifications</div>
+      <PanelSectionRow>
+        <div style={{ minHeight: "0px", marginTop: "0px", marginBottom: "0px", display: "flex", justifyContent: "space-between" }} flow-children="horizontal">
+          <div>Toast</div><div>Sound</div>
+        </div>
+        <Focusable
+          style={{ minHeight: "0px", marginLeft: "20px", marginRight: "20px", display: "flex", justifyContent: "space-between" }}
+          flow-children="horizontal">
+          <Toggle
+            value={notificationEnabled}
+            onChange={(notificationEnabled) => {
+              setNotificationEnabled(notificationEnabled);
+            }}
+          />
+          <Toggle
+            value={soundEnabled}
+            disabled={notificationEnabled}
+            onChange={(soundEnabled) => {
+              setSoundEnabled(soundEnabled);
+            }}
+          />
+        </Focusable>
       </PanelSectionRow>
     </PanelSection>
   );
