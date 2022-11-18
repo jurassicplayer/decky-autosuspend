@@ -1,150 +1,45 @@
 import {
   definePlugin,
-  Focusable,
-  Toggle,
-  SliderField,
-  ButtonItem,
-  PanelSection,
-  PanelSectionRow,
   ServerAPI,
   staticClasses
-} from "decky-frontend-lib";
-import { BatteryState } from "./lib/SteamClient";
-import { VFC, useState, useEffect } from "react";
-import { FaBatteryQuarter } from "react-icons/fa";
-import { loadSettingsFromLocalStorage, Settings, saveSettingsToLocalStorage } from "./settings";
-import { Backend } from "./utils";
+} from "decky-frontend-lib"
+import { BatteryState } from "./lib/SteamClient"
+import { FaBatteryQuarter } from "react-icons/fa"
+import { QAMPanel } from "./QAM/QAMPanel"
+import { Settings } from "./Utils/Settings"
+import { Backend } from "./Utils/Backend"
+import { SteamUtils } from "./Utils/SteamUtils"
 
-let settings: Settings;
-
-const Content: VFC<{ settings: Settings }> = ({ settings }) => {
-  const [notificationEnabled, setNotificationEnabled] = useState<boolean>(settings.notificationEnabled);
-  const [soundEnabled, setSoundEnabled] = useState<boolean>(settings.soundEnabled);
-  const [warningLevel, setWarningLevel] = useState<number>(settings.warningLevel);
-  const [criticalLevel, setCriticalLevel] = useState<number>(settings.criticalLevel);
-  const [saveButton, setSaveButton] = useState<boolean>(false);
-
-  useEffect(() => {
-    if (!saveButton) return
-    settings.warningLevel = warningLevel;
-    settings.criticalLevel = criticalLevel;
-    saveSettingsToLocalStorage(settings);
-    setSaveButton(false);
-  }, [saveButton]);
-  useEffect(() => {
-    settings.notificationEnabled = notificationEnabled;
-    settings.soundEnabled = soundEnabled;
-    saveSettingsToLocalStorage(settings);
-  }, [notificationEnabled, soundEnabled]);
-  
-
-  return (
-    <PanelSection>
-      <PanelSectionRow>
-        <SliderField
-          label="Warning Level"
-          description="Threshold before sending warning notification"
-          value={warningLevel}
-          step={5}
-          max={100}
-          min={0}
-          showValue={true}
-          disabled={warningLevel >= criticalLevel? false : true}
-          notchTicksVisible={true}
-          onChange={(threshold: number) => {
-            setWarningLevel(threshold);
-          }}
-        />
-      </PanelSectionRow>
-
-      <PanelSectionRow>
-        <SliderField
-          label="Critical Level"
-          description="Threshold before suspending device"
-          value={criticalLevel}
-          step={5}
-          max={100}
-          min={0}
-          showValue={true}
-          notchTicksVisible={true}
-          onChange={(threshold: number) => {
-            setCriticalLevel(threshold);
-          }}
-        />
-      </PanelSectionRow>
-
-      <PanelSectionRow>
-        <ButtonItem
-          layout="below"
-          onClick={() => {
-            setSaveButton(true);
-          }}
-        >Apply Changes</ButtonItem>
-      </PanelSectionRow>
-
-      <div className={staticClasses.PanelSectionTitle}>Notifications</div>
-      <PanelSectionRow>
-        <div style={{ minHeight: "0px", marginTop: "0px", marginBottom: "0px", display: "flex", justifyContent: "space-between" }} flow-children="horizontal">
-          <div>Toast</div><div>Sound</div>
-        </div>
-        <Focusable
-          style={{ minHeight: "0px", marginLeft: "20px", marginRight: "20px", display: "flex", justifyContent: "space-between" }}
-          flow-children="horizontal">
-          <Toggle
-            value={notificationEnabled}
-            onChange={(notificationEnabled) => {
-              setNotificationEnabled(notificationEnabled);
-            }}
-          />
-          <Toggle
-            value={soundEnabled}
-            disabled={notificationEnabled}
-            onChange={(soundEnabled) => {
-              setSoundEnabled(soundEnabled);
-            }}
-          />
-        </Focusable>
-      </PanelSectionRow>
-    </PanelSection>
-  );
-};
 
 export default definePlugin((serverApi: ServerAPI) => {
-  const backend = new Backend(serverApi);
-  let warnNotifiedState = false;
-  let criticalNotifiedState = false;
+  Backend.initBackend(serverApi)
+  Settings.loadFromLocalStorage()
 
-  // load settings
-  settings = loadSettingsFromLocalStorage();
+  let warnNotifiedState = false
+  let criticalNotifiedState = false
 
   // percentage check loop
   SteamClient.System.RegisterForBatteryStateChanges((batteryState: BatteryState)=> {
     let batteryPercent = Math.round(batteryState.flLevel * 100)
-    /*
-    console.log('batt:'+batteryPercent+
-      ' audio: '+settings.soundEnabled+
-      ' warn: '+settings.warningLevel+
-      ' critical: '+settings.criticalLevel);
-    //*/
-    if (!criticalNotifiedState && batteryPercent < settings.criticalLevel ) {
-      backend.notify("AutoSuspend", "Critical limit exceeded, suspending device", settings.notificationEnabled, settings.soundEnabled, 5000);
-      setTimeout(() => {backend.suspend();}, 6000);
-      criticalNotifiedState = true;
-    } else if (!warnNotifiedState && batteryPercent < settings.warningLevel && settings.warningLevel > settings.criticalLevel) {
-      backend.notify("AutoSuspend", "Warning limit exceeded", settings.notificationEnabled, settings.soundEnabled);
-      warnNotifiedState = true;
+    if (!criticalNotifiedState && batteryPercent < Settings.criticalLevel ) {
+      SteamUtils.notify("AutoSuspend", "Critical limit exceeded, suspending device", Settings.notificationEnabled, Settings.soundEnabled, 5000)
+      setTimeout(() => {SteamUtils.suspend();}, 5500)
+      criticalNotifiedState = true
+    } else if (!warnNotifiedState && batteryPercent < Settings.warningLevel && Settings.warningLevel > Settings.criticalLevel) {
+      SteamUtils.notify("AutoSuspend", "Warning limit exceeded")
+      warnNotifiedState = true
     }
-    if (criticalNotifiedState && batteryPercent > settings.criticalLevel) {
-      criticalNotifiedState = false;
+    if (criticalNotifiedState && batteryPercent > Settings.criticalLevel) {
+      criticalNotifiedState = false
     }
-    if (warnNotifiedState && batteryPercent > settings.warningLevel) {
-      warnNotifiedState = false;
+    if (warnNotifiedState && batteryPercent > Settings.warningLevel) {
+      warnNotifiedState = false
     }
   })
 
   return {
     title: <div className={staticClasses.Title}>AutoSuspend</div>,
-    content: <Content settings={settings} />,
+    content: <QAMPanel />,
     icon: <FaBatteryQuarter />,
-  };
-});
+  }
+})
