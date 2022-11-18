@@ -5,6 +5,6 @@
   "publish": {
     "tags": ["battery", "power-management", "utility", "suspend"],
     "description": "Automatically suspend on low power.",
-    "image": "https://github.com/jurassicplayer/decky-autosuspend/blob/main/assets/thumbnail.jpg"
+    "image": "https://github.com/jurassicplayer/decky-autosuspend/blob/main/assets/thumbnail.png"
   }
 }
