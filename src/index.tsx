@@ -36,6 +36,7 @@ export default definePlugin((serverApi: ServerAPI) => {
       warnNotifiedState = false
     }
   })
+  Backend.setAppInitialized(true)
 
   return {
     title: <div className={staticClasses.Title}>AutoSuspend</div>,
