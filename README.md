@@ -12,11 +12,11 @@ This plugin provides audible and toast notifications when reaching a warning and
 ## Notes
 - The plugin is basically feature complete until someone broadens my horizons.
 - This plugin is integrated with SteamOS and utilizes Valve's functions to suspend/play notifications sounds
-   - The notification sound effect is currently not customizable (possible to add though), but will follow any applied sound packs from [SDH-AudioLoader](https://github.com/EMERALD0874/SDH-AudioLoader)
+   - The notification sound effect will follow any applied sound packs from [SDH-AudioLoader](https://github.com/EMERALD0874/SDH-AudioLoader)
    - Suspending shouldn't cause any issues unforseen issues that aren't already present when using SteamOS's suspend.
 - The warning threshold slider is disabled if below the currently selected critical threshold
 - The `Apply Settings` button is specifically for the warning/critical sliders (to prevent suddenly suspending the console while changing settings)
-- The notification/sound mode is instantly applied (currently notifications always have a sound effect associated with it).
+- The notification/sound mode is instantly applied.
 - I basically don't know ReactJS, so if there is a glaring flaw feel free to create an issue, PR, or w/e.
 
 ## Future Plans
