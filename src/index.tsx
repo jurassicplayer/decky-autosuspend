@@ -25,7 +25,7 @@ export default definePlugin((serverApi: ServerAPI) => {
       SteamUtils.notify("AutoSuspend", "Critical limit exceeded, suspending device", Settings.notificationEnabled, Settings.soundEnabled, 5000)
       setTimeout(() => {SteamUtils.suspend();}, 5500)
       criticalNotifiedState = true
-    } else if (!warnNotifiedState && batteryPercent < Settings.warningLevel && Settings.warningLevel > Settings.criticalLevel) {
+    } else if (!warnNotifiedState && batteryPercent < Settings.warningLevel && Settings.warningLevel > Settings.criticalLevel && !criticalNotifiedState) {
       SteamUtils.notify("AutoSuspend", "Warning limit exceeded")
       warnNotifiedState = true
     }
