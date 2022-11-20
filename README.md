@@ -28,19 +28,30 @@ For manual installation, you will need to use the terminal a little (decky-loade
 12. Press Enter to run the command (it will prompt for your password, which is the same one you used when you installed decky-loader)
 13. Return to Gaming Mode and enjoy \o/
 
+## Usage
+- Adjust the warning and critical threshold sliders to the desired percentage using either the slider or the entry box
+- Apply threshold settings with the `Apply Changes` button
+- Adjust notifications to your preference: Toast & Sound, Toast Only, Sound Only, or No notifications
+
+## Functionality
+- Notifications are only sent AFTER passing the threshold value and do not get sent again until charging above the threshold
+   - Ex. With a threshold value of 40%
+      - A notification will be sent at 39% and threshold won't send another until reset
+      - The notification will be reset after charging up to at least 41%
+- The `Apply Settings` button is specifically for the warning/critical sliders, notification settings are applied instantly.
+- The warning threshold slider will be disabled when lower than the critical threshold.
+
 ## Notes
 - The plugin is basically feature complete until someone broadens my horizons.
 - This plugin is integrated with SteamOS and utilizes Valve's functions to suspend/play notifications sounds
    - The notification sound effect will follow any applied sound packs from [SDH-AudioLoader](https://github.com/EMERALD0874/SDH-AudioLoader)
    - Suspending shouldn't cause any issues unforseen issues that aren't already present when using SteamOS's suspend.
-- The warning threshold slider is disabled if below the currently selected critical threshold
-- The `Apply Settings` button is specifically for the warning/critical sliders (to prevent suddenly suspending the console while changing settings)
-- The notification/sound mode is instantly applied.
 - I basically don't know ReactJS, so if there is a glaring flaw feel free to create an issue, PR, or w/e.
 
 ## Future Plans
 - Maybe look into finding SteamOS's battery warning toasts
    - See if I can change their internal levels from the default 10%, 5%, 3%
+   - Inhibit/Re-use SteamOS's battery warning toasts
 - Bugfixes
 
 ## Thanks
