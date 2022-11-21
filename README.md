@@ -41,6 +41,20 @@ For manual installation, you will need to use the terminal a little (decky-loade
 - The `Apply Settings` button is specifically for the warning/critical sliders, notification settings are applied instantly.
 - The warning threshold slider will be disabled when lower than the critical threshold.
 
+## Ran Into an Issue?
+- In order to properly assess what could potentially be happening, you must be able to reproduce the issue or provide steps for me to attempt reproducing the issue. In the event that you are able to repeatedly reproduce the issue, please follow the following steps and submit the logs so I can fix it for you :D (that's the hope anyways).
+#### Obtaining debugging information
+- Reset your device
+- Ensure that your device and a computer are connected on the same network
+- Go to the Decky settings and enable `Allow Remote CEF Debugging`
+- From the computer, navigate to `http://<steamdeck-ip>:8081` using a google chrome/chromium-based browser
+- On the list of links, click `Steam`
+- Click on the `Console` tab
+- Set the `Log Level` dropdown (to the right of the `Filter` box) to include `Verbose`
+- Reproduce the issue on your device
+- Right click on the log and choose `Save as...` OR make screenshots beginning from the line: `Trying to load AutoSuspend`
+- Upload the file/screenshots to a new/relevant [Github issue](https://github.com/jurassicplayer/decky-autosuspend/issues)
+
 ## Notes
 - The plugin is basically feature complete until someone broadens my horizons.
 - This plugin is integrated with SteamOS and utilizes Valve's functions to suspend/play notifications sounds
