@@ -5,15 +5,17 @@ const findModule = (property: string) => {
   console.debug(`[AutoSuspend] Finding module for '${property}'`)
   return findModuleChild((m: Module) => {
     if (typeof m !== "object") return undefined;
-    for (let prop in m)
+    for (let prop in m) {
       try {
-        if (m[prop][property])
-          console.debug(`[AutoSuspend] Found module for '${property}'`)
+        if (m[prop][property]) {
+          console.debug("[AutoSuspend] module: ", m[prop])
           return m[prop];
+        }
       } catch (e) {
         console.debug(`[AutoSuspend] Unable to findModuleChild for '${property}'`)
         return undefined;
       }
+    }
   });
 }
 
