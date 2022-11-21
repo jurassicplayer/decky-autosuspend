@@ -18,7 +18,7 @@ For manual installation, you will need to use the terminal a little (decky-loade
 4. Scroll down the General settings using the D-Pad/Joystick, not touch
 5. On `Manual plugin install` section, keep navigating using the D-Pad/Joystick until the `URL` entry is highlighted
 6. Press A to bring up the virtual keyboard, or use your own keyboard to add the following url:
-   - `https://github.com/jurassicplayer/decky-autosuspend/releases/download/v1.2.0/decky-autosuspend.zip`
+   - `https://github.com/jurassicplayer/decky-autosuspend/releases/latest/download/decky-autosuspend.zip`
 7. Press `Install` and `Confirm`
 8. Go to desktop mode (`Steam` menu => `Power` => `Switch to Desktop`)
 9. Open the start menu
