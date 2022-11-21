@@ -12,16 +12,20 @@ from settings import SettingsManager
 from helpers import get_home_path, get_homebrew_path, get_user
 
 import os
-logger.info('{}{}settings'.format(get_homebrew_path(get_home_path(get_user())), os.sep))
+logger.info('Settings path: {}{}settings'.format(get_homebrew_path(get_home_path(get_user())), os.sep))
 settings = SettingsManager(name="autosuspend", settings_directory='{}{}settings'.format(get_homebrew_path(get_home_path(get_user())), os.sep))
 settings.read()
 
 class Plugin:
   async def settings_read(self):
+    logger.info('Reading settings')
     return settings.read()
   async def settings_commit(self):
+    logger.info('Saving settings')
     return settings.commit()
   async def settings_getSetting(self, key: str, defaults):
+    logger.info('Get {}'.format(key))
     return settings.getSetting(key, defaults)
   async def settings_setSetting(self, key: str, value):
+    logger.info('Set {}: {}'.format(key, value))
     return settings.setSetting(key, value)

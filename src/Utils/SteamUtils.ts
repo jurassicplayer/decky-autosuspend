@@ -2,14 +2,16 @@ import { findModuleChild, Module, ToastData } from "decky-frontend-lib";
 import { Settings } from "./Settings"
 
 const findModule = (property: string) => {
+  console.debug(`[AutoSuspend] Finding module for '${property}'`)
   return findModuleChild((m: Module) => {
     if (typeof m !== "object") return undefined;
     for (let prop in m)
       try {
         if (m[prop][property])
+          console.debug(`[AutoSuspend] Found module for '${property}'`)
           return m[prop];
       } catch (e) {
-        console.log(`Unable to findModuleChild for '${property}'`)
+        console.debug(`[AutoSuspend] Unable to findModuleChild for '${property}'`)
         return undefined;
       }
   });
@@ -28,6 +30,7 @@ interface ToastDataExtended extends ToastData {
 
 export class SteamUtils {
   static async suspend() {
+    console.debug('[AutoSuspend] Sending suspend request to SteamOS')
     SleepParent.OnSuspendRequest()
   }
 
@@ -67,9 +70,10 @@ export class SteamUtils {
     // Check for system notification settings
     // @ts-ignore
     if ((settingsStore.settings.bDisableAllToasts && !toast.critical) || (settingsStore.settings.bDisableToastsInGame && !toast.critical && NotificationStore.BIsUserInGame())) {
-      console.log("[AutoSuspend] Disable/hide non-critical turned on, skipping notification")
+      console.debug("[AutoSuspend] Disable/hide non-critical turned on, skipping notification")
       return
     }
+    console.debug(`[AutoSuspend] Sending notification with toast:${toast.showToast}, sound:${toast.sound}`)
     if(toast.sound) AudioParent.GamepadUIAudio.PlayNavSound(toast.sound)
     if(toast.showToast) {
       NotificationStore.m_rgNotificationToasts.push(toastData)

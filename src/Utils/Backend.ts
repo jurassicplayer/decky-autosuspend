@@ -13,16 +13,22 @@ export class Backend {
       initialized: false,
       state: "Idle"  
     }
+    console.debug("[AutoSuspend] Initialized serverAPI and appState")
   }
   static setServer(server: ServerAPI) { this.serverAPI = server }
   static getServer() { return this.serverAPI }
-  static setAppState(state: string) { this.appState.state = state }
+  static setAppState(state: string) {
+    console.debug(`[AutoSuspend] Setting backend appState: ${state}`)
+    this.appState.state = state }
   static getAppState() { return this.appState.state }
-  static setAppInitialized(state: boolean) {this.appState.initialized = state}
-  static getAppInitialized() { return this.appState.initialized}
+  static setAppInitialized(state: boolean) { 
+    console.debug(`[AutoSuspend] Setting backend AppInitialized: ${state}`)
+    this.appState.initialized = state }
+  static getAppInitialized() { return this.appState.initialized }
 
   static async bridge(functionName: string, namedArgs?: any) {
     namedArgs = (namedArgs) ? namedArgs : {}
+    console.debug(`[AutoSuspend] Calling backend function: ${functionName}`)
     var output = await this.serverAPI.callPluginMethod(functionName, namedArgs)
     return output.result
   }

@@ -13,11 +13,12 @@ export const QAMPanel: VFC = () => {
   const [warningLevel, setWarningLevel] = useState<number>(Settings.warningLevel)
   const [criticalLevel, setCriticalLevel] = useState<number>(Settings.criticalLevel)
 
-  const onWarningLevelSlider = (threshold: number) => { setWarningLevel(threshold)}
-  const onCriticalLevelSlider = (threshold: number) => { setCriticalLevel(threshold)}
+  const onWarningLevelSlider = (threshold: number) => { setWarningLevel(threshold) }
+  const onCriticalLevelSlider = (threshold: number) => { setCriticalLevel(threshold) }
   const onSaveButton = () => {
     Settings.warningLevel = warningLevel;
     Settings.criticalLevel = criticalLevel;
+    console.debug(`[AutoSuspend] Threshold settings changed, saving warning:${Settings.warningLevel}, critical:${Settings.criticalLevel}`)
     Settings.saveToLocalStorage();
   }
 

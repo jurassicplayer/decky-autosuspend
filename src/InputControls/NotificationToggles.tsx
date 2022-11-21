@@ -13,6 +13,7 @@ export function NotificationToggles() {
   useEffect(() => {
     if (Settings.soundEnabled != soundEnabled) Settings.soundEnabled = soundEnabled;
     if (Settings.notificationEnabled != notificationEnabled) Settings.notificationEnabled = notificationEnabled;
+    console.debug(`[AutoSuspend] Notification settings changed, saving toast:${Settings.notificationEnabled}, sound:${Settings.soundEnabled}`)
     Settings.saveToLocalStorage()
   }, [notificationEnabled, soundEnabled])
 
