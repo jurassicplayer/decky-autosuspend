@@ -21,13 +21,13 @@ export default definePlugin((serverApi: ServerAPI) => {
   // percentage check loop
   SteamClient.System.RegisterForBatteryStateChanges((batteryState: BatteryState)=> {
     let batteryPercent = Math.round(batteryState.flLevel * 100)
-    if (!criticalNotifiedState && batteryPercent < Settings.criticalLevel ) {
+    if (!criticalNotifiedState && batteryPercent <= Settings.criticalLevel ) {
       console.debug(`[AutoSuspend] Critical threshold triggered, current state: warnNotifiedState:${warnNotifiedState}, criticalNotifiedState:${criticalNotifiedState}, warnThreshold:${Settings.warningLevel}, critThreshold:${Settings.criticalLevel}, battPercent:${batteryPercent}, battRaw:${batteryState.flLevel}`)
       console.debug(batteryState)
       SteamUtils.notify("AutoSuspend", "Critical limit exceeded, suspending device", Settings.notificationEnabled, Settings.soundEnabled, 5000)
       setTimeout(() => {SteamUtils.suspend();}, 5500)
       criticalNotifiedState = true
-    } else if (!warnNotifiedState && batteryPercent < Settings.warningLevel && Settings.warningLevel > Settings.criticalLevel && !criticalNotifiedState) {
+    } else if (!warnNotifiedState && batteryPercent <= Settings.warningLevel && Settings.warningLevel > Settings.criticalLevel && !criticalNotifiedState) {
       console.debug(`[AutoSuspend] Warning threshold triggered, current state: warnNotifiedState:${warnNotifiedState}, criticalNotifiedState:${criticalNotifiedState}, warnThreshold:${Settings.warningLevel}, critThreshold:${Settings.criticalLevel}, battPercent:${batteryPercent}, battRaw:${batteryState.flLevel}`)
       console.debug(batteryState)
       SteamUtils.notify("AutoSuspend", "Warning limit exceeded")
