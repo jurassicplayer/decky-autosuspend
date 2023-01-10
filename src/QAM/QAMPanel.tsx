@@ -18,7 +18,6 @@ export const QAMPanel: VFC = () => {
   const onSaveButton = () => {
     Settings.warningLevel = warningLevel;
     Settings.criticalLevel = criticalLevel;
-    console.debug(`[AutoSuspend] Threshold settings changed, saving warning:${Settings.warningLevel}, critical:${Settings.criticalLevel}`)
     Settings.saveToLocalStorage();
   }
 

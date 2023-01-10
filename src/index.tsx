@@ -1,17 +1,10 @@
-import {
-  definePlugin,
-  ServerAPI,
-  staticClasses
-} from "decky-frontend-lib"
+import { definePlugin, ServerAPI, staticClasses } from "decky-frontend-lib"
 import { FaBatteryQuarter } from "react-icons/fa"
 import { QAMPanel } from "./QAM/QAMPanel"
 import { Settings } from "./Utils/Settings"
 import { Backend } from "./Utils/Backend"
 import { SteamUtils } from "./Utils/SteamUtils"
 import { events } from "./Utils/Events"
-
-
-
 
 export default definePlugin((serverApi: ServerAPI) => {
   Backend.initBackend(serverApi)

@@ -18,7 +18,6 @@ export class Settings {
   }
 
   static async saveToLocalStorage() {
-    console.debug("[AutoSuspend] Saving settings to storage")
     let promises = Object.keys(this).map(key => {
       return Backend.setSetting(key, this[key])
     })

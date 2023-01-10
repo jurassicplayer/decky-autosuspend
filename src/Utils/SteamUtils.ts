@@ -2,17 +2,14 @@ import { findModuleChild, Module, ToastData } from "decky-frontend-lib";
 import { Settings } from "./Settings"
 
 const findModule = (property: string) => {
-  console.debug(`[AutoSuspend] Finding module for '${property}'`)
   return findModuleChild((m: Module) => {
     if (typeof m !== "object") return undefined;
     for (let prop in m) {
       try {
         if (m[prop][property]) {
-          console.debug("[AutoSuspend] module: ", m[prop])
           return m[prop];
         }
       } catch (e) {
-        console.debug(`[AutoSuspend] Unable to findModuleChild for '${property}'`)
         return undefined;
       }
     }
