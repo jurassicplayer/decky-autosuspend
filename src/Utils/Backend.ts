@@ -45,9 +45,7 @@ export class Backend {
     this.eventBus.dispatchEvent(new events.AppStateEvent(this.appState.state))
   }
   static getAppState() { return this.appState.state }
-  static setAppInitialized(state: boolean) { 
-    console.debug(`[AutoSuspend] Setting backend AppInitialized: ${state}`)
-    this.appState.initialized = state }
+  static setAppInitialized(state: boolean) { this.appState.initialized = state }
   static getAppInitialized() { return this.appState.initialized }
 
   static async bridge(functionName: string, namedArgs?: any) {
