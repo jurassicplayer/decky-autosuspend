@@ -1,8 +1,8 @@
 import { Backend } from './Backend'
 
 export class Settings {
-  public static notificationEnabled: boolean = true
-  public static soundEnabled: boolean = true
+  public static showToast: boolean = true
+  public static playSound: boolean = true
   public static warningLevel: number = 20
   public static criticalLevel: number = 10
 
