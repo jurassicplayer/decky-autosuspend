@@ -1,16 +1,16 @@
 ## Decky-AutoSuspend Plugin
-A plugin to notify and automatically suspend your steamdeck console when passing a battery percentage threshold.
+A plugin to notify and automatically suspend your steamdeck console when passing battery percentage thresholds.
 ![Main View](./assets/thumbnail.png)
 
 ## Overview
-This plugin provides audible and toast notifications when reaching a warning and critical battery level. The warning and critical thresholds are user-defined and the audible notification can be turned off if a silent auto-suspend is preferred.
+This plugin provides audible and toast notifications when reaching an overcharge and warning battery levels. It will also send a notification and autosuspend the device at critical battery levels. Thresholds can be enabled/disabled independently and the notifications can be toggled off if completely silent autosuspend is preferred.
 
 ## Installation
 #### Decky-Loader Store
 1. [Install decky-loader](https://github.com/SteamDeckHomebrew/decky-loader#installation)
 2. Use the built in plugin store to download the AutoSuspend plugin
 #### Manual Installation
-For manual installation, you will need to use the terminal a little (decky-loader has some bugs with setting the right permissions for some folders atm) and a keyboard would be preferred (not required), but it's not a daunting task and hopefully these instructions will be easy enough to follow. Please follow them in order, from top to bottom.
+For manual installation, steps 8-13 are optional, but will require a terminal and a keyboard preferably (not required), and just changes the AutoSuspend folder's owner to `deck`. Please follow them in order, from top to bottom.
 
 1. Start the deck in Gaming Mode
 2. Open Decky-Loader in the QAM
@@ -24,7 +24,7 @@ For manual installation, you will need to use the terminal a little (decky-loade
 9. Open the start menu
 10. Search and open the application called `Konsole`
 11. Type in the following command
-  - `sudo chown -R deck:deck ~/homebrew/plugins/decky-autosuspend && sudo chown -R deck:deck ~/homebrew/settings`
+  - `sudo chown -R deck:deck ~/homebrew/plugins/decky-autosuspend`
 12. Press Enter to run the command (it will prompt for your password, which is the same one you used when you installed decky-loader)
 13. Return to Gaming Mode and enjoy \o/
 
@@ -36,10 +36,11 @@ For manual installation, you will need to use the terminal a little (decky-loade
 ## Functionality
 - Notifications are only sent AFTER passing the threshold value and do not get sent again until charging above the threshold
    - Ex. With a threshold value of 40%
-      - A notification will be sent at 39% and threshold won't send another until reset
+      - A notification will be sent at 40% and threshold won't send another until reset
       - The notification will be reset after charging up to at least 41%
-- The `Apply Settings` button is specifically for the warning/critical sliders, notification settings are applied instantly.
+- The `Apply Settings` button is specifically for the warning/critical/overcharge sliders, notification settings are applied instantly.
 - The warning threshold slider will be disabled when lower than the critical threshold.
+- The overcharge threshold slider will be disabled when lower than either warning or critical thresholds.
 
 ## Ran Into an Issue?
 - In order to properly assess what could potentially be happening, you must be able to reproduce the issue or provide steps for me to attempt reproducing the issue. In the event that you are able to repeatedly reproduce the issue, please follow the following steps and submit the logs so I can fix it for you :D (that's the hope anyways).
