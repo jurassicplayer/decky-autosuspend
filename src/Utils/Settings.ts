@@ -11,14 +11,19 @@ export class Settings {
   public static overchargeLevel: number = 80
 
   static async loadFromLocalStorage() {
-    console.debug("[AutoSuspend] Loading settings from storage")
+    let settings = "[AutoSuspend] Loaded settings from storage"
     for (let key in this) {
-      if (typeof this[key] == "boolean") this[key] = (await Backend.getSetting(key, this[key])) as boolean
-      else if (typeof this[key] == "number") this[key] = (await Backend.getSetting(key, this[key])) as number
-      else if (typeof this[key] == "string") this[key] = (await Backend.getSetting(key, this[key])) as string
-      else if (this[key] instanceof Date) this[key] = (await Backend.getSetting(key, this[key])) as Date
-      console.debug(`[AutoSuspend] ${key}: ${this[key]}`)
+      try {
+        if (typeof this[key] == "boolean") this[key] = (await Backend.getSetting(key, this[key])) as boolean
+        else if (typeof this[key] == "number") this[key] = (await Backend.getSetting(key, this[key])) as number
+        else if (typeof this[key] == "string") this[key] = (await Backend.getSetting(key, this[key])) as string
+        else if (this[key] instanceof Date) this[key] = new Date((await Backend.getSetting(key, this[key])).toString())
+        settings += `\n ${key}: ${this[key]}`
+      } catch (error) {
+        console.debug(`[AutoSuspend] Failed to load setting: ${key}`)
+      }
     }
+    console.debug(settings)
   }
 
   static async saveToLocalStorage() {
