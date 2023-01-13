@@ -30,29 +30,29 @@ export default definePlugin((serverApi: ServerAPI) => {
       battPercent:${batteryPercent}
       battRaw:${batteryState.flLevel}`
     if (Settings.criticalEnabled && !criticalNotifiedState && batteryPercent <= (Settings.criticalLevel+offset - resolution) ) {
-      console.debug(`[AutoSuspend] Critical threshold triggered, current state: ${debugInfo}`)
+      console.debug(`[AutoSuspend] Critical threshold triggered, current state:\n${debugInfo}`)
       SteamUtils.notify("AutoSuspend", "Critical limit exceeded, suspending device", undefined, undefined, undefined, 5000)
       setTimeout(() => {SteamUtils.suspend();}, 5500)
       criticalNotifiedState = true
     } else if (Settings.warningEnabled && !warnNotifiedState && batteryPercent <= (Settings.warningLevel+offset - resolution) && Settings.warningLevel > Settings.criticalLevel && !criticalNotifiedState) {
-      console.debug(`[AutoSuspend] Warning threshold triggered, current state: ${debugInfo}`)
+      console.debug(`[AutoSuspend] Warning threshold triggered, current state:\n${debugInfo}`)
       SteamUtils.notify("AutoSuspend", "Warning limit exceeded")
       warnNotifiedState = true
     } else if (Settings.overchargeEnabled && !overchargeNotifiedState && batteryPercent >= (Settings.overchargeLevel+offset + resolution) && (Settings.overchargeLevel > Settings.criticalLevel && Settings.overchargeLevel > Settings.warningLevel)) {
-      console.debug(`[AutoSuspend] Overcharge threshold triggered, current state: ${debugInfo}`)
+      console.debug(`[AutoSuspend] Overcharge threshold triggered, current state:\n${debugInfo}`)
       SteamUtils.notify("AutoSuspend", "Overcharge limit exceeded")
       overchargeNotifiedState = true
     }
     if (Settings.overchargeEnabled && overchargeNotifiedState && batteryPercent < Settings.overchargeLevel+offset - resolution) {
-      console.debug(`[AutoSuspend] Reset overchargeNotifiedState, current state: ${debugInfo}`)
+      console.debug(`[AutoSuspend] Reset overchargeNotifiedState, current state:\n${debugInfo}`)
       overchargeNotifiedState = false
     }
     if (Settings.criticalEnabled && criticalNotifiedState && batteryPercent > (Settings.criticalLevel+offset + resolution)) {
-      console.debug(`[AutoSuspend] Reset criticalNotifiedState, current state: ${debugInfo}`)
+      console.debug(`[AutoSuspend] Reset criticalNotifiedState, current state:\n${debugInfo}`)
       criticalNotifiedState = false
     }
     if (Settings.warningEnabled && warnNotifiedState && batteryPercent > (Settings.warningLevel+offset + resolution)) {
-      console.debug(`[AutoSuspend] Reset warnNotifiedState, current state: ${debugInfo}`)
+      console.debug(`[AutoSuspend] Reset warnNotifiedState, current state:\n${debugInfo}`)
       warnNotifiedState = false
     }
   }
