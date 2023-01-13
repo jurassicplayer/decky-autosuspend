@@ -3,8 +3,12 @@ import { Backend } from './Backend'
 export class Settings {
   public static showToast: boolean = true
   public static playSound: boolean = true
+  public static warningEnabled: boolean = true
+  public static criticalEnabled: boolean = true
+  public static overchargeEnabled: boolean = false
   public static warningLevel: number = 20
   public static criticalLevel: number = 10
+  public static overchargeLevel: number = 80
 
   static async loadFromLocalStorage() {
     console.debug("[AutoSuspend] Loading settings from storage")
