@@ -92,7 +92,7 @@ export const QAMPanel: VFC = () => {
               max={100}
               min={0}
               showValue={true}
-              disabled={overchargeEnabled && overchargeLevel > (criticalLevel || warningLevel) ? false : true}
+              disabled={overchargeEnabled && (overchargeLevel > criticalLevel && overchargeLevel > warningLevel) ? false : true}
               editableValue={true}
               onChange={onOverchargeLevelSlider}
             />

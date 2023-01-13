@@ -38,7 +38,7 @@ export default definePlugin((serverApi: ServerAPI) => {
       console.debug(`[AutoSuspend] Warning threshold triggered, current state: ${debugInfo}`)
       SteamUtils.notify("AutoSuspend", "Warning limit exceeded")
       warnNotifiedState = true
-    } else if (Settings.overchargeEnabled && !overchargeNotifiedState && batteryPercent >= (Settings.overchargeLevel+offset + resolution) && Settings.overchargeLevel > (Settings.warningLevel || Settings.criticalLevel)) {
+    } else if (Settings.overchargeEnabled && !overchargeNotifiedState && batteryPercent >= (Settings.overchargeLevel+offset + resolution) && (Settings.overchargeLevel > Settings.criticalLevel && Settings.overchargeLevel > Settings.warningLevel)) {
       console.debug(`[AutoSuspend] Overcharge threshold triggered, current state: ${debugInfo}`)
       SteamUtils.notify("AutoSuspend", "Overcharge limit exceeded")
       overchargeNotifiedState = true
