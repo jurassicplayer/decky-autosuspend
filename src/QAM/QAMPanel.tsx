@@ -50,6 +50,7 @@ export const QAMPanel: VFC = () => {
               max={100}
               min={0}
               showValue={true}
+              validValues={(n: number) => 100 >= n && n >= 0 && n == Math.trunc(n)}
               disabled={warningEnabled && warningLevel >= criticalLevel ? false : true}
               editableValue={true}
               onChange={onWarningLevelSlider}
@@ -71,6 +72,7 @@ export const QAMPanel: VFC = () => {
               max={100}
               min={0}
               showValue={true}
+              validValues={(n: number) => 100 >= n && n >= 0 && n == Math.trunc(n)}
               disabled={!criticalEnabled}
               editableValue={true}
               onChange={onCriticalLevelSlider}
@@ -92,6 +94,7 @@ export const QAMPanel: VFC = () => {
               max={100}
               min={0}
               showValue={true}
+              validValues={(n: number) => 100 >= n && n >= 0 && n == Math.trunc(n)}
               disabled={overchargeEnabled && (overchargeLevel > criticalLevel && overchargeLevel > warningLevel) ? false : true}
               editableValue={true}
               onChange={onOverchargeLevelSlider}
