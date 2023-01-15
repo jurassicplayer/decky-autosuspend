@@ -18,7 +18,7 @@ export class Settings {
         else if (typeof this[key] == "number") this[key] = (await Backend.getSetting(key, this[key])) as number
         else if (typeof this[key] == "string") this[key] = (await Backend.getSetting(key, this[key])) as string
         else if (this[key] instanceof Date) this[key] = new Date((await Backend.getSetting(key, this[key])).toString())
-        settings += `\n ${key}: ${this[key]}`
+        settings += `\n\t${key}: ${this[key]}`
       } catch (error) {
         console.debug(`[AutoSuspend] Failed to load setting: ${key}`)
       }
