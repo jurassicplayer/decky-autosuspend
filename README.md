@@ -29,6 +29,7 @@ For manual installation, steps 8-13 are optional, but will require a terminal an
 13. Return to Gaming Mode and enjoy \o/
 
 ## Usage
+- Press the hamburger menu button to toggle visibility of disabled thresholds
 - Adjust the warning and critical threshold sliders to the desired percentage using either the slider or the entry box
 - Apply threshold settings with the `Apply Changes` button
 - Adjust notifications to your preference: Toast & Sound, Toast Only, Sound Only, or No notifications
