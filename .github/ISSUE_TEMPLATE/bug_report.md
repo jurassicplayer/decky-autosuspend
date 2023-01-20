@@ -26,5 +26,11 @@ Steps to reproduce the behavior:
  - Loader Version: [e.g. v2.5.0-pre1, v2.4.15]
  - Plugin Version: [e.g. v1.3.4]
 
+**Other plugins installed**
+ - Please add a list of all of the other decky-loader plugins installed
+
 **Additional context**
-Add any other context about the problem here.
+Please include the following:
+ - Output of `journalctl -eu plugin_loader.service > decky-loader.log`
+ - Log file from `/tmp/autosuspend.log`
+ - Screenshots of the CEF console log
