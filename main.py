@@ -1,19 +1,28 @@
 #!/usr/bin/env python
-import logging
-logging.basicConfig(filename="/tmp/autosuspend.log",
+import logging, os
+from settings import SettingsManager # type: ignore
+from helpers import get_user_id, get_home_path # type: ignore
+
+# Setup environment variables
+settingsDir = os.environ["DECKY_PLUGIN_SETTINGS_DIR"]
+loggingDir = os.environ["DECKY_PLUGIN_LOG_DIR"]
+
+# Setup backend logger
+logging.basicConfig(filename=os.path.join(loggingDir, 'backend.log'),
                     format='[AutoSuspend] %(asctime)s %(levelname)s %(message)s',
                     filemode='w+',
                     force=True)
 logger=logging.getLogger()
 logger.setLevel(logging.INFO) # can be changed to logging.DEBUG for debugging issues
 
-# Initialize decky-loader settings manager
-from settings import SettingsManager
-from helpers import get_home_path, get_homebrew_path, get_user
+# Migrate any old settings
+oldSettingsPath = os.path.join(get_home_path(), 'settings', 'autosuspend.json')
+if os.path.exists(oldSettingsPath):
+    os.replace(oldSettingsPath, os.path.join(settingsDir, 'settings.json'))
 
 import os
-logger.info('Settings path: {}{}settings'.format(get_homebrew_path(get_home_path(get_user())), os.sep))
-settings = SettingsManager(name="autosuspend", settings_directory='{}{}settings'.format(get_homebrew_path(get_home_path(get_user())), os.sep))
+logger.info('Settings path: {}'.format(os.path.join(settingsDir, 'settings.json')))
+settings = SettingsManager(name="settings", settings_directory=settingsDir)
 settings.read()
 
 class Plugin:
