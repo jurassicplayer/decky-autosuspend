@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 import logging, os
 from settings import SettingsManager # type: ignore
-from helpers import get_user_id, get_home_path # type: ignore
 
 # Setup environment variables
+deckyHomeDir = os.environ["DECKY_HOME"]
 settingsDir = os.environ["DECKY_PLUGIN_SETTINGS_DIR"]
 loggingDir = os.environ["DECKY_PLUGIN_LOG_DIR"]
 
@@ -16,12 +16,16 @@ logger=logging.getLogger()
 logger.setLevel(logging.INFO) # can be changed to logging.DEBUG for debugging issues
 
 # Migrate any old settings
-oldSettingsPath = os.path.join(get_home_path(), 'settings', 'autosuspend.json')
+newSettingsPath = os.path.join(settingsDir, 'settings.json')
+oldSettingsPath = os.path.join(deckyHomeDir, 'settings', 'autosuspend.json')
 if os.path.exists(oldSettingsPath):
-    os.replace(oldSettingsPath, os.path.join(settingsDir, 'settings.json'))
+  logger.info(f'Migrating settings: {oldSettingsPath} => {newSettingsPath}')
+  try:
+    os.replace(oldSettingsPath, newSettingsPath)
+  except Exception as e:
+    logger.info(f'Failed to migrate old settings: {e}')
 
-import os
-logger.info('Settings path: {}'.format(os.path.join(settingsDir, 'settings.json')))
+logger.info('Settings path: {}'.format(newSettingsPath))
 settings = SettingsManager(name="settings", settings_directory=settingsDir)
 settings.read()
 
