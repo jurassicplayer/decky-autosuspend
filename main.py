@@ -15,17 +15,7 @@ logging.basicConfig(filename=os.path.join(loggingDir, 'backend.log'),
 logger=logging.getLogger()
 logger.setLevel(logging.INFO) # can be changed to logging.DEBUG for debugging issues
 
-# Migrate any old settings
-newSettingsPath = os.path.join(settingsDir, 'settings.json')
-oldSettingsPath = os.path.join(deckyHomeDir, 'settings', 'autosuspend.json')
-if os.path.exists(oldSettingsPath):
-  logger.info(f'Migrating settings: {oldSettingsPath} => {newSettingsPath}')
-  try:
-    os.replace(oldSettingsPath, newSettingsPath)
-  except Exception as e:
-    logger.info(f'Failed to migrate old settings: {e}')
-
-logger.info('Settings path: {}'.format(newSettingsPath))
+logger.info('Settings path: {}'.format(settingsDir))
 settings = SettingsManager(name="settings", settings_directory=settingsDir)
 settings.read()
 
