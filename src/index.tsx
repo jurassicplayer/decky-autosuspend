@@ -57,9 +57,9 @@ export default definePlugin((serverApi: ServerAPI) => {
       warnNotifiedState = false
     }
   }
-  Backend.eventBus.addEventListener(events.BatteryStateEvent.eType, IntervalCheck)
   Backend.setAppInitialized(true)
   let appCtx = new AppContextState(serverApi)
+  appCtx.eventBus.addEventListener(events.BatteryStateEvent.eType, IntervalCheck)
 
   return {
     title: <div className={staticClasses.Title}>AutoSuspend</div>,
