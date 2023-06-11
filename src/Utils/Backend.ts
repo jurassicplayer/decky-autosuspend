@@ -36,7 +36,7 @@ export class Backend {
   }
   static setBatteryStateChange(batteryState: BatteryState) {
     this.pseudoBatteryState = batteryState
-    this.eventBus.dispatchEvent(new events.BatteryStateEvent(this.pseudoBatteryState))
+    //this.eventBus.dispatchEvent(new events.BatteryStateEvent(this.pseudoBatteryState))
   }
   static setServer(server: ServerAPI) { this.serverAPI = server }
   static getServer() { return this.serverAPI }

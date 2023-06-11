@@ -3,7 +3,8 @@ import { ServerAPI } from "decky-frontend-lib"
 import { BackendCtx } from "./Backend"
 import { BatteryState } from "../lib/SteamClient"
 import { SettingsProps, SettingsManager } from "./Settings"
-import { Logger } from './Logger'
+import { events } from "./Events"
+import { Logger } from "./Logger"
 
 interface AppInfo {
   initialized: boolean
@@ -50,7 +51,7 @@ export class AppContextState implements Context {
   }
   updateBatteryState(batteryState: BatteryState) {
     this.batteryState = batteryState
-    //this.eventBus.dispatchEvent(new events.BatteryStateEvent(this.deckBatteryState))
+    this.eventBus.dispatchEvent(new events.BatteryStateEvent(this.batteryState))
   }
 }
 // #endregion
