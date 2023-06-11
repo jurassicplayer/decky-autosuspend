@@ -1,6 +1,7 @@
 import { findModuleChild, Module, ToastData } from "decky-frontend-lib";
-import { Backend } from "./Backend"
+import { BackendCtx } from "./Backend"
 import { Settings } from "./Settings"
+import { Logger } from "./Logger"
 
 const findModule = (property: string) => {
   return findModuleChild((m: Module) => {
@@ -18,11 +19,11 @@ const findModule = (property: string) => {
 }
 
 const SleepParent = findModule("InitiateSleep")
-const NavSoundMap = findModule("ToastMisc")
+export const NavSoundMap = findModule("ToastMisc")
 
 export class SteamUtils {
   static async suspend() {
-    console.debug('[AutoSuspend] Sending suspend request to SteamOS')
+    await Logger.debug('Sending suspend request to SteamOS')
     SleepParent.OnSuspendRequest()
   }
 
@@ -39,7 +40,7 @@ export class SteamUtils {
       playSound: playSound,
       showToast: showToast
     }
-    Backend.getServer().toaster.toast(toastData)
+    BackendCtx.serverAPI.toaster.toast(toastData)
   }
   //#endregion
 }
