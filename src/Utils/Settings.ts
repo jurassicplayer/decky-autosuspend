@@ -1,5 +1,6 @@
 import { Backend, BackendCtx } from './Backend'
 import { Logger } from './Logger'
+import { NavSoundMap } from './SteamUtils'
 
 export class Settings {
   public static showToast: boolean = true
@@ -44,34 +45,6 @@ export class Settings {
 
 
 // #region Enumerations
-enum toastSfx {
-  LaunchGame = 'LaunchGame',
-  FriendMessage = 'FriendMessage',
-  ChatMention = 'ChatMention',
-  ChatMessage = 'ChatMessage',
-  ToastMessage = 'ToastMessage',
-  ToastAchievement = 'ToastAchievement',
-  ToastMisc = 'ToastMisc',
-  FriendOnline = 'FriendOnline',
-  FriendInGame = 'FriendInGame',
-  VolSound = 'VolSound',
-  ShowModal = 'ShowModal',
-  HideModal = 'HideModal',
-  IntoGameDetail = 'IntoGameDetail',
-  OutOfGameDetail = 'OutOfGameDetail',
-  PagedNavigation = 'PagedNavigation',
-  ToggleOn = 'ToggleOn',
-  ToggleOff = 'ToggleOff',
-  SliderUp = 'SliderUp',
-  SliderDown = 'SliderDown',
-  ChangeTabs = 'ChangeTabs',
-  DefaultOk = 'DefaultOk',
-  OpenSideMenu = 'OpenSideMenu',
-  CloseSideMenu = 'CloseSideMenu',
-  BasicNav = 'BasicNav',
-  FailedNav = 'FailedNav',
-  Typing = 'Typing'
-}
 enum alarmTypes {
   none = 'none',
   repeatToast = 'repeatToast',
@@ -121,7 +94,7 @@ export interface SettingsProps {
 export const defaultSettings: SettingsProps = {
   defaultShowToast: true,
   defaultPlaySound: true,
-  defaultSound: toastSfx.ToastMisc,
+  defaultSound: NavSoundMap.ToastMisc,
   defaultAlarmType: alarmTypes.none,
   defaultAlarmRepeat: 0,
   alarms: {
@@ -159,8 +132,9 @@ export class SettingsManager {
         invalidNotices.push(`Invalid setting [${key}]: expected ${typeof settings[key]}, found ${typeof setting}`)
         continue
       }
-      // Validate settings: remove wrong interface typing (toastSfx, alarmTypes, thresholdTypes, triggerActions)
-      if (key == 'defaultSound' && !Object.values(toastSfx).includes(setting as toastSfx)) {
+      // Validate settings: remove wrong interface typing (navSound, alarmTypes, thresholdTypes, triggerActions)
+      // @ts-ignore
+      if (key == 'defaultSound' && !(setting in NavSoundMap)) {
         invalidNotices.push(`Invalid setting [${key}]: "${setting}" is not a valid sound`)
         continue
       }
@@ -209,8 +183,8 @@ export class SettingsManager {
         invalidNotices.push(`\tInvalid setting [${key}]: expected ${typeof defaults[key]}, found ${typeof setting}`)
         continue
       }
-      // Validate settings: remove wrong interface typing (toastSfx, alarmTypes, thresholdTypes, triggerActions)
-      if (key == 'sound' && (!Object.values(toastSfx).includes(setting as toastSfx) && (typeof setting) != 'undefined')) {
+      // Validate settings: remove wrong interface typing (navSound, alarmTypes, thresholdTypes, triggerActions)
+      if (key == 'sound' && (!(setting in NavSoundMap) && (typeof setting) != 'undefined')) {
         invalidNotices.push(`\tInvalid setting [${key}]: "${setting}" is not a valid sound`)
         continue
       }
