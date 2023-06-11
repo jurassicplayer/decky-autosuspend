@@ -115,6 +115,7 @@ export const defaultSettings: SettingsProps = {
   } 
 }
 // #endregion
+
 export class SettingsManager {
   static async saveToFile(userSettings: SettingsProps) {
     let settings: {[key:string]: any} = {...userSettings}
@@ -125,6 +126,7 @@ export class SettingsManager {
       await BackendCtx.commitSettings()
     })
   }
+  
   static async loadFromFile() {
     let settings: {[key:string]: any} = {...defaultSettings}
     let invalidNotices: string[] = []
