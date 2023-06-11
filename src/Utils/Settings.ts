@@ -118,9 +118,12 @@ export const defaultSettings: SettingsProps = {
 export class SettingsManager {
   static async saveToFile(userSettings: SettingsProps) {
     let settings: {[key:string]: any} = {...userSettings}
-    for (let key in settings) {
-      await BackendCtx.setSetting(key, settings[key])
-    }
+    let promises = Object.keys(settings).map(key => {
+      return BackendCtx.setSetting(key, settings[key])
+    })
+    Promise.all(promises).then(async () => {
+      await BackendCtx.commitSettings()
+    })
   }
   static async loadFromFile() {
     let settings: {[key:string]: any} = {...defaultSettings}
