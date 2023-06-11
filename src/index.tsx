@@ -5,6 +5,7 @@ import { Settings } from "./Utils/Settings"
 import { Backend } from "./Utils/Backend"
 import { SteamUtils } from "./Utils/SteamUtils"
 import { events } from "./Utils/Events"
+import { AppContextProvider, AppContextState } from "./Utils/Context"
 
 export default definePlugin((serverApi: ServerAPI) => {
   Backend.initBackend(serverApi)
@@ -58,10 +59,11 @@ export default definePlugin((serverApi: ServerAPI) => {
   }
   Backend.eventBus.addEventListener(events.BatteryStateEvent.eType, IntervalCheck)
   Backend.setAppInitialized(true)
+  let appCtx = new AppContextState(serverApi)
 
   return {
     title: <div className={staticClasses.Title}>AutoSuspend</div>,
-    content: <QAMPanel />,
+    content:  <AppContextProvider appContextState={appCtx}><QAMPanel /></AppContextProvider>,
     icon: <FaBatteryQuarter />,
     onDismount: () => {
       Backend.eventBus.removeEventListener(events.BatteryStateEvent.eType, IntervalCheck)
