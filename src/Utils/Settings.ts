@@ -143,6 +143,7 @@ export class SettingsManager {
     Promise.all(promises).then(async () => {
       await BackendCtx.commitSettings()
     })
+    Logger.info('Saved user settings')
   }
 
   static async loadFromFile() {
@@ -186,6 +187,7 @@ export class SettingsManager {
       console.log(invalidNotices.join('\n'))
     }
     let allSettings = { validSettings: (validSettings as SettingsProps), userSettings: (userSettings as SettingsProps) }
+    Logger.info('Loaded user settings')
     return allSettings
   }
 
@@ -210,5 +212,12 @@ export class SettingsManager {
       invalidNotice = `[${key}]: "${setting}" is not a valid trigger action`
     }
     return invalidNotice
+  }
+
+  static loadFromLocalStorage(key: string, defaults: any) {
+    console.log(key, defaults)
+  }
+  static saveToLocalStorage(key: string, value: any) {
+    console.log(key, value)
   }
 }
