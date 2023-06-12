@@ -74,6 +74,8 @@ interface AlarmSetting {
   thresholdLevel: number
   thresholdType: thresholdTypes
   triggeredAction: triggerActions
+  enabled: boolean
+  profile?: string
   sortOrder: number
 }
 interface Alarms {
@@ -103,6 +105,7 @@ export const defaultSettings: SettingsProps = {
       thresholdLevel: 20,
       thresholdType: thresholdTypes.discharge,
       triggeredAction: triggerActions.none,
+      enabled: true,
       sortOrder: 0
     },
     defaultCritical: {
@@ -110,9 +113,24 @@ export const defaultSettings: SettingsProps = {
       thresholdLevel: 15,
       thresholdType: thresholdTypes.discharge,
       triggeredAction: triggerActions.suspend,
+      enabled: true,
       sortOrder: 1
     }
   } 
+}
+const exampleAlarmSettings: AlarmSetting = {
+  showToast: true,
+  playSound: true,
+  sound: NavSoundMap[6],
+  alarmType: alarmTypes.none,
+  alarmRepeat: 0,
+  alarmName: 'defaults',
+  thresholdLevel: 0,
+  thresholdType: thresholdTypes.discharge,
+  triggeredAction: triggerActions.none,
+  enabled: true,
+  profile: 'deck',
+  sortOrder: 0
 }
 // #endregion
 
@@ -126,86 +144,71 @@ export class SettingsManager {
       await BackendCtx.commitSettings()
     })
   }
-  
+
   static async loadFromFile() {
     let settings: {[key:string]: any} = {...defaultSettings}
+    let validSettings: {[key:string]: any} = {...defaultSettings}
+    let alarmSettings: {[key:string]: any} = {...exampleAlarmSettings}
+    let userSettings: {[key:string]: any} = {}
     let invalidNotices: string[] = []
     for (let key in settings) {
-      let setting = await BackendCtx.getSetting(key, settings[key])
-      // Validate settings: remove wrong base typing (number, string, boolean, etc.)
-      if ((typeof setting) != (typeof settings[key])) {
-        invalidNotices.push(`Invalid setting [${key}]: expected ${typeof settings[key]}, found ${typeof setting}`)
-        continue
+      userSettings[key] = await BackendCtx.getSetting(key, settings[key])
+      let settingValidation = this.validateKey(key, userSettings[key], settings[key])
+      if (settingValidation == 'valid') {
+        validSettings[key] = userSettings[key]
+      } else {
+        validSettings[key] = settings[key]
+        invalidNotices.push(`\t${settingValidation}`)
       }
-      // Validate settings: remove wrong interface typing (navSound, alarmTypes, thresholdTypes, triggerActions)
-      // @ts-ignore
-      if (key == 'defaultSound' && !(setting in NavSoundMap)) {
-        invalidNotices.push(`Invalid setting [${key}]: "${setting}" is not a valid sound`)
-        continue
-      }
-      if (key == 'defaultAlarmType' && !Object.values(alarmTypes).includes(setting as alarmTypes)) {
-        invalidNotices.push(`Invalid setting [${key}]: "${setting}" is not a valid alarm type`)
-        continue
-      }
-      if (key == 'alarms' && (typeof setting) != 'string') {
-        // @ts-ignore
-        let alarms: Alarms = setting 
-        for (let alarm in alarms) {
-          let alarmInvalidNotices = this.validateAlarm(alarms[alarm])
-          if (alarmInvalidNotices.length > 0) {
-            invalidNotices.push(`Invalid alarm configuration: ${alarm}`)
-            invalidNotices = invalidNotices.concat(alarmInvalidNotices)
-            delete alarms[alarm]
+      if (key == 'alarms' && (typeof userSettings[key]) != 'string') {
+        let alarms: Alarms = {...userSettings[key]}
+        for (let alarmID in alarms) {
+          let invalidAlarm = false
+          let alarm: {[key:string]: any} = {...alarms[alarmID]}
+          let validAlarm: {[key:string]: any} = {}
+          for (let alarmKey in alarmSettings) {
+            let alarmValidation = this.validateKey(alarmKey, alarm[alarmKey], alarmSettings[alarmKey])
+            if (alarmValidation == 'valid') {
+              validAlarm[alarmKey] = alarm[alarmKey]
+            } else {
+              invalidAlarm = true
+              invalidNotices.push(`\t\t[${alarmID}] ${alarmValidation}`)
+            }
           }
+          if (invalidAlarm) { delete alarms[alarmID] }
         }
+        validSettings[key] = alarms
       }
-      settings[key] = setting
     }
-    if (invalidNotices.length > 0) { Logger.warning(invalidNotices.join('\n')) }
-    return settings as SettingsProps
+    if (invalidNotices.length > 0) {
+      invalidNotices.unshift('Invalid settings:')
+      Logger.warning(invalidNotices.join('\n'))
+      console.log(invalidNotices.join('\n'))
+    }
+    let allSettings = { validSettings: (validSettings as SettingsProps), userSettings: (userSettings as SettingsProps) }
+    return allSettings
   }
 
-  static validateAlarm(alarmSettings: AlarmSetting) {
-    let defaults:{[key:string]: any} = {
-      showToast: true,
-      playSound: true,
-      sound: 'ToastMisc',
-      alarmType: 'none',
-      alarmRepeat: 0,
-      alarmName: 'defaults',
-      thresholdLevel: 0,
-      thresholdType: 'discharge',
-      triggeredAction: 'none',
-      sortOrder: 0
+  static validateKey(key: string, setting: any, defaults: any) {
+    let invalidNotice: string = 'valid'
+    let nullableSettings = ['showToast', 'playSound', 'sound', 'alarmType', 'alarmRepeat', 'profile']
+    // Validate settings: remove wrong base typing (number, string, boolean, object, undefined)
+    if (!(typeof setting == typeof defaults) && !(typeof setting == 'undefined' && nullableSettings.includes(key))) {
+      invalidNotice = `[${key}]: expected ${typeof defaults}, found ${typeof setting}`
+    } else
+    // Validate settings: remove wrong interface typing (navSound, alarmTypes, thresholdTypes, triggerActions)
+    if (['defaultSound', 'sound'].includes(key) && (!(setting in NavSoundMap) && (typeof setting) != 'undefined')) {
+      invalidNotice = `[${key}]: "${setting}" is not a valid sound`
+    } else
+    if (['defaultAlarmType', 'alarmType'].includes(key) && (!Object.values(alarmTypes).includes(setting as alarmTypes) && (typeof setting) != 'undefined')) {
+      invalidNotice = `[${key}]: "${setting}" is not a valid alarm type`
+    } else
+    if (key == 'thresholdType' && !Object.values(thresholdTypes).includes(setting as thresholdTypes)) {
+      invalidNotice = `[${key}]: "${setting}" is not a valid threshold type`
+    } else
+    if (key == 'triggeredAction' && !Object.values(triggerActions).includes(setting as triggerActions)) {
+      invalidNotice = `[${key}]: "${setting}" is not a valid trigger action`
     }
-    let settings: {[key:string]: any} = {...alarmSettings}
-    let nullableSettings = ['showToast', 'playSound', 'sound', 'alarmType', 'alarmRepeat']
-    let invalidNotices: string[] = []
-    for (let key in defaults) {
-      // Validate settings: remove wrong base typing (number, string, boolean, etc.)
-      let setting = settings[key]
-      if (!(typeof setting == typeof defaults[key] || (typeof setting == 'undefined' && nullableSettings.includes(key)))) {
-        invalidNotices.push(`\tInvalid setting [${key}]: expected ${typeof defaults[key]}, found ${typeof setting}`)
-        continue
-      }
-      // Validate settings: remove wrong interface typing (navSound, alarmTypes, thresholdTypes, triggerActions)
-      if (key == 'sound' && (!(setting in NavSoundMap) && (typeof setting) != 'undefined')) {
-        invalidNotices.push(`\tInvalid setting [${key}]: "${setting}" is not a valid sound`)
-        continue
-      }
-      if (key == 'alarmType' && (!Object.values(alarmTypes).includes(setting as alarmTypes) && (typeof setting) != 'undefined')) {
-        invalidNotices.push(`\tInvalid setting [${key}]: "${setting}" is not a valid alarm type`)
-        continue
-      }
-      if (key == 'thresholdType' && !Object.values(thresholdTypes).includes(setting as thresholdTypes)) {
-        invalidNotices.push(`\tInvalid setting [${key}]: "${setting}" is not a valid threshold type`)
-        continue
-      }
-      if (key == 'triggeredAction' && !Object.values(triggerActions).includes(setting as triggerActions)) {
-        invalidNotices.push(`\tInvalid setting [${key}]: "${setting}" is not a valid trigger action`)
-        continue
-      }
-    }
-    return invalidNotices
+    return invalidNotice
   }
 }
