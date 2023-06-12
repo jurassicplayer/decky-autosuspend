@@ -28,7 +28,7 @@ export class AppContextState implements Context {
       version: 'v2.0.0'
     }
     BackendCtx.initialize(serverAPI)
-    Logger.info('Initializing app context')
+    Logger.info('Initializing frontend')
     this.intervalID = setInterval(()=>{
       // @ts-ignore
       let currentState = window.SystemPowerStore.batteryState
@@ -49,6 +49,7 @@ export class AppContextState implements Context {
     this.userSettings = userSettings
     this.appInfo.initialized = true
     //await SettingsManager.saveToFile(this.settings)
+    Logger.info('Initialization complete')
   }
   public onDismount() {
     clearInterval(this.intervalID)

@@ -1,6 +1,6 @@
 import { findModuleChild, Module, ToastData } from "decky-frontend-lib";
 import { BackendCtx } from "./Backend"
-import { Settings } from "./Settings"
+import { defaultSettings } from "./Settings"
 import { Logger } from "./Logger"
 
 const findModule = (property: string) => {
@@ -29,9 +29,9 @@ export class SteamUtils {
 
   //#region Notification Wrapper
   static async notify(title: string, message: string, showToast?: boolean, playSound?: boolean, sound?: number, duration?: number) {
-    if (sound === undefined ) sound = NavSoundMap?.ToastMisc // Not important, could pass the actual number instead (6)
-    if (playSound === undefined ) playSound = Settings.playSound
-    if (showToast === undefined ) showToast = Settings.showToast
+    if (sound === undefined ) sound = NavSoundMap[defaultSettings.defaultSound]
+    if (playSound === undefined ) playSound = defaultSettings.defaultPlaySound
+    if (showToast === undefined ) showToast = defaultSettings.defaultShowToast
     let toastData: ToastData = {
       title: title,
       body: message,
