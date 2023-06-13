@@ -15,7 +15,6 @@ interface AppInfo {
 // #region Context definition and constructor
 interface Context {
   settings: SettingsProps       // When modifying settings, apply modification to this and use for plugin.
-  userSettings: SettingsProps   // When modifying settings, apply modification to this and save. Preserves any non-functional alarms for later fixing.
   appInfo: AppInfo
   batteryState: BatteryState
   eventBus: EventTarget
@@ -37,16 +36,13 @@ export class AppContextState implements Context {
     this.initialize()
   }
   public settings!: SettingsProps
-  public userSettings!: SettingsProps
   public appInfo!: AppInfo
   public batteryState!: BatteryState
   public eventBus: EventTarget = new EventTarget()
   private intervalID!: NodeJS.Timer
 
   private async initialize() {
-    let {validSettings, userSettings} = await SettingsManager.loadFromFile()
-    this.settings = validSettings
-    this.userSettings = userSettings
+    this.settings = await SettingsManager.loadFromFile()
     this.appInfo.initialized = true
     //await SettingsManager.saveToFile(this.settings)
     Logger.info('Initialization complete')
