@@ -156,18 +156,27 @@ export class SettingsManager {
   }
 
   static async loadFromFile() {
-    let settings: {[key:string]: any} = {...defaultSettings}
+    let userSettings: {[key:string]: any} = {}
+    let validSettings: {[key:string]: any} = {...defaultSettings}
+    for (let key in validSettings) {
+      userSettings[key] = await BackendCtx.getSetting(key, validSettings[key])
+    }
+    this.userSettings = userSettings as SettingsProps
+    this.settings = await this.validateSettings(this.userSettings)
+    Logger.info('Loaded user settings')
+    return this.settings
+  }
+
+  static validateSettings(settings: SettingsProps): SettingsProps {
+    let userSettings: {[key:string]: any} = {...settings}
     let validSettings: {[key:string]: any} = {...defaultSettings}
     let alarmSettings: {[key:string]: any} = {...exampleAlarmSettings}
-    let userSettings: {[key:string]: any} = {}
     let invalidNotices: string[] = []
-    for (let key in settings) {
-      userSettings[key] = await BackendCtx.getSetting(key, settings[key])
-      let settingValidation = this.validateKey(key, userSettings[key], settings[key])
+    for (let key in validSettings) {
+      let settingValidation = this.validateKey(key, userSettings[key], validSettings[key])
       if (settingValidation == 'valid') {
         validSettings[key] = userSettings[key]
       } else {
-        validSettings[key] = settings[key]
         invalidNotices.push(`\t${settingValidation}`)
       }
       if (key == 'alarms' && (typeof userSettings[key]) != 'string') {
@@ -195,9 +204,7 @@ export class SettingsManager {
       Logger.warning(invalidNotices.join('\n'))
       console.log(invalidNotices.join('\n'))
     }
-    let allSettings = { validSettings: (validSettings as SettingsProps), userSettings: (userSettings as SettingsProps) }
-    Logger.info('Loaded user settings')
-    return allSettings
+    return validSettings as SettingsProps
   }
 
   static validateKey(key: string, setting: any, defaults: any) {
