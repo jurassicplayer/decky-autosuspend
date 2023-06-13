@@ -81,6 +81,11 @@ interface AlarmSetting {
 interface Alarms {
   [uniqueid: string]: AlarmSetting
 }
+interface AlarmHistory {
+  lastTriggered: number
+  sessionStartTime?: number
+  currentPlayTime?: number
+}
 
 export interface SettingsProps {
   defaultShowToast: boolean
@@ -214,10 +219,19 @@ export class SettingsManager {
     return invalidNotice
   }
 
-  static loadFromLocalStorage(key: string, defaults: any) {
-    console.log(key, defaults)
+  static getAlarmHistory(alarmID: string): AlarmHistory | null {
+    let s_histories = localStorage.getItem('autosuspend-alarms')
+    let histories: {[key: string]: AlarmHistory} = JSON.parse(s_histories ? s_histories : '{}')
+    let history = null
+    if (alarmID in histories) { history = histories[alarmID] }
+    Logger.debug(`GetAlarmHistory [${alarmID}]: ${JSON.stringify(history)}`)
+    return history
   }
-  static saveToLocalStorage(key: string, value: any) {
-    console.log(key, value)
+  static setAlarmHistory(alarmID: string, history: AlarmHistory) {
+    let s_histories = localStorage.getItem('autosuspend-alarms')
+    let histories = JSON.parse(s_histories ? s_histories : '{}')
+    histories[alarmID] = history
+    localStorage.setItem('autosuspend-alarms', JSON.stringify(histories))
+    Logger.debug(`SetAlarmHistory [${alarmID}]: ${JSON.stringify(history)}`)
   }
 }
