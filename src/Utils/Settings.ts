@@ -93,6 +93,7 @@ export interface SettingsProps {
   defaultSound: string
   defaultAlarmType: string
   defaultAlarmRepeat: number
+  debuggingMode: boolean
   alarms: Alarms
 }
 // #endregion
@@ -104,6 +105,7 @@ export const defaultSettings: SettingsProps = {
   defaultSound: NavSoundMap.ToastMisc,
   defaultAlarmType: alarmTypes.none,
   defaultAlarmRepeat: 0,
+  debuggingMode: false,
   alarms: {
     defaultWarning: {
       alarmName: 'Warning 20%',
@@ -140,6 +142,8 @@ const exampleAlarmSettings: AlarmSetting = {
 // #endregion
 
 export class SettingsManager {
+  static settings: SettingsProps = defaultSettings
+  static userSettings: SettingsProps
   static async saveToFile(userSettings: SettingsProps) {
     let settings: {[key:string]: any} = {...userSettings}
     let promises = Object.keys(settings).map(key => {
