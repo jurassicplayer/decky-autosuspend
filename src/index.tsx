@@ -10,7 +10,8 @@ import { AlarmSetting, thresholdTypes } from './Utils/Settings'
 const evaluateAlarm = async (alarmID: string, settings: AlarmSetting, context: AppContextState) => {
   let { showToast, playSound, sound, alarmType, alarmRepeat, alarmName, alarmMessage, thresholdLevel, thresholdType, triggeredAction, enabled, profile } = settings
   if (!enabled) { return }
-  if (profile && !(profile == 'CurrentUserProfile')) { return } // ##FIXME## Need a method to get the current logged in steam user to compare against
+  // @ts-ignore
+  if (profile && profile != loginStore.m_strAccountName) { return }
   let history = SettingsManager.getAlarmHistory(alarmID)
   history = history ? history : { triggered: false }
   let triggerAction = false
