@@ -44,10 +44,6 @@ export class AppContextState implements Context {
   private async initialize() {
     this.settings = await SettingsManager.loadFromFile()
     this.appInfo.initialized = true
-    //await SettingsManager.saveToFile(this.settings)
-    // let alarmHistory = SettingsManager.getAlarmHistory('validAlarm')
-    // SettingsManager.setAlarmHistory('validAlarm', {lastTriggered: Date.now(), sessionStartTime: Date.now()})
-    // alarmHistory = SettingsManager.getAlarmHistory('validAlarm')
     Logger.info('Initialization complete')
   }
   public onDismount() {
