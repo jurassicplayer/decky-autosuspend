@@ -2,7 +2,6 @@ import { definePlugin, ServerAPI, staticClasses } from "decky-frontend-lib"
 import { FaBatteryQuarter } from "react-icons/fa"
 import { QAMPanel } from "./QAM/QAMPanel"
 import { alarmTypes, SettingsManager, triggerActions } from "./Utils/Settings"
-import { Backend } from "./Utils/Backend"
 import { SteamUtils } from "./Utils/SteamUtils"
 import { events } from "./Utils/Events"
 import { AppContextProvider, AppContextState } from "./Utils/Context"
@@ -113,8 +112,8 @@ export default definePlugin((serverApi: ServerAPI) => {
     content:  <AppContextProvider appContextState={appCtx}><QAMPanel /></AppContextProvider>,
     icon: <FaBatteryQuarter />,
     onDismount: () => {
-      Backend.eventBus.removeEventListener(events.BatteryStateEvent.eType, IntervalCheck)
-      Backend.onDismount()
+      appCtx.eventBus.removeEventListener(events.BatteryStateEvent.eType, IntervalCheck)
+      appCtx.onDismount()
     }
   }
 })
