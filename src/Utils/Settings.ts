@@ -45,32 +45,33 @@ export class Settings {
 
 
 // #region Enumerations
-enum alarmTypes {
+export enum alarmTypes {
   none = 'none',
   repeatToast = 'repeatToast',
   repeatSound = 'repeatSound',
   repeatBoth = 'repeatBoth'
 }
-enum thresholdTypes {
+export enum thresholdTypes {
   overcharge = 'overcharge',
   discharge = 'discharge',
   dailyPlaytime = 'dailyPlaytime',
   bedtime = 'bedtime'
 }
-enum triggerActions {
+export enum triggerActions {
   none = 'none',
   suspend = 'suspend'
 }
 // #endregion
 
 // #region Interfaces
-interface AlarmSetting {
+export interface AlarmSetting {
   showToast?: boolean
   playSound?: boolean
   sound?: string
   alarmType?: alarmTypes
   alarmRepeat?: number
   alarmName: string
+  alarmMessage?: string
   thresholdLevel: number
   thresholdType: thresholdTypes
   triggeredAction: triggerActions
@@ -82,7 +83,8 @@ interface Alarms {
   [uniqueid: string]: AlarmSetting
 }
 interface AlarmHistory {
-  lastTriggered: number
+  triggered: boolean
+  lastTriggered?: number
   sessionStartTime?: number
   currentPlayTime?: number
 }
@@ -131,12 +133,13 @@ const exampleAlarmSettings: AlarmSetting = {
   sound: NavSoundMap[6],
   alarmType: alarmTypes.none,
   alarmRepeat: 0,
-  alarmName: 'defaults',
+  alarmName: '',
+  alarmMessage: '',
   thresholdLevel: 0,
   thresholdType: thresholdTypes.discharge,
   triggeredAction: triggerActions.none,
   enabled: true,
-  profile: 'deck',
+  profile: '',
   sortOrder: 0
 }
 // #endregion
@@ -209,7 +212,7 @@ export class SettingsManager {
 
   static validateKey(key: string, setting: any, defaults: any) {
     let invalidNotice: string = 'valid'
-    let nullableSettings = ['showToast', 'playSound', 'sound', 'alarmType', 'alarmRepeat', 'profile']
+    let nullableSettings = ['showToast', 'playSound', 'sound', 'alarmType', 'alarmRepeat', 'alarmMessage', 'profile']
     // Validate settings: remove wrong base typing (number, string, boolean, object, undefined)
     if (!(typeof setting == typeof defaults) && !(typeof setting == 'undefined' && nullableSettings.includes(key))) {
       invalidNotice = `[${key}]: expected ${typeof defaults}, found ${typeof setting}`
@@ -235,7 +238,6 @@ export class SettingsManager {
     let histories: {[key: string]: AlarmHistory} = JSON.parse(s_histories ? s_histories : '{}')
     let history = null
     if (alarmID in histories) { history = histories[alarmID] }
-    Logger.debug(`GetAlarmHistory [${alarmID}]: ${JSON.stringify(history)}`)
     return history
   }
   static setAlarmHistory(alarmID: string, history: AlarmHistory) {
@@ -243,6 +245,5 @@ export class SettingsManager {
     let histories = JSON.parse(s_histories ? s_histories : '{}')
     histories[alarmID] = history
     localStorage.setItem('autosuspend-alarms', JSON.stringify(histories))
-    Logger.debug(`SetAlarmHistory [${alarmID}]: ${JSON.stringify(history)}`)
   }
 }
