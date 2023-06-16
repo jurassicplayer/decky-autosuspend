@@ -28,15 +28,15 @@ export class SteamUtils {
   }
 
   //#region Notification Wrapper
-  static async notify(title: string, message: string, showToast?: boolean, playSound?: boolean, sound?: number, duration?: number) {
-    if (sound === undefined ) sound = NavSoundMap[defaultSettings.defaultSound]
+  static async notify(title: string, message: string, showToast?: boolean, playSound?: boolean, sound?: string, duration?: number) {
+    let sfx = sound ? NavSoundMap[sound] : NavSoundMap[defaultSettings.defaultSound]
     if (playSound === undefined ) playSound = defaultSettings.defaultPlaySound
     if (showToast === undefined ) showToast = defaultSettings.defaultShowToast
     let toastData: ToastData = {
       title: title,
       body: message,
       duration: duration,
-      sound: sound,
+      sound: sfx,
       playSound: playSound,
       showToast: showToast
     }
