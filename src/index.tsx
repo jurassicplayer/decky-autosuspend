@@ -1,64 +1,111 @@
 import { definePlugin, ServerAPI, staticClasses } from "decky-frontend-lib"
 import { FaBatteryQuarter } from "react-icons/fa"
 import { QAMPanel } from "./QAM/QAMPanel"
-import { Settings } from "./Utils/Settings"
+import { alarmTypes, SettingsManager, triggerActions } from "./Utils/Settings"
 import { Backend } from "./Utils/Backend"
 import { SteamUtils } from "./Utils/SteamUtils"
 import { events } from "./Utils/Events"
 import { AppContextProvider, AppContextState } from "./Utils/Context"
 
-export default definePlugin((serverApi: ServerAPI) => {
-  Backend.initBackend(serverApi)
-  Settings.loadFromLocalStorage()
-
-  let warnNotifiedState = false
-  let criticalNotifiedState = false
-  let overchargeNotifiedState = false
-  let offset = 0.5
-  let resolution = 0.02
-
-  // percentage check loop
-  const IntervalCheck = (e: Event) => {
-    if (!Backend.getAppInitialized()) return
-    let batteryState = (e as events.BatteryStateEvent).batteryState
-    let batteryPercent = Math.round(batteryState.flLevel * 10000) / 100
-    let debugInfo = `warnNotifiedState:${warnNotifiedState}
-      criticalNotifiedState:${criticalNotifiedState}
-      overchargeNotifiedState:${overchargeNotifiedState}
-      warnThreshold:${Settings.warningLevel}
-      critThreshold:${Settings.criticalLevel}
-      overThreshold:${Settings.overchargeLevel}
-      battPercent:${batteryPercent}
-      battRaw:${batteryState.flLevel}`
-    if (Settings.criticalEnabled && !criticalNotifiedState && batteryPercent <= (Settings.criticalLevel+offset) ) {
-      console.debug(`[AutoSuspend] Critical threshold triggered, current state:\n${debugInfo}`)
-      SteamUtils.notify("AutoSuspend", "Critical limit exceeded, suspending device", undefined, undefined, undefined, 5000)
-      setTimeout(() => {SteamUtils.suspend();}, 5500)
-      criticalNotifiedState = true
-    } else if (Settings.warningEnabled && !warnNotifiedState && batteryPercent <= (Settings.warningLevel+offset) && Settings.warningLevel > Settings.criticalLevel && !criticalNotifiedState) {
-      console.debug(`[AutoSuspend] Warning threshold triggered, current state:\n${debugInfo}`)
-      SteamUtils.notify("AutoSuspend", "Warning limit exceeded")
-      warnNotifiedState = true
-    } else if (Settings.overchargeEnabled && !overchargeNotifiedState && batteryPercent >= (Settings.overchargeLevel+offset) && (Settings.overchargeLevel > Settings.criticalLevel && Settings.overchargeLevel > Settings.warningLevel)) {
-      console.debug(`[AutoSuspend] Overcharge threshold triggered, current state:\n${debugInfo}`)
-      SteamUtils.notify("AutoSuspend", "Overcharge limit exceeded")
-      overchargeNotifiedState = true
+import { AlarmSetting, thresholdTypes } from './Utils/Settings'
+const evaluateAlarm = async (alarmID: string, settings: AlarmSetting, context: AppContextState) => {
+  let { showToast, playSound, sound, alarmType, alarmRepeat, alarmName, alarmMessage, thresholdLevel, thresholdType, triggeredAction, enabled, profile } = settings
+  if (!enabled) { return }
+  if (profile && !(profile == 'CurrentUserProfile')) { return } // ##FIXME## Need a method to get the current logged in steam user to compare against
+  let history = SettingsManager.getAlarmHistory(alarmID)
+  history = history ? history : { triggered: false }
+  let triggerAction = false
+  let batteryPercent: number
+  // Evaluate triggers
+  switch (thresholdType) {
+    case thresholdTypes.discharge:
+      // ##FIXME## Need to fix rounding (visually changes at 0.5%)
+      batteryPercent = Math.round(context.batteryState.flLevel * 10000) / 100
+      if (batteryPercent <= thresholdLevel && !history.triggered) { // Trigger discharge
+        history.lastTriggered = Date.now()
+        history.triggered = true
+        triggerAction = true
+      } else if (batteryPercent > thresholdLevel && history.triggered) { // Reset discharge trigger
+        history.triggered = false
+      }
+      break
+    case thresholdTypes.overcharge:
+      batteryPercent = Math.round(context.batteryState.flLevel * 10000) / 100
+      if (batteryPercent >= thresholdLevel && !history.triggered) { // Trigger overcharge
+        history.lastTriggered = Date.now()
+        history.triggered = true
+        triggerAction = true
+      } else if (batteryPercent < thresholdLevel && history.triggered) { // Reset overcharge trigger
+        history.triggered = false
+      }
+      break
+    case thresholdTypes.bedtime:
+      const minute = 1000 * 60
+      const hour = minute * 60
+      const day = hour * 24
+      let date = new Date()
+      let currentDateUTC = Math.floor(date.getTime() / day) * day
+      let currentDate = currentDateUTC + (date.getTimezoneOffset() * minute)
+      // thresholdLevel = time delta in ms from 12:00am
+      if (date.getTime() >= (currentDate + thresholdLevel) && !history.triggered) { // Trigger bedtime
+        history.lastTriggered = date.getTime()
+        history.triggered = true
+        triggerAction = true
+      } else if (date.getTime() < (currentDate + thresholdLevel) && history.triggered) { // Reset overcharge trigger
+        history.triggered = false
+      }
+      break
+  }
+  SettingsManager.setAlarmHistory(alarmID, history)
+  if (!triggerAction) { return }
+  // Send notifications
+  alarmMessage = alarmMessage ? alarmMessage : ''
+  SteamUtils.notify(alarmName, alarmMessage, showToast, playSound, sound, 5000) // First toast
+  if (alarmRepeat) {
+    let sleepDuration = 3000
+    switch (alarmType) {
+      case alarmTypes.repeatSound:
+        showToast = false
+        sleepDuration = 500
+        break
+      case alarmTypes.repeatToast:
+        playSound = false
+        break
+      default:
     }
-    if (Settings.overchargeEnabled && overchargeNotifiedState && batteryPercent < Settings.overchargeLevel+offset - resolution) {
-      console.debug(`[AutoSuspend] Reset overchargeNotifiedState, current state:\n${debugInfo}`)
-      overchargeNotifiedState = false
-    }
-    if (Settings.criticalEnabled && criticalNotifiedState && batteryPercent > (Settings.criticalLevel+offset + resolution)) {
-      console.debug(`[AutoSuspend] Reset criticalNotifiedState, current state:\n${debugInfo}`)
-      criticalNotifiedState = false
-    }
-    if (Settings.warningEnabled && warnNotifiedState && batteryPercent > (Settings.warningLevel+offset + resolution)) {
-      console.debug(`[AutoSuspend] Reset warnNotifiedState, current state:\n${debugInfo}`)
-      warnNotifiedState = false
+    for (let i = 0; i < alarmRepeat; i++) {
+      await sleep(sleepDuration)
+      await SteamUtils.notify(alarmName, alarmMessage, showToast, playSound, sound)
     }
   }
-  Backend.setAppInitialized(true)
+  
+  switch (triggeredAction) {
+    case triggerActions.suspend:
+      // suspend
+      if (!context.batteryState.bHasBattery) { return }
+      sleep(5500)
+      //SteamUtils.suspend()
+      console.log(`[${alarmName}]: action triggered, suspending`)
+      break
+    default:
+  }
+}
+
+function sleep(ms: number) {
+  return new Promise(
+    resolve => setTimeout(resolve, ms)
+  )
+}
+
+export default definePlugin((serverApi: ServerAPI) => {
   let appCtx = new AppContextState(serverApi)
+  const IntervalCheck = (e: Event) => {
+    if (!appCtx.appInfo.initialized) { return }
+    let alarms = SettingsManager.settings.alarms
+    for (let alarmID in alarms) {
+      evaluateAlarm(alarmID, alarms[alarmID], appCtx)
+    }
+  }
   appCtx.eventBus.addEventListener(events.BatteryStateEvent.eType, IntervalCheck)
 
   return {
