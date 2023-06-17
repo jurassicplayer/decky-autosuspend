@@ -16,4 +16,16 @@ export namespace events {
       this.batteryState = batteryState
     }
   }
+  export class ResumeEvent extends Event {
+    public static eType: string = 'ResumeEvent'
+    constructor(eventInitDict?: EventInit) {
+      super(ResumeEvent.eType, eventInitDict)
+    }
+  }
+  export class SuspendEvent extends Event {
+    public static eType: string = 'SuspendEvent'
+    constructor(eventInitDict?: EventInit) {
+      super(SuspendEvent.eType, eventInitDict)
+    }
+  }
 }

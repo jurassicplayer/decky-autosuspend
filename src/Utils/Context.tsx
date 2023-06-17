@@ -11,6 +11,9 @@ interface AppInfo {
   name: string
   version: string
 }
+interface SteamHook {
+  unregister: () => void
+}
 
 // #region Context definition and constructor
 interface Context {
@@ -18,6 +21,7 @@ interface Context {
   appInfo: AppInfo
   batteryState: BatteryState
   eventBus: EventTarget
+  activeHooks: SteamHook[]
 }
 export class AppContextState implements Context {
   constructor(serverAPI: ServerAPI) {
@@ -33,6 +37,8 @@ export class AppContextState implements Context {
       let currentState = window.SystemPowerStore.batteryState
       if (currentState != this.batteryState) this.updateBatteryState(currentState)
     }, 1000)
+    this.activeHooks.push(SteamClient.System.RegisterForOnSuspendRequest(()=> {this.onSuspend()}))
+    this.activeHooks.push(SteamClient.System.RegisterForOnResumeFromSuspend(()=> {this.onResume()}))
     SettingsManager.loadFromFile().then(()=>{
       this.appInfo.initialized = true
       Logger.info('Initialization complete')
@@ -42,14 +48,22 @@ export class AppContextState implements Context {
   public appInfo!: AppInfo
   public batteryState!: BatteryState
   public eventBus: EventTarget = new EventTarget()
+  public activeHooks: SteamHook[] = []
   private intervalID!: NodeJS.Timer
 
   public onDismount() {
     clearInterval(this.intervalID)
+    this.activeHooks.forEach((hook) => { hook.unregister() })
   }
   private updateBatteryState(batteryState: BatteryState) {
     this.batteryState = batteryState
     this.eventBus.dispatchEvent(new events.BatteryStateEvent(this.batteryState))
+  }
+  private onSuspend() {
+    this.eventBus.dispatchEvent(new events.SuspendEvent())
+  }
+  private onResume() {
+    this.eventBus.dispatchEvent(new events.ResumeEvent())
   }
 }
 // #endregion

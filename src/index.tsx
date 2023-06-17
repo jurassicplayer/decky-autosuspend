@@ -12,17 +12,17 @@ const evaluateAlarm = async (alarmID: string, settings: AlarmSetting, context: A
   if (!enabled) { return }
   // @ts-ignore
   if (profile && profile != loginStore.m_strAccountName) { return }
-  let history = SettingsManager.getAlarmHistory(alarmID)
-  history = history ? history : { triggered: false }
+  let history = SettingsManager.getAlarmHistory(alarmID) || { triggered: false }
   let triggerAction = false
   let batteryPercent: number
+  let date = new Date()
   // Evaluate triggers
   switch (thresholdType) {
     case thresholdTypes.discharge:
       // ##FIXME## Need to fix rounding (visually changes at 0.5%)
       batteryPercent = Math.round(context.batteryState.flLevel * 10000) / 100
       if (batteryPercent <= thresholdLevel && !history.triggered) { // Trigger discharge
-        history.lastTriggered = Date.now()
+        history.lastTriggered = date.getTime()
         history.triggered = true
         triggerAction = true
       } else if (batteryPercent > thresholdLevel && history.triggered) { // Reset discharge trigger
@@ -32,7 +32,7 @@ const evaluateAlarm = async (alarmID: string, settings: AlarmSetting, context: A
     case thresholdTypes.overcharge:
       batteryPercent = Math.round(context.batteryState.flLevel * 10000) / 100
       if (batteryPercent >= thresholdLevel && !history.triggered) { // Trigger overcharge
-        history.lastTriggered = Date.now()
+        history.lastTriggered = date.getTime()
         history.triggered = true
         triggerAction = true
       } else if (batteryPercent < thresholdLevel && history.triggered) { // Reset overcharge trigger
@@ -43,7 +43,6 @@ const evaluateAlarm = async (alarmID: string, settings: AlarmSetting, context: A
       const minute = 1000 * 60
       const hour = minute * 60
       const day = hour * 24
-      let date = new Date()
       let currentDateUTC = Math.floor(date.getTime() / day) * day
       let currentDate = currentDateUTC + (date.getTimezoneOffset() * minute)
       // thresholdLevel = time delta in ms from 12:00am
@@ -52,6 +51,21 @@ const evaluateAlarm = async (alarmID: string, settings: AlarmSetting, context: A
         history.triggered = true
         triggerAction = true
       } else if (date.getTime() < (currentDate + thresholdLevel) && history.triggered) { // Reset overcharge trigger
+        history.triggered = false
+      }
+      break
+    case thresholdTypes.dailyPlaytime:
+      history.currentPlayTime = history.currentPlayTime || 0
+      history.sessionStartTime = history.sessionStartTime || date.getTime()
+      history.lastTriggered = history.lastTriggered || 0
+      let sessionStartTimeDate = history.sessionStartTime // Perform timezone conversions and truncate to days
+      let lastTriggeredDate = history.lastTriggered // Perform timezone conversions and truncate to days
+      if (history.currentPlayTime >= thresholdLevel && !history.triggered) {
+        history.lastTriggered = date.getTime()
+        history.triggered = true
+        triggerAction = true
+      } else if ((history.currentPlayTime < thresholdLevel || sessionStartTimeDate > lastTriggeredDate) && history.triggered) {
+        delete history.currentPlayTime
         history.triggered = false
       }
       break
@@ -97,16 +111,52 @@ function sleep(ms: number) {
   )
 }
 
+const OnSuspend = (context: AppContextState) => {
+  let alarms = context.settings.alarms
+  for (let alarmID in alarms) {
+    let {thresholdType} = alarms[alarmID]
+    if (thresholdType != thresholdTypes.dailyPlaytime) { continue }
+    let history = SettingsManager.getAlarmHistory(alarmID) || { triggered: false }
+    let now = Date.now()
+    //history = history ? history : { triggered: false }
+    history.currentPlayTime = (history.currentPlayTime || 0) + (now - (history.sessionStartTime || now))
+    delete history.sessionStartTime
+    SettingsManager.setAlarmHistory(alarmID, history)
+  }
+  console.log(`OnSuspend triggered: ${appInstance}`)
+}
+const OnResume = (context: AppContextState) => {
+  let alarms = context.settings.alarms
+  for (let alarmID in alarms) {
+    let {thresholdType} = alarms[alarmID]
+    if (thresholdType != thresholdTypes.dailyPlaytime) { continue }
+    let history = SettingsManager.getAlarmHistory(alarmID) || { triggered: false }
+    //history = history ? history : { triggered: false }
+    history.sessionStartTime = Date.now()
+    SettingsManager.setAlarmHistory(alarmID, history)
+  }
+  console.log(`OnResume triggered: ${appInstance}`)
+}
+
 export default definePlugin((serverApi: ServerAPI) => {
   let appCtx = new AppContextState(serverApi)
+  /* ##FIXME## On context initialization:
+    check for dailyPlaytime alarms
+    set sessionStartTime
+    reset currentPlayTime if current date is larger than lastTriggered date
+      will need to take into account timezones again
+  */
   const IntervalCheck = (e: Event) => {
     if (!appCtx.appInfo.initialized) { return }
-    let alarms = SettingsManager.settings.alarms
+    let alarms = appCtx.settings.alarms
     for (let alarmID in alarms) {
       evaluateAlarm(alarmID, alarms[alarmID], appCtx)
     }
   }
+  let appInstance = Math.random()
   appCtx.eventBus.addEventListener(events.BatteryStateEvent.eType, IntervalCheck)
+  appCtx.eventBus.addEventListener(events.SuspendEvent.eType, () => OnSuspend(appCtx))
+  appCtx.eventBus.addEventListener(events.ResumeEvent.eType, () => OnResume(appCtx))
 
   return {
     title: <div className={staticClasses.Title}>AutoSuspend</div>,
@@ -114,6 +164,8 @@ export default definePlugin((serverApi: ServerAPI) => {
     icon: <FaBatteryQuarter />,
     onDismount: () => {
       appCtx.eventBus.removeEventListener(events.BatteryStateEvent.eType, IntervalCheck)
+      appCtx.eventBus.removeEventListener(events.SuspendEvent.eType, () => OnSuspend(appInstance))
+      appCtx.eventBus.removeEventListener(events.ResumeEvent.eType, () => OnResume(appInstance))
       appCtx.onDismount()
     }
   }
