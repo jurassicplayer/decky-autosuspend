@@ -5,6 +5,7 @@ import { BatteryState } from "../lib/SteamClient"
 import { SettingsProps, SettingsManager } from "./Settings"
 import { events } from "./Events"
 import { Logger } from "./Logger"
+import { registerAlarmEvents, unregisterAlarmEvents } from './Alarms'
 
 interface AppInfo {
   initialized: boolean
@@ -32,14 +33,19 @@ export class AppContextState implements Context {
     }
     BackendCtx.initialize(serverAPI)
     Logger.info('Initializing frontend')
-    this.intervalID = setInterval(()=>{
-      // @ts-ignore
-      let currentState = window.SystemPowerStore.batteryState
-      if (currentState != this.batteryState) this.updateBatteryState(currentState)
-    }, 1000)
-    this.activeHooks.push(SteamClient.System.RegisterForOnSuspendRequest(()=> {this.onSuspend()}))
-    this.activeHooks.push(SteamClient.System.RegisterForOnResumeFromSuspend(()=> {this.onResume()}))
-    SettingsManager.loadFromFile().then(()=>{
+    SettingsManager.loadFromFile().then((settings)=>{
+      this.settings = settings
+      console.log(settings)
+      this.intervalID = setInterval(()=>{
+        // @ts-ignore
+        let currentState = window.SystemPowerStore.batteryState
+        if (currentState != this.batteryState) this.updateBatteryState(currentState)
+      }, 1000)
+      this.activeHooks.push(SteamClient.System.RegisterForOnSuspendRequest(() => {this.onSuspend()}))
+      this.activeHooks.push(SteamClient.System.RegisterForOnResumeFromSuspend(() => {this.onResume()}))
+      this.activeHooks.push(SteamClient.User.RegisterForShutdownDone(() => {this.onShutdown()}))
+      registerAlarmEvents(this)
+      this.onResume() // Trigger OnResume alarm events on "boot" to setup alarms
       this.appInfo.initialized = true
       Logger.info('Initialization complete')
     })
@@ -53,6 +59,7 @@ export class AppContextState implements Context {
 
   public onDismount() {
     clearInterval(this.intervalID)
+    unregisterAlarmEvents(this)
     this.activeHooks.forEach((hook) => { hook.unregister() })
   }
   private updateBatteryState(batteryState: BatteryState) {
@@ -64,6 +71,9 @@ export class AppContextState implements Context {
   }
   private onResume() {
     this.eventBus.dispatchEvent(new events.ResumeEvent())
+  }
+  private onShutdown() {
+    this.eventBus.dispatchEvent(new events.ShutdownEvent())
   }
 }
 // #endregion
