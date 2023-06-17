@@ -1,53 +1,10 @@
 import { BackendCtx } from './Backend'
 import { Logger } from './Logger'
 import { NavSoundMap } from './SteamUtils'
+import { Alarms, AlarmSetting, alarmTypes, thresholdTypes, triggerActions } from './Alarms'
 
-
-// #region Enumerations
-export enum alarmTypes {
-  none = 'none',
-  repeatToast = 'repeatToast',
-  repeatSound = 'repeatSound',
-  repeatBoth = 'repeatBoth'
-}
-export enum thresholdTypes {
-  overcharge = 'overcharge',
-  discharge = 'discharge',
-  dailyPlaytime = 'dailyPlaytime',
-  bedtime = 'bedtime'
-}
-export enum triggerActions {
-  none = 'none',
-  suspend = 'suspend'
-}
-// #endregion
 
 // #region Interfaces
-export interface AlarmSetting {
-  showToast?: boolean
-  playSound?: boolean
-  sound?: string
-  alarmType?: alarmTypes
-  alarmRepeat?: number
-  alarmName: string
-  alarmMessage?: string
-  thresholdLevel: number
-  thresholdType: thresholdTypes
-  triggeredAction: triggerActions
-  enabled: boolean
-  profile?: string
-  sortOrder: number
-}
-interface Alarms {
-  [uniqueid: string]: AlarmSetting
-}
-interface AlarmHistory {
-  triggered: boolean
-  lastTriggered?: number
-  sessionStartTime?: number
-  currentPlayTime?: number
-}
-
 export interface SettingsProps {
   defaultShowToast: boolean
   defaultPlaySound: boolean
@@ -97,7 +54,7 @@ const exampleAlarmSettings: AlarmSetting = {
   thresholdLevel: 0,
   thresholdType: thresholdTypes.discharge,
   triggeredAction: triggerActions.none,
-  enabled: true,
+  enabled: false,
   profile: '',
   sortOrder: 0
 }
@@ -190,19 +147,5 @@ export class SettingsManager {
       invalidNotice = `[${key}]: "${setting}" is not a valid trigger action`
     }
     return invalidNotice
-  }
-
-  static getAlarmHistory(alarmID: string): AlarmHistory | null {
-    let s_histories = localStorage.getItem('autosuspend-alarms')
-    let histories: {[key: string]: AlarmHistory} = JSON.parse(s_histories ? s_histories : '{}')
-    let history = null
-    if (alarmID in histories) { history = histories[alarmID] }
-    return history
-  }
-  static setAlarmHistory(alarmID: string, history: AlarmHistory) {
-    let s_histories = localStorage.getItem('autosuspend-alarms')
-    let histories = JSON.parse(s_histories ? s_histories : '{}')
-    histories[alarmID] = history
-    localStorage.setItem('autosuspend-alarms', JSON.stringify(histories))
   }
 }
