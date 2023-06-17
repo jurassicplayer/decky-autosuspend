@@ -33,7 +33,10 @@ export class AppContextState implements Context {
       let currentState = window.SystemPowerStore.batteryState
       if (currentState != this.batteryState) this.updateBatteryState(currentState)
     }, 1000)
-    this.initialize()
+    SettingsManager.loadFromFile().then(()=>{
+      this.appInfo.initialized = true
+      Logger.info('Initialization complete')
+    })
   }
   public settings!: SettingsProps
   public appInfo!: AppInfo
@@ -41,15 +44,10 @@ export class AppContextState implements Context {
   public eventBus: EventTarget = new EventTarget()
   private intervalID!: NodeJS.Timer
 
-  private async initialize() {
-    this.settings = await SettingsManager.loadFromFile()
-    this.appInfo.initialized = true
-    Logger.info('Initialization complete')
-  }
   public onDismount() {
     clearInterval(this.intervalID)
   }
-  updateBatteryState(batteryState: BatteryState) {
+  private updateBatteryState(batteryState: BatteryState) {
     this.batteryState = batteryState
     this.eventBus.dispatchEvent(new events.BatteryStateEvent(this.batteryState))
   }
