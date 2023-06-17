@@ -28,4 +28,10 @@ export namespace events {
       super(SuspendEvent.eType, eventInitDict)
     }
   }
+  export class ShutdownEvent extends Event {
+    public static eType: string = 'ShutdownEvent'
+    constructor(eventInitDict?: EventInit) {
+      super(ShutdownEvent.eType, eventInitDict)
+    }
+  }
 }
