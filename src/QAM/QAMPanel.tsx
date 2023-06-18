@@ -12,7 +12,9 @@ export const QAMPanel: VFC = () => {
   return (
     <PanelSection>
       <Focusable>
-        <ButtonItem>Alarm Name and simple information</ButtonItem>
+        <PanelSectionRow>
+          <ButtonItem>Alarm Name and simple information</ButtonItem>
+        </PanelSectionRow>
       </Focusable>
     </PanelSection>
   );
