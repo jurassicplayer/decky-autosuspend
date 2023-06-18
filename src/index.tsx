@@ -9,7 +9,7 @@ import { evaluateAlarm } from "./Utils/Alarms"
 
 export default definePlugin((serverApi: ServerAPI) => {
   let appCtx = new AppContextState(serverApi)
-  const IntervalCheck = (e: Event) => {
+  const IntervalCheck = () => {
     if (!appCtx.appInfo.initialized) { return }
     let alarms = appCtx.settings.alarms
     for (let alarmID in alarms) {

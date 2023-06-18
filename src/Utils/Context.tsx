@@ -35,7 +35,6 @@ export class AppContextState implements Context {
     Logger.info('Initializing frontend')
     SettingsManager.loadFromFile().then((settings)=>{
       this.settings = settings
-      console.log(settings)
       this.intervalID = setInterval(()=>{
         // @ts-ignore
         let currentState = window.SystemPowerStore.batteryState
