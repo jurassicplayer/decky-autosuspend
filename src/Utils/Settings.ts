@@ -61,8 +61,9 @@ const exampleAlarmSettings: AlarmSetting = {
 // #endregion
 
 export class SettingsManager {
-  static settings: SettingsProps = defaultSettings
-  static userSettings: SettingsProps
+  //static settings: SettingsProps = defaultSettings
+  //static userSettings: SettingsProps
+  static debuggingMode: boolean = false
   static async saveToFile(userSettings: SettingsProps) {
     let settings: {[key:string]: any} = {...userSettings}
     let promises = Object.keys(settings).map(key => {
@@ -71,7 +72,7 @@ export class SettingsManager {
     Promise.all(promises).then(async () => {
       await BackendCtx.commitSettings()
     })
-    Logger.info('Saved user settings')
+    Logger.info(`Saved user settings:\n${JSON.stringify(settings, null, 2)}`)
   }
 
   static async loadFromFile() {
@@ -80,10 +81,11 @@ export class SettingsManager {
     for (let key in validSettings) {
       userSettings[key] = await BackendCtx.getSetting(key, validSettings[key])
     }
-    this.userSettings = userSettings as SettingsProps
-    this.settings = await this.validateSettings(this.userSettings)
-    Logger.info('Loaded user settings')
-    return this.settings
+    //this.userSettings = userSettings as SettingsProps
+    let settings = await this.validateSettings(userSettings as SettingsProps)
+    this.debuggingMode = settings.debuggingMode
+    Logger.info(`Loaded user settings:\n${JSON.stringify(settings, null, 2)}`)
+    return settings
   }
 
   static validateSettings(settings: SettingsProps): SettingsProps {

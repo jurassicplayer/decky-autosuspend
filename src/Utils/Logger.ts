@@ -6,7 +6,7 @@ export class Logger {
     await BackendCtx.bridge("logger", {logLevel:'info', msg})
   }
   static async debug(msg: string) {
-    if (!(SettingsManager.settings.debuggingMode)) { return }
+    if (!(SettingsManager.debuggingMode)) { return }
     await BackendCtx.bridge("logger", {logLevel:'debug', msg})
   }
   static async warning(msg: string) {
