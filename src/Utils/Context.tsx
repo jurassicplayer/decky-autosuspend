@@ -6,6 +6,8 @@ import { SettingsProps, SettingsManager } from "./Settings"
 import { events } from "./Events"
 import { Logger } from "./Logger"
 import { registerAlarmEvents, unregisterAlarmEvents } from './Alarms'
+import { AlarmList } from '../Browser/AlarmList'
+import { AlarmSettings } from '../Browser/AlarmSettings'
 
 interface AppInfo {
   initialized: boolean
@@ -22,10 +24,15 @@ interface Context {
   appInfo: AppInfo
   batteryState: BatteryState
   eventBus: EventTarget
+  serverApi: ServerAPI
   activeHooks: SteamHook[]
+  activeRoutes: string[]
+  registerRoute: (path: string, component: React.ComponentType) => void
+  unregisterRoute: (path: string) => void
 }
 export class AppContextState implements Context {
   constructor(serverAPI: ServerAPI) {
+    this.serverApi = serverAPI
     this.appInfo = {
       initialized: false,
       name: 'AutoSuspend',
@@ -40,25 +47,50 @@ export class AppContextState implements Context {
         let currentState = window.SystemPowerStore.batteryState
         if (currentState != this.batteryState) this.updateBatteryState(currentState)
       }, 1000)
-      this.activeHooks.push(SteamClient.System.RegisterForOnSuspendRequest(() => {this.onSuspend()}))
-      this.activeHooks.push(SteamClient.System.RegisterForOnResumeFromSuspend(() => {this.onResume()}))
-      this.activeHooks.push(SteamClient.User.RegisterForShutdownDone(() => {this.onShutdown()}))
+      this.registerHooks()
+      this.registerRoutes()
       registerAlarmEvents(this)
       this.onResume() // Trigger OnResume alarm events on "boot" to setup alarms
       this.appInfo.initialized = true
       Logger.info('Initialization complete')
     })
   }
+  public serverApi: ServerAPI
   public settings!: SettingsProps
-  public appInfo!: AppInfo
+  public appInfo: AppInfo
   public batteryState!: BatteryState
   public eventBus: EventTarget = new EventTarget()
   public activeHooks: SteamHook[] = []
+  public activeRoutes: string[] = []
   private intervalID!: NodeJS.Timer
 
   public onDismount() {
     clearInterval(this.intervalID)
     unregisterAlarmEvents(this)
+    this.unregisterRoutes()
+    this.unregisterHooks()
+  }
+  private registerRoutes() {
+    this.registerRoute("/autosuspend/alarms", AlarmList)
+    this.registerRoute("/autosuspend/alarm/:alarmID", AlarmSettings)
+  }
+  public registerRoute = (path: string, component: React.ComponentType) => {
+    this.serverApi.routerHook.addRoute(path, component)
+    this.activeRoutes.push(path)
+  }
+  public unregisterRoute = (path: string) => {
+    this.serverApi.routerHook.removeRoute(path)
+    this.activeRoutes = this.activeRoutes.filter(route => route !== path)
+  }
+  private unregisterRoutes() {
+    this.activeRoutes.forEach((route) => { this.unregisterRoute(route) })
+  }
+  private registerHooks() {
+    this.activeHooks.push(SteamClient.System.RegisterForOnSuspendRequest(() => {this.onSuspend()}))
+    this.activeHooks.push(SteamClient.System.RegisterForOnResumeFromSuspend(() => {this.onResume()}))
+    this.activeHooks.push(SteamClient.User.RegisterForShutdownDone(() => {this.onShutdown()}))
+  }
+  private unregisterHooks() {
     this.activeHooks.forEach((hook) => { hook.unregister() })
   }
   private updateBatteryState(batteryState: BatteryState) {
