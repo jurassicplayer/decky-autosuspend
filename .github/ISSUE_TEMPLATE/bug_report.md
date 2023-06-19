@@ -33,5 +33,5 @@ Steps to reproduce the behavior:
 **Additional context**
 Please include the following:
  - Output of `journalctl -eu plugin_loader.service > decky-loader.log`
- - Log file from `/tmp/autosuspend.log`
+ - Log file from `~/homebrew/logs/decky-autosuspend/backend.log`
  - Screenshots of the CEF console log
