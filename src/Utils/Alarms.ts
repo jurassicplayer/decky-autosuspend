@@ -2,6 +2,7 @@ import { SteamUtils } from "./SteamUtils"
 import { AppContextState } from "./Context"
 import { events } from "./Events"
 import { SettingsManager } from "./Settings"
+import { sleep } from "decky-frontend-lib"
 
 // #region Enumerations
 export enum alarmTypes {
@@ -205,11 +206,6 @@ export const evaluateAlarm = async (alarmID: string, settings: AlarmSetting, con
       break
     default:
   }
-}
-function sleep(ms: number) {
-  return new Promise(
-    resolve => setTimeout(resolve, ms)
-  )
 }
 
 export function registerAlarmEvents(context: AppContextState) {
