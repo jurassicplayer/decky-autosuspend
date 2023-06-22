@@ -75,7 +75,9 @@ export class AppContextState implements Context {
     this.registerRoute("/autosuspend/alarm/:alarmID", AlarmSettings)
   }
   public registerRoute = (path: string, component: React.ComponentType) => {
-    this.serverApi.routerHook.addRoute(path, component)
+    let Component = component
+    let ctxWrapper = <AppContextProvider appContextState={this}><Component /></AppContextProvider>
+    this.serverApi.routerHook.addRoute(path, () => ctxWrapper)
     this.activeRoutes.push(path)
   }
   public unregisterRoute = (path: string) => {
