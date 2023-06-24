@@ -70,10 +70,6 @@ export class AppContextState implements Context {
     this.unregisterRoutes()
     this.unregisterHooks()
   }
-  private registerRoutes() {
-    this.registerRoute("/autosuspend/alarms", AlarmList)
-    this.registerRoute("/autosuspend/alarm/:alarmID", AlarmSettings)
-  }
   public registerRoute = (path: string, component: React.ComponentType) => {
     let Component = component
     let ctxWrapper = <AppContextProvider appContextState={this}><Component /></AppContextProvider>
@@ -83,6 +79,9 @@ export class AppContextState implements Context {
   public unregisterRoute = (path: string) => {
     this.serverApi.routerHook.removeRoute(path)
     this.activeRoutes = this.activeRoutes.filter(route => route !== path)
+  }
+  private registerRoutes() {
+    this.registerRoute("/autosuspend/alarms", AlarmList)
   }
   private unregisterRoutes() {
     this.activeRoutes.forEach((route) => { this.unregisterRoute(route) })
