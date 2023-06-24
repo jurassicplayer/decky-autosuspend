@@ -2,10 +2,10 @@ import { BackendCtx } from './Backend'
 import { Logger } from './Logger'
 import { NavSoundMap } from './SteamUtils'
 import { Alarms, AlarmSetting, alarmTypes, thresholdTypes, triggerActions } from './Alarms'
-
+import { IObjectKeys } from './Interfaces'
 
 // #region Interfaces
-export interface SettingsProps {
+export interface SettingsProps extends IObjectKeys {
   defaultShowToast: boolean
   defaultPlaySound: boolean
   defaultSound: string

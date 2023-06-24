@@ -3,6 +3,7 @@ import { AppContextState } from "./Context"
 import { events } from "./Events"
 import { SettingsManager } from "./Settings"
 import { sleep } from "decky-frontend-lib"
+import { IObjectKeys } from "./Interfaces"
 
 // #region Enumerations
 export enum alarmTypes {
@@ -26,7 +27,7 @@ export enum triggerActions {
 // #endregion
 
 // #region Interfaces
-export interface AlarmSetting {
+export interface AlarmSetting extends IObjectKeys {
   showToast?: boolean
   playSound?: boolean
   sound?: string
