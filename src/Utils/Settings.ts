@@ -43,6 +43,13 @@ export const defaultSettings: SettingsProps = {
     }
   } 
 }
+export const thresholdLevelDefaults:{[key:string]: number} = {
+  discharge: 0,
+  overcharge: 85,
+  bedtime: 100000,
+  dailyPlaytime: 100000,
+  sessionPlaytime: 100000
+}
 const exampleAlarmSettings: AlarmSetting = {
   showToast: true,
   playSound: true,
