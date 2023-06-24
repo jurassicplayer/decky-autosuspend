@@ -1,19 +1,19 @@
-import { FaBatteryQuarter, FaBatteryThreeQuarters, FaBed, FaCommentAlt, FaCommentSlash, FaExclamationCircle, FaMoon, FaPowerOff, FaStopwatch, FaSun, FaUser, FaUsers, FaVolumeMute, FaVolumeUp } from "react-icons/fa"
-import { SettingsProps } from "../Utils/Settings"
+import { FaBatteryFull, FaBatteryQuarter, FaBed, FaExclamationCircle, FaMoon, FaPowerOff, FaStopwatch, FaSun, FaUser, FaUsers, FaVolumeMute, FaVolumeUp } from "react-icons/fa"
+import { BiNotification, BiNotificationOff } from "react-icons/bi"
 import { IconContext } from "react-icons"
-import { DialogButton, DialogCheckbox, Dropdown, DropdownItem, Focusable, ReorderableEntry, ToggleField, } from "decky-frontend-lib"
-import { AlarmSetting, thresholdTypes } from "../Utils/Alarms"
+import { DialogButton, DialogCheckbox, Dropdown, DropdownOption, ReorderableEntry, ToggleField } from "decky-frontend-lib"
+import { thresholdTypes, triggerActions } from "../Utils/Alarms"
 import { useState, CSSProperties, SVGProps, useEffect } from "react"
 import { SteamCssVariables } from "../Utils/SteamUtils"
-import { useAppContext } from "../Utils/Context"
+import { useSettingsContext } from "../Utils/Context"
+import { thresholdLevelDefaults } from "../Utils/Settings"
 
 export type AlarmItemProps<T> = {
   entry: ReorderableEntry<T>
 }
 export interface EntryProps {
   alarmID: string
-  settings: AlarmSetting
-  defaults: SettingsProps
+  alarmName: string
 }
 
 const SteamChevronDown = (props:SVGProps<SVGSVGElement>) => {
@@ -62,67 +62,92 @@ const SteamCSS: {[key:string]: CSSProperties} = {
     flexDirection: "row",
     backgroundColor: SteamCssVariables.gpSystemDarkerGrey,
     padding: "1ex 0 0 5ex",
-    boxShadow: "inset 0px 2px 3px rgba(0,0,0,.5)"
+    boxShadow: "inset 0px 2px 3px rgba(0,0,0,.5)",
+    flexWrap: "wrap"
   }
 }
 
 export const AlarmItem = (props: AlarmItemProps<EntryProps>) => {
-  let ctx = useAppContext()
   let alarmID = props.entry.data!.alarmID
-  //let settings = props.entry.data!.settings
-  let [settings, setSettings] = useState(ctx.settings.alarms[alarmID])
-  let defaults = props.entry.data!.defaults
-  let [showToast, setShowToast]     = useState<boolean>( (typeof settings.showToast   != 'undefined') ? settings.showToast    : defaults.defaultShowToast )
-  let [playSound, setPlaySound]     = useState<boolean>( (typeof settings.playSound   != 'undefined') ? settings.playSound    : defaults.defaultPlaySound )
-  //let [sound, setSound]             = useState<string>(  (typeof settings.sound       != 'undefined') ? settings.sound        : defaults.defaultSound )
-  //let [alarmType, setAlarmType]     = useState<string>(  (typeof settings.alarmType   != 'undefined') ? settings.alarmType    : defaults.defaultAlarmType )
-  //let [alarmRepeat, setAlarmRepeat] = useState<number>(  (typeof settings.alarmRepeat != 'undefined') ? settings.alarmRepeat  : defaults.defaultAlarmRepeat )
-  let [selected, setSelected]       = useState<boolean>(false)
-  let thresholdType = <FaExclamationCircle/>
-  switch (settings.thresholdType) {
+  let { getSettings, getAlarmSettings, setAlarmSetting } = useSettingsContext()
+  let { defaultShowToast, defaultPlaySound, defaultSound, defaultAlarmRepeat, defaultAlarmType } = getSettings()
+  let { enabled, alarmName, profile, showToast, playSound, thresholdType, triggeredAction } = getAlarmSettings(alarmID)
+  let showToastOrDefault = (typeof showToast   != 'undefined') ? showToast    : defaultShowToast
+  let playSoundOrDefault = (typeof playSound   != 'undefined') ? playSound    : defaultPlaySound
+  //let soundOrDefault = (typeof sound       != 'undefined') ? sound        : defaultSound
+  //let alarmTypeOrDefault = (typeof alarmType   != 'undefined') ? alarmType    : defaultAlarmType
+  //let alarmRepeatOrDefault = (typeof alarmRepeat != 'undefined') ? alarmRepeat  : defaultAlarmRepeat
+  let [selected, setSelected] = useState<boolean>(false)
+  let [loginUsers, setLoginUsers] = useState<LoginUser[]>([])
+  let [profileData, setProfileData] = useState<ProfileData>()
+  useEffect(()=>{
+    async function init(){
+      let loginUsers: LoginUser[] = await SteamClient.User.GetLoginUsers()
+      setLoginUsers(loginUsers)
+      if (profile) {
+        let profileData = loginUsers.find((user)=>user.accountName == profile)
+        if (profileData) {
+          setProfileData({ personaName: profileData.personaName, avatarUrl: profileData.avatarUrl })
+        }
+      }
+    }
+    init()
+  },[])
+
+  
+  let thresholdTypeIcon = <FaExclamationCircle/>
+  switch (thresholdType) {
     case 'discharge':
-      thresholdType = <FaBatteryQuarter/>
+      thresholdTypeIcon = <FaBatteryQuarter/>
       break
     case 'overcharge':
-      thresholdType = <FaBatteryThreeQuarters/>
+      thresholdTypeIcon = <FaBatteryFull/>
       break
     case 'bedtime':
-      thresholdType = <FaBed/>
+      thresholdTypeIcon = <FaBed/>
       break
     case 'dailyPlaytime':
-      thresholdType = <FaSun/>
+      thresholdTypeIcon = <FaSun/>
       break
     case 'sessionPlaytime':
-      thresholdType = <FaStopwatch/>
+      thresholdTypeIcon = <FaStopwatch/>
       break
   }
-  let triggerAction: any = <FaExclamationCircle/>
-  switch (settings.triggeredAction) {
+  let triggerActionIcon: any = <FaExclamationCircle/>
+  switch (triggeredAction) {
     case 'suspend':
-      triggerAction = <FaMoon/>
+      triggerActionIcon = <FaMoon/>
       break
     case 'shutdown':
-      triggerAction = <FaPowerOff/>
+      triggerActionIcon = <FaPowerOff/>
       break
     case 'none':
-      triggerAction = null
+      triggerActionIcon = null
       break
   }
   return (
     <div style={selected ? SteamCSS.NotificationGroupExpanded : SteamCSS.NotificationGroup}>
       <div style={SteamCSS.NotificationSection}>
         <div style={SteamCSS.NotificationFeedToggle}>
-          <ToggleField layout="below" bottomSeparator="none" checked={settings.enabled} onChange={(value) => settings.enabled = value }/>
+          <ToggleField layout="below" bottomSeparator="none" checked={enabled} onChange={(value) => setAlarmSetting(alarmID, 'enabled', value) }/>
         </div>
         <div style={SteamCSS.NotificationDescription}>
-        {settings.alarmName}
+        {alarmName}
         <IconContext.Provider value={{size: "0.8em"}}>
           <div style={{display:"flex", columnGap: "0.8em"}}>
-            {settings.profile ? <FaUser/> : <FaUsers/>}
-            {showToast ? <FaCommentAlt/> : <FaCommentSlash/>}
-            {playSound ? <FaVolumeUp/> : <FaVolumeMute/>}
-            {thresholdType}
-            {triggerAction}
+            {profile ?
+              <div style={{ display: "flex", alignContent: "center" }}>
+                {profileData && profileData.avatarUrl ? <img src={profileData.avatarUrl} style={{width:"0.8em", height:"0.8em"}}/>: <FaUser/>}
+                <span style={{ fontSize: "0.6em", marginLeft: "0.7em" }}>{profileData?.personaName}</span>
+              </div>
+            : <div style={{ display: "flex", alignContent: "center" }}>
+                <FaUsers/><span style={{ fontSize: "0.6em", marginLeft: "0.7em" }}>Global</span>
+              </div>
+            }
+            {showToastOrDefault ? <BiNotification/> : <BiNotificationOff/>}
+            {playSoundOrDefault ? <FaVolumeUp/> : <FaVolumeMute/>}
+            {thresholdTypeIcon}
+            {triggerActionIcon}
           </div>
         </IconContext.Provider>
         </div>
@@ -133,7 +158,7 @@ export const AlarmItem = (props: AlarmItemProps<EntryProps>) => {
         </DialogButton>
       </div>
       { selected ?
-        <AlarmItemSettings alarmID={alarmID} />
+        <AlarmItemSettings alarmID={alarmID} loginUsers={loginUsers}/>
       : null }
     </div>
   )
@@ -142,21 +167,40 @@ export const AlarmItem = (props: AlarmItemProps<EntryProps>) => {
 
 interface AlarmItemSettingsProps {
   alarmID: string
+  loginUsers: LoginUser[]
+}
+interface ProfileData {
+  personaName: string
+  avatarUrl: string
+}
+interface LoginUser extends ProfileData{
+  accountName: string
+  rememberPassword: boolean
 }
 const AlarmItemSettings = (props: AlarmItemSettingsProps) => {
-  let ctx = useAppContext()
-  let [settings, setSettings] = useState(ctx.settings.alarms[props.alarmID])
+  let { getAlarmSettings, setAlarmSettings, setAlarmSetting, deleteAlarmSetting } = useSettingsContext()
+  let { enabled, showToast, playSound, sound, alarmName, alarmMessage, alarmType, alarmRepeat, thresholdLevel, thresholdType, triggeredAction, profile, sortOrder } = getAlarmSettings(props.alarmID)
+  let loginUsers: {label: string, data: LoginUser | null}[] = props.loginUsers.map((userData: LoginUser) => {
+    return {label: userData.personaName, data: userData}
+  })
+  loginUsers.unshift({label: "Global", data: null})
   return (
     <div style={SteamCSS.NotificationPrefDetails}>
       <DialogCheckbox
-        onChange={(value)=>{
-          setSettings({...settings, showToast: !value})
-        }}
-        label="Checkbox label"
-        description="Checkbox description"
-        disabled={!settings.enabled}
+        onChange={(value) => setAlarmSetting(props.alarmID, 'showToast', value)}
+        label="Toast"
+        description="Show toast notification"
+        disabled={!enabled}
         bottomSeparator="none"
-        checked={settings.showToast}
+        checked={showToast}
+      />
+      <DialogCheckbox
+        onChange={(value) => setAlarmSetting(props.alarmID, 'playSound', value)}
+        label="Sound"
+        description="Play toast sound"
+        disabled={!enabled}
+        bottomSeparator="none"
+        checked={playSound}
       />
       <Dropdown
         rgOptions={[
@@ -166,13 +210,38 @@ const AlarmItemSettings = (props: AlarmItemSettingsProps) => {
           {label: 'Daily Playtime',   data: thresholdTypes.dailyPlaytime},
           {label: 'Session Playtime', data: thresholdTypes.sessionPlaytime}
         ]}
-        selectedOption={thresholdTypes.discharge}
-        onChange={(value)=> setSettings({...settings, thresholdType: value.data})}
-        disabled={!settings.enabled}
-        menuLabel="Buooong"
-        strDefaultLabel="defaults"
-        focusable={settings.enabled} />
-      <DialogButton onOKButton={()=>{console.log(ctx.settings)}}>Context Settings</DialogButton>
+        selectedOption={thresholdType}
+        onChange={(value)=> {
+          let alarmSettings = getAlarmSettings(props.alarmID)
+          alarmSettings.thresholdType = value.data
+          alarmSettings.thresholdLevel = thresholdLevelDefaults[value.data]
+          setAlarmSettings(props.alarmID, alarmSettings)
+        }}
+        disabled={!enabled}
+        menuLabel="Threshold Type"
+        strDefaultLabel="Error"
+        focusable={enabled} />
+      <Dropdown
+        rgOptions={[
+          {label: 'None',     data: triggerActions.none},
+          {label: 'Suspend',  data: triggerActions.suspend},
+          {label: 'Shutdown', data: triggerActions.shutdown}
+        ]}
+        selectedOption={triggeredAction}
+        onChange={(value)=> setAlarmSetting(props.alarmID, 'triggeredAction', value.data)}
+        disabled={!enabled}
+        menuLabel="Trigger Action"
+        strDefaultLabel="Error"
+        focusable={enabled} />
+      <Dropdown
+        rgOptions={loginUsers}
+        selectedOption={loginUsers.find((user)=>user.data && user.data.accountName == profile)?.data || null}
+        onChange={(value)=> value.data ? setAlarmSetting(props.alarmID, 'profile', value.data.accountName): deleteAlarmSetting(props.alarmID, 'profile') }
+        disabled={!enabled}
+        menuLabel="Per Profile"
+        strDefaultLabel="Error"
+        focusable={enabled} />
+      <DialogButton onOKButton={()=>{console.log(getAlarmSettings(props.alarmID))}}>Context Settings</DialogButton>
     </div>
   )
 }
