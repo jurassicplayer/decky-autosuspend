@@ -1,11 +1,11 @@
-import { createContext, FC, useContext } from 'react'
+import { createContext, FC, useContext, useMemo, useState } from 'react'
 import { ServerAPI } from "decky-frontend-lib"
 import { BackendCtx } from "./Backend"
 import { BatteryState } from "../lib/SteamClient"
 import { SettingsProps, SettingsManager } from "./Settings"
 import { events } from "./Events"
 import { Logger } from "./Logger"
-import { registerAlarmEvents, unregisterAlarmEvents } from './Alarms'
+import { AlarmSetting, registerAlarmEvents, unregisterAlarmEvents } from './Alarms'
 import { AlarmList } from '../Browser/AlarmList'
 import { AlarmSettings } from '../Browser/AlarmSettings'
 
@@ -30,6 +30,19 @@ interface Context {
   registerRoute: (path: string, component: React.ComponentType) => void
   unregisterRoute: (path: string) => void
 }
+interface SettingsContext {
+  getSettings: () => SettingsProps
+  getSetting: (key: string) => any
+  setSetting: (key: string, value: any) => void
+  getAlarmSettings: (alarmID: string) => AlarmSetting
+  setAlarmSettings: (alarmID: string, alarmSettings: AlarmSetting) => void
+  getAlarmSetting: (alarmID: string, key: string) => any
+  setAlarmSetting: (alarmID: string, key: string, value: any) => void
+  deleteAlarmSetting: (alarmID: string, key: string) => void
+  addAlarm: (alarmID: string, alarmSettings: AlarmSetting) => void
+  deleteAlarm: (alarmID: string) => void
+}
+
 export class AppContextState implements Context {
   constructor(serverAPI: ServerAPI) {
     this.serverApi = serverAPI
@@ -112,13 +125,59 @@ export class AppContextState implements Context {
 
 // Create context and export useAppContext to remove need to import useContext + AppContext
 const AppContext = createContext<Context>(null as any)
+const SettingsContext = createContext<SettingsContext>(null as any)
 export const useAppContext = () => useContext(AppContext)
+export const useSettingsContext = () => useContext(SettingsContext)
 
 interface ProviderProps { appContextState: AppContextState }
 export const AppContextProvider: FC<ProviderProps> = ({children, appContextState}) => {
+  const [appCtx, setAppCtx] = useState<Context>(appContextState)
+  const settingsContext: SettingsContext = {
+    getSettings: ()=>{ return appCtx.settings },
+    getSetting: (key) => { return appCtx.settings[key] },
+    setSetting: (key, value) => {
+      let newCtx = {...appCtx}
+      newCtx.settings[key] = value
+      setAppCtx(newCtx)
+    },
+    getAlarmSettings: (alarmID) => { return appCtx.settings.alarms[alarmID] },
+    setAlarmSettings: (alarmID, alarmSettings) => {
+      let newCtx = {...appCtx}
+      newCtx.settings.alarms[alarmID] = alarmSettings
+      setAppCtx(newCtx)
+    },
+    getAlarmSetting: (alarmID, key) => { 
+      console.log(`Get setting ${alarmID}.${key}: `, appCtx.settings.alarms[alarmID][key])
+      return appCtx.settings.alarms[alarmID][key] },
+    setAlarmSetting: (alarmID, key, value) => {
+      console.log(`Set setting ${alarmID}.${key}: `, value)
+      let newCtx = {...appCtx}
+      newCtx.settings.alarms[alarmID][key] = value
+      setAppCtx(newCtx)
+    },
+    deleteAlarmSetting: (alarmID, key) => {
+      console.log(`Delete setting ${alarmID}.${key}`)
+      let newCtx = {...appCtx}
+      delete newCtx.settings.alarms[alarmID][key]
+      setAppCtx(newCtx)
+    },
+    addAlarm: (alarmID, alarmSettings) => {
+      let newCtx = {...appCtx}
+      newCtx.settings.alarms[alarmID] = alarmSettings
+      setAppCtx(newCtx)
+    },
+    deleteAlarm: (alarmID) => {
+      let newCtx = {...appCtx}
+      delete newCtx.settings.alarms[alarmID]
+      setAppCtx(newCtx)
+    }
+  }
+  let context = useMemo(()=>appCtx, [appCtx])
   return (
-    <AppContext.Provider value={{...appContextState}}>
-      {children}
+    <AppContext.Provider value={context}>
+      <SettingsContext.Provider value={settingsContext}>
+        {useMemo(() => children, [])}
+      </SettingsContext.Provider>
     </AppContext.Provider>
   )
 }
