@@ -97,44 +97,45 @@ export const useSettingsContext = () => useContext(SettingsContext)
 
 export const AppContextProvider: FC<ProviderProps> = ({children, appContextState}) => {
   const [appCtx, setAppCtx] = useState<Context>(appContextState)
+  const setSettings = (context: Context) => {
+    // SettingsManager.saveToFile(SettingsManager.validateSettings(context.settings))
+    SettingsManager.saveToFile(context.settings)
+    setAppCtx(context)
+  }
   const settingsContext: SettingsContext = {
     getSettings: ()=>{ return appCtx.settings },
     getSetting: (key) => { return appCtx.settings[key] },
     setSetting: (key, value) => {
       let newCtx = {...appCtx}
       newCtx.settings[key] = value
-      setAppCtx(newCtx)
+      setSettings(newCtx)
     },
     getAlarmSettings: (alarmID) => { return appCtx.settings.alarms[alarmID] },
     setAlarmSettings: (alarmID, alarmSettings) => {
       let newCtx = {...appCtx}
       newCtx.settings.alarms[alarmID] = alarmSettings
-      setAppCtx(newCtx)
+      setSettings(newCtx)
     },
-    getAlarmSetting: (alarmID, key) => { 
-      console.log(`Get setting ${alarmID}.${key}: `, appCtx.settings.alarms[alarmID][key])
-      return appCtx.settings.alarms[alarmID][key] },
+    getAlarmSetting: (alarmID, key) => { return appCtx.settings.alarms[alarmID][key] },
     setAlarmSetting: (alarmID, key, value) => {
-      console.log(`Set setting ${alarmID}.${key}: `, value)
       let newCtx = {...appCtx}
       newCtx.settings.alarms[alarmID][key] = value
-      setAppCtx(newCtx)
+      setSettings(newCtx)
     },
     deleteAlarmSetting: (alarmID, key) => {
-      console.log(`Delete setting ${alarmID}.${key}`)
       let newCtx = {...appCtx}
       delete newCtx.settings.alarms[alarmID][key]
-      setAppCtx(newCtx)
+      setSettings(newCtx)
     },
     addAlarm: (alarmID, alarmSettings) => {
       let newCtx = {...appCtx}
       newCtx.settings.alarms[alarmID] = alarmSettings
-      setAppCtx(newCtx)
+      setSettings(newCtx)
     },
     deleteAlarm: (alarmID) => {
       let newCtx = {...appCtx}
       delete newCtx.settings.alarms[alarmID]
-      setAppCtx(newCtx)
+      setSettings(newCtx)
     }
   }
   let context = useMemo(()=>appCtx, [appCtx])
