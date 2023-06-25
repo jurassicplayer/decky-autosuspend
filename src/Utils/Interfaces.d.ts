@@ -9,7 +9,6 @@ export interface BatteryState {
   flLevel: number,
   nSecondsRemaining: number,
 }
-
 interface AppInfo {
   initialized: boolean
   name: string
@@ -31,7 +30,6 @@ export interface Context {
   registerRoute: (path: string, component: React.ComponentType) => void
   unregisterRoute: (path: string) => void
 }
-
 export interface SettingsContext {
   getSettings: () => SettingsProps
   getSetting: (key: string) => any
@@ -44,30 +42,21 @@ export interface SettingsContext {
   addAlarm: (alarmID: string, alarmSettings: AlarmSetting) => void
   deleteAlarm: (alarmID: string) => void
 }
-
 export interface ProviderProps { appContextState: AppContextState }
 // #endregion
 
-export type AlarmItemProps<T> = {
-  entry: ReorderableEntry<T>
+// #region Settings Interfaces
+export interface SettingsProps extends IObjectKeys {
+  defaultShowToast: boolean
+  defaultPlaySound: boolean
+  defaultSound: string
+  defaultRepeatToast: boolean
+  defaultRepeatSound: boolean
+  defaultAlarmRepeat: number
+  debuggingMode: boolean
+  alarms: Alarms
 }
-export interface EntryProps {
-  alarmID: string
-  alarmName: string
-}
-
-interface AlarmItemSettingsProps {
-  alarmID: string
-  loginUsers: LoginUser[]
-}
-interface ProfileData {
-  personaName: string
-  avatarUrl: string
-}
-interface LoginUser extends ProfileData{
-  accountName: string
-  rememberPassword: boolean
-}
+// #endregion
 
 // #region Alarm Setting Enumerations
 export enum thresholdTypes {
@@ -81,19 +70,6 @@ export enum triggerActions {
   none = 'none',
   suspend = 'suspend',
   shutdown = 'shutdown'
-}
-// #endregion
-
-// #region Settings Interfaces
-export interface SettingsProps extends IObjectKeys {
-  defaultShowToast: boolean
-  defaultPlaySound: boolean
-  defaultSound: string
-  defaultRepeatToast: boolean
-  defaultRepeatSound: boolean
-  defaultAlarmRepeat: number
-  debuggingMode: boolean
-  alarms: Alarms
 }
 // #endregion
 
@@ -122,5 +98,24 @@ export interface AlarmHistory {
   lastTriggered?: number
   sessionStartTime?: number
   currentPlayTime?: number
+}
+export type AlarmItemProps<T> = {
+  entry: ReorderableEntry<T>
+}
+export interface EntryProps {
+  alarmID: string
+  alarmName: string
+}
+interface AlarmItemSettingsProps {
+  alarmID: string
+  loginUsers: LoginUser[]
+}
+interface ProfileData {
+  personaName: string
+  avatarUrl: string
+}
+interface LoginUser extends ProfileData{
+  accountName: string
+  rememberPassword: boolean
 }
 // #endregion

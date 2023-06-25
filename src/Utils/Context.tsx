@@ -1,15 +1,13 @@
 import { createContext, FC, useContext, useMemo, useState } from 'react'
 import { ServerAPI } from "decky-frontend-lib"
 import { BackendCtx } from "./Backend"
-import { BatteryState } from "./Interfaces"
-import { SettingsProps, SettingsManager } from "./Settings"
+import { BatteryState, SettingsProps } from "./Interfaces"
+import { SettingsManager } from "./Settings"
 import { events } from "./Events"
 import { Logger } from "./Logger"
 import { registerAlarmEvents, unregisterAlarmEvents } from './Alarms'
 import { AlarmList } from '../Browser/AlarmList'
 import { AppInfo, Context, ProviderProps, SettingsContext, SteamHook } from './Interfaces'
-
-
 
 export class AppContextState implements Context {
   constructor(serverAPI: ServerAPI) {
