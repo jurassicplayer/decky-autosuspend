@@ -1,7 +1,7 @@
 import { BackendCtx } from './Backend'
 import { Logger } from './Logger'
 import { NavSoundMap } from './SteamUtils'
-import { Alarms, AlarmSetting, alarmTypes, thresholdTypes, triggerActions } from './Alarms'
+import { Alarms, AlarmSetting, thresholdTypes, triggerActions } from './Alarms'
 import { IObjectKeys } from './Interfaces'
 
 // #region Interfaces
@@ -9,7 +9,8 @@ export interface SettingsProps extends IObjectKeys {
   defaultShowToast: boolean
   defaultPlaySound: boolean
   defaultSound: string
-  defaultAlarmType: string
+  defaultRepeatToast: boolean
+  defaultRepeatSound: boolean
   defaultAlarmRepeat: number
   debuggingMode: boolean
   alarms: Alarms
@@ -21,7 +22,8 @@ export const defaultSettings: SettingsProps = {
   defaultShowToast: true,
   defaultPlaySound: true,
   defaultSound: NavSoundMap.ToastMisc,
-  defaultAlarmType: alarmTypes.none,
+  defaultRepeatToast: false,
+  defaultRepeatSound: false,
   defaultAlarmRepeat: 0,
   debuggingMode: false,
   alarms: {
@@ -54,7 +56,8 @@ const exampleAlarmSettings: AlarmSetting = {
   showToast: true,
   playSound: true,
   sound: NavSoundMap[6],
-  alarmType: alarmTypes.none,
+  repeatToast: false,
+  repeatSound: false,
   alarmRepeat: 0,
   alarmName: '',
   alarmMessage: '',
@@ -137,7 +140,7 @@ export class SettingsManager {
 
   static validateKey(key: string, setting: any, defaults: any) {
     let invalidNotice: string = 'valid'
-    let nullableSettings = ['showToast', 'playSound', 'sound', 'alarmType', 'alarmRepeat', 'alarmMessage', 'profile']
+    let nullableSettings = ['showToast', 'playSound', 'sound', 'repeatToast', 'repeatSound', 'alarmRepeat', 'alarmMessage', 'profile']
     // Validate settings: remove wrong base typing (number, string, boolean, object, undefined)
     if (!(typeof setting == typeof defaults) && !(typeof setting == 'undefined' && nullableSettings.includes(key))) {
       invalidNotice = `[${key}]: expected ${typeof defaults}, found ${typeof setting}`
@@ -145,9 +148,6 @@ export class SettingsManager {
     // Validate settings: remove wrong interface typing (navSound, alarmTypes, thresholdTypes, triggerActions)
     if (['defaultSound', 'sound'].includes(key) && (!(setting in NavSoundMap) && (typeof setting) != 'undefined')) {
       invalidNotice = `[${key}]: "${setting}" is not a valid sound`
-    } else
-    if (['defaultAlarmType', 'alarmType'].includes(key) && (!Object.values(alarmTypes).includes(setting as alarmTypes) && (typeof setting) != 'undefined')) {
-      invalidNotice = `[${key}]: "${setting}" is not a valid alarm type`
     } else
     if (key == 'thresholdType' && !Object.values(thresholdTypes).includes(setting as thresholdTypes)) {
       invalidNotice = `[${key}]: "${setting}" is not a valid threshold type`
