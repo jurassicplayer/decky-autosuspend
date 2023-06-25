@@ -1,52 +1,9 @@
 import { SteamUtils } from "./SteamUtils"
 import { AppContextState } from "./Context"
 import { events } from "./Events"
-import { SettingsManager, SettingsProps } from "./Settings"
+import { SettingsManager, applyDefaults } from "./Settings"
 import { sleep } from "decky-frontend-lib"
-import { IObjectKeys } from "./Interfaces"
-
-// #region Enumerations
-export enum thresholdTypes {
-  overcharge = 'overcharge',
-  discharge = 'discharge',
-  dailyPlaytime = 'dailyPlaytime',
-  sessionPlaytime = 'sessionPlaytime',
-  bedtime = 'bedtime'
-}
-export enum triggerActions {
-  none = 'none',
-  suspend = 'suspend',
-  shutdown = 'shutdown'
-}
-// #endregion
-
-// #region Interfaces
-export interface AlarmSetting extends IObjectKeys {
-  showToast?: boolean
-  playSound?: boolean
-  sound?: string
-  repeatToast?: boolean
-  repeatSound?: boolean
-  alarmRepeat?: number
-  alarmName: string
-  alarmMessage?: string
-  thresholdLevel: number
-  thresholdType: thresholdTypes
-  triggeredAction: triggerActions
-  enabled: boolean
-  profile?: string
-  sortOrder: number
-}
-export interface Alarms {
-  [uniqueid: string]: AlarmSetting
-}
-export interface AlarmHistory {
-  triggered: boolean
-  lastTriggered?: number
-  sessionStartTime?: number
-  currentPlayTime?: number
-}
-// #endregion
+import { AlarmHistory, AlarmSetting, thresholdTypes, triggerActions } from "./Interfaces"
 
 // #region Constants
 const minute = 1000 * 60
@@ -66,28 +23,6 @@ export function setAlarmHistory(alarmID: string, history: AlarmHistory) {
   let histories = JSON.parse(s_histories ? s_histories : '{}')
   histories[alarmID] = history
   localStorage.setItem('autosuspend-alarms', JSON.stringify(histories))
-}
-
-export function applyDefaults(settings: AlarmSetting, defaults: SettingsProps) {
-  let { showToast, playSound, sound, repeatToast, repeatSound, alarmRepeat, alarmMessage } = settings
-  let { defaultShowToast, defaultPlaySound, defaultSound, defaultRepeatToast, defaultRepeatSound, defaultAlarmRepeat } = defaults
-  let showToastOrDefault    = (typeof showToast     != 'undefined') ? showToast    : defaultShowToast
-  let playSoundOrDefault    = (typeof playSound     != 'undefined') ? playSound    : defaultPlaySound
-  let soundOrDefault        = (typeof sound         != 'undefined') ? sound        : defaultSound
-  let repeatToastOrDefault  = (typeof repeatToast   != 'undefined') ? repeatToast  : defaultRepeatToast
-  let repeatSoundOrDefault  = (typeof repeatSound   != 'undefined') ? repeatSound  : defaultRepeatSound
-  let alarmRepeatOrDefault  = (typeof alarmRepeat   != 'undefined') ? alarmRepeat  : defaultAlarmRepeat
-  let alarmMessageOrBlank   = (typeof alarmMessage  != 'undefined') ? alarmMessage : ""
-  let newSettings = {
-    showToast:    showToastOrDefault,
-    playSound:    playSoundOrDefault,
-    sound:        soundOrDefault,
-    repeatToast:  repeatToastOrDefault,
-    repeatSound:  repeatSoundOrDefault,
-    alarmRepeat:  alarmRepeatOrDefault,
-    alarmMessage: alarmMessageOrBlank
-  }
-  return {...settings, ...newSettings}
 }
 
 export const evaluateAlarm = async (alarmID: string, settings: AlarmSetting, context: AppContextState) => {

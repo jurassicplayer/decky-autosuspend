@@ -1,47 +1,15 @@
 import { createContext, FC, useContext, useMemo, useState } from 'react'
 import { ServerAPI } from "decky-frontend-lib"
 import { BackendCtx } from "./Backend"
-import { BatteryState } from "../lib/SteamClient"
+import { BatteryState } from "./Interfaces"
 import { SettingsProps, SettingsManager } from "./Settings"
 import { events } from "./Events"
 import { Logger } from "./Logger"
-import { AlarmSetting, registerAlarmEvents, unregisterAlarmEvents } from './Alarms'
+import { registerAlarmEvents, unregisterAlarmEvents } from './Alarms'
 import { AlarmList } from '../Browser/AlarmList'
-import { AlarmSettings } from '../Browser/AlarmSettings'
+import { AppInfo, Context, ProviderProps, SettingsContext, SteamHook } from './Interfaces'
 
-interface AppInfo {
-  initialized: boolean
-  name: string
-  version: string
-}
-interface SteamHook {
-  unregister: () => void
-}
 
-// #region Context definition and constructor
-interface Context {
-  settings: SettingsProps       // When modifying settings, apply modification to this and use for plugin.
-  appInfo: AppInfo
-  batteryState: BatteryState
-  eventBus: EventTarget
-  serverApi: ServerAPI
-  activeHooks: SteamHook[]
-  activeRoutes: string[]
-  registerRoute: (path: string, component: React.ComponentType) => void
-  unregisterRoute: (path: string) => void
-}
-interface SettingsContext {
-  getSettings: () => SettingsProps
-  getSetting: (key: string) => any
-  setSetting: (key: string, value: any) => void
-  getAlarmSettings: (alarmID: string) => AlarmSetting
-  setAlarmSettings: (alarmID: string, alarmSettings: AlarmSetting) => void
-  getAlarmSetting: (alarmID: string, key: string) => any
-  setAlarmSetting: (alarmID: string, key: string, value: any) => void
-  deleteAlarmSetting: (alarmID: string, key: string) => void
-  addAlarm: (alarmID: string, alarmSettings: AlarmSetting) => void
-  deleteAlarm: (alarmID: string) => void
-}
 
 export class AppContextState implements Context {
   constructor(serverAPI: ServerAPI) {
@@ -129,7 +97,6 @@ const SettingsContext = createContext<SettingsContext>(null as any)
 export const useAppContext = () => useContext(AppContext)
 export const useSettingsContext = () => useContext(SettingsContext)
 
-interface ProviderProps { appContextState: AppContextState }
 export const AppContextProvider: FC<ProviderProps> = ({children, appContextState}) => {
   const [appCtx, setAppCtx] = useState<Context>(appContextState)
   const settingsContext: SettingsContext = {

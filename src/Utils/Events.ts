@@ -1,4 +1,4 @@
-import { BatteryState } from "../lib/SteamClient"
+import { BatteryState } from "./Interfaces"
 export namespace events {
   export class AppStateEvent extends Event {
     public static eType: string = 'AppStateEvent'

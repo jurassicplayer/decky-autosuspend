@@ -1,21 +1,7 @@
 import { BackendCtx } from './Backend'
 import { Logger } from './Logger'
 import { NavSoundMap } from './SteamUtils'
-import { Alarms, AlarmSetting, thresholdTypes, triggerActions } from './Alarms'
-import { IObjectKeys } from './Interfaces'
-
-// #region Interfaces
-export interface SettingsProps extends IObjectKeys {
-  defaultShowToast: boolean
-  defaultPlaySound: boolean
-  defaultSound: string
-  defaultRepeatToast: boolean
-  defaultRepeatSound: boolean
-  defaultAlarmRepeat: number
-  debuggingMode: boolean
-  alarms: Alarms
-}
-// #endregion
+import { Alarms, AlarmSetting, SettingsProps, thresholdTypes, triggerActions } from './Interfaces'
 
 // #region Default application settings
 export const defaultSettings: SettingsProps = {
@@ -71,8 +57,6 @@ const exampleAlarmSettings: AlarmSetting = {
 // #endregion
 
 export class SettingsManager {
-  //static settings: SettingsProps = defaultSettings
-  //static userSettings: SettingsProps
   static debuggingMode: boolean = false
   static async saveToFile(userSettings: SettingsProps) {
     let settings: {[key:string]: any} = {...userSettings}
@@ -157,4 +141,26 @@ export class SettingsManager {
     }
     return invalidNotice
   }
+}
+
+export function applyDefaults(settings: AlarmSetting, defaults: SettingsProps) {
+  let { showToast, playSound, sound, repeatToast, repeatSound, alarmRepeat, alarmMessage } = settings
+  let { defaultShowToast, defaultPlaySound, defaultSound, defaultRepeatToast, defaultRepeatSound, defaultAlarmRepeat } = defaults
+  let showToastOrDefault    = (typeof showToast     != 'undefined') ? showToast    : defaultShowToast
+  let playSoundOrDefault    = (typeof playSound     != 'undefined') ? playSound    : defaultPlaySound
+  let soundOrDefault        = (typeof sound         != 'undefined') ? sound        : defaultSound
+  let repeatToastOrDefault  = (typeof repeatToast   != 'undefined') ? repeatToast  : defaultRepeatToast
+  let repeatSoundOrDefault  = (typeof repeatSound   != 'undefined') ? repeatSound  : defaultRepeatSound
+  let alarmRepeatOrDefault  = (typeof alarmRepeat   != 'undefined') ? alarmRepeat  : defaultAlarmRepeat
+  let alarmMessageOrBlank   = (typeof alarmMessage  != 'undefined') ? alarmMessage : ""
+  let newSettings = {
+    showToast:    showToastOrDefault,
+    playSound:    playSoundOrDefault,
+    sound:        soundOrDefault,
+    repeatToast:  repeatToastOrDefault,
+    repeatSound:  repeatSoundOrDefault,
+    alarmRepeat:  alarmRepeatOrDefault,
+    alarmMessage: alarmMessageOrBlank
+  }
+  return {...settings, ...newSettings}
 }

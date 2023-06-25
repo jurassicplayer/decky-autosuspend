@@ -1,9 +1,4 @@
 import { ServerAPI } from "decky-frontend-lib"
-export enum appStates {
-  initializing,
-  failedInitialize,
-  idle
-}
 
 export class BackendCtx {
   static initialize(serverApi: ServerAPI) {

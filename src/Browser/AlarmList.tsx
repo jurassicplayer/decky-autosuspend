@@ -1,10 +1,10 @@
-import { DialogBody, DialogButton, DialogControlsSection, DialogSubHeader, Focusable, ReorderableEntry } from "decky-frontend-lib"
+import { DialogBody, DialogButton, DialogControlsSection, DialogSubHeader, ReorderableEntry } from "decky-frontend-lib"
 import { VFC, useEffect } from "react"
 import { useSettingsContext } from "../Utils/Context"
-import { AlarmItem, EntryProps } from "./AlarmItem"
+import { AlarmItem } from "./AlarmItem"
 import { SteamCssVariables } from "../Utils/SteamUtils"
-import { Alarms } from "../Utils/Alarms"
 import { FaPlusSquare } from "react-icons/fa"
+import { Alarms, EntryProps } from "../Utils/Interfaces"
 
 export const AlarmList: VFC = () => {
   let { getSetting, getAlarmSettings, getAlarmSetting } = useSettingsContext()
