@@ -1,9 +1,10 @@
-import { DialogBody, DialogControlsSection, DialogSubHeader, ReorderableEntry } from "decky-frontend-lib"
+import { DialogBody, DialogButton, DialogControlsSection, DialogSubHeader, Focusable, ReorderableEntry } from "decky-frontend-lib"
 import { VFC, useEffect } from "react"
 import { useSettingsContext } from "../Utils/Context"
 import { AlarmItem, EntryProps } from "./AlarmItem"
 import { SteamCssVariables } from "../Utils/SteamUtils"
 import { Alarms } from "../Utils/Alarms"
+import { FaPlusSquare } from "react-icons/fa"
 
 export const AlarmList: VFC = () => {
   let { getSetting, getAlarmSettings, getAlarmSetting } = useSettingsContext()
@@ -37,7 +38,7 @@ export const AlarmList: VFC = () => {
   return (
     <DialogBody>
       <DialogControlsSection style={{marginTop: "40px", padding: SteamCssVariables.gpSpaceGap, rowGap: SteamCssVariables.gpSpaceGap, backgroundColor: SteamCssVariables.gpSystemDarkestGrey, height: "-webkit-fill-available"}}>
-        <DialogSubHeader>Alarms</DialogSubHeader>
+        <DialogSubHeader>Alarms<DialogButton><FaPlusSquare/></DialogButton></DialogSubHeader>
         {alarmList}
       </DialogControlsSection>
     </DialogBody>
