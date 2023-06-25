@@ -59,7 +59,7 @@ const exampleAlarmSettings: AlarmSetting = {
 export class SettingsManager {
   static debuggingMode: boolean = false
   static async saveToFile(userSettings: SettingsProps) {
-    let settings: {[key:string]: any} = {...userSettings}
+    let settings = userSettings
     let promises = Object.keys(settings).map(key => {
       return BackendCtx.setSetting(key, settings[key])
     })
@@ -71,7 +71,7 @@ export class SettingsManager {
 
   static async loadFromFile() {
     let userSettings: {[key:string]: any} = {}
-    let validSettings: {[key:string]: any} = {...defaultSettings}
+    let validSettings = defaultSettings
     for (let key in validSettings) {
       userSettings[key] = await BackendCtx.getSetting(key, validSettings[key])
     }
@@ -83,9 +83,9 @@ export class SettingsManager {
   }
 
   static validateSettings(settings: SettingsProps): SettingsProps {
-    let userSettings: {[key:string]: any} = {...settings}
-    let validSettings: {[key:string]: any} = {...defaultSettings}
-    let alarmSettings: {[key:string]: any} = {...exampleAlarmSettings}
+    let userSettings = settings
+    let validSettings = defaultSettings
+    let alarmSettings = exampleAlarmSettings
     let invalidNotices: string[] = []
     for (let key in validSettings) {
       let settingValidation = this.validateKey(key, userSettings[key], validSettings[key])
