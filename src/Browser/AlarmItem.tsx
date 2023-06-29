@@ -56,7 +56,7 @@ export const AlarmItem = (props: AlarmItemProps<EntryProps>) => {
           <ToggleField layout="below" bottomSeparator="none" checked={enabled} onChange={(value) => setAlarmSetting(alarmID, 'enabled', value) }/>
         </div>
         <div style={SteamCss.NotificationDescription}>
-        {alarmName}
+        {alarmName || alarmID}
         <IconContext.Provider value={{size: "0.8em"}}>
           <div style={{display:"flex", columnGap: "0.8em"}}>
             {profile ?
