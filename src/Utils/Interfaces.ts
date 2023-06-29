@@ -1,3 +1,6 @@
+import { ReorderableEntry, ServerAPI } from "decky-frontend-lib"
+import { AppContextState } from "./Context"
+
 interface IObjectKeys {
   [key: string]: any
 }
@@ -9,12 +12,12 @@ export interface BatteryState {
   flLevel: number,
   nSecondsRemaining: number,
 }
-interface AppInfo {
+export interface AppInfo {
   initialized: boolean
   name: string
   version: string
 }
-interface SteamHook {
+export interface SteamHook {
   unregister: () => void
 }
 
@@ -106,15 +109,15 @@ export interface EntryProps {
   alarmID: string
   alarmName: string
 }
-interface AlarmItemSettingsProps {
+export interface AlarmItemSettingsProps {
   alarmID: string
   loginUsers: LoginUser[]
 }
-interface ProfileData {
+export interface ProfileData {
   personaName: string
   avatarUrl: string
 }
-interface LoginUser extends ProfileData{
+export interface LoginUser extends ProfileData {
   accountName: string
   rememberPassword: boolean
 }
