@@ -18,7 +18,7 @@ export const AlarmItemSettings = (props: AlarmItemSettingsProps) => {
   })
   loginUsers.unshift({label: "Global", data: null})
   return (
-    <div style={SteamCss.NotificationPrefDetails}>
+    <div style={{...SteamCss.NotificationPrefDetails, padding: "1ex 1ex 0 2ex"}}>
       <div style={{display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between"}}>
         <span>Alarm Name:</span>
         <div style={{maxWidth: "80%", flexGrow: 1, marginLeft: "0.8em"}}>
