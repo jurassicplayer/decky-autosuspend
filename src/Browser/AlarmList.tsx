@@ -1,10 +1,16 @@
-import { DialogBody, DialogButton, DialogControlsSection, DialogSubHeader, ReorderableEntry } from "decky-frontend-lib"
-import { VFC, useEffect } from "react"
+import { DialogBody, DialogButton, DialogControlsSection, Focusable, ReorderableEntry } from "decky-frontend-lib"
+import { CSSProperties, VFC, useEffect } from "react"
 import { useSettingsContext } from "../Utils/Context"
 import { AlarmItem } from "./AlarmItem"
 import { SteamCssVariables } from "../Utils/SteamUtils"
-import { FaPlusSquare } from "react-icons/fa"
+import { FaCog, FaPlusSquare } from "react-icons/fa"
+import { BsInfoSquareFill } from "react-icons/bs"
 import { Alarms, EntryProps } from "../Utils/Interfaces"
+
+const buttonCss: CSSProperties = {
+  minWidth: "0px",
+  width: "4em"
+}
 
 export const AlarmList: VFC = () => {
   let { getSetting, getAlarmSettings, getAlarmSetting } = useSettingsContext()
@@ -37,8 +43,15 @@ export const AlarmList: VFC = () => {
   let alarmList = entries.map((entry) => <AlarmItem entry={entry}/>)
   return (
     <DialogBody>
-      <DialogControlsSection style={{marginTop: "40px", padding: SteamCssVariables.gpSpaceGap, rowGap: SteamCssVariables.gpSpaceGap, backgroundColor: SteamCssVariables.gpSystemDarkestGrey, height: "-webkit-fill-available"}}>
-        <DialogSubHeader>Alarms<DialogButton><FaPlusSquare/></DialogButton></DialogSubHeader>
+      <DialogControlsSection style={{marginTop: "40px", padding: SteamCssVariables.gpSpaceGap, paddingTop: "0px", rowGap: SteamCssVariables.gpSpaceGap, backgroundColor: SteamCssVariables.gpSystemDarkestGrey, overflow: "auto", height: "-webkit-fill-available"}}>
+        <div style={{display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between", rowGap: "1em"}}>
+          <span style={{fontSize: "2em"}}>Alarms</span>
+          <Focusable style={{display: "flex", flexDirection: "row", alignItems: "center", columnGap: "0.4em"}}>
+            <DialogButton style={buttonCss}><FaPlusSquare/></DialogButton>
+            <DialogButton style={buttonCss}><FaCog/></DialogButton>
+            <DialogButton style={buttonCss}><BsInfoSquareFill/></DialogButton>
+          </Focusable>
+        </div>
         {alarmList}
       </DialogControlsSection>
     </DialogBody>
