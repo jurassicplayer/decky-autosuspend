@@ -13,7 +13,7 @@ const NavigateToAlarms = () => {
 export const QAMPanel: VFC = () => {
   return (
     <Focusable>
-      <DialogButton onOKButton={NavigateToAlarms} />
+      <DialogButton onOKButton={NavigateToAlarms}>Settings</DialogButton>
     </Focusable>
   )
 }
