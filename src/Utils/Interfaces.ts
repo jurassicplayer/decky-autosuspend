@@ -121,4 +121,11 @@ export interface LoginUser extends ProfileData {
   accountName: string
   rememberPassword: boolean
 }
+export interface thresholdLevels extends IObjectKeys {
+  discharge: number
+  overcharge: number
+  bedtime: number
+  dailyPlaytime: number
+  sessionPlaytime: number
+}
 // #endregion

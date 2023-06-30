@@ -1,7 +1,7 @@
 import { BackendCtx } from './Backend'
 import { Logger } from './Logger'
 import { NavSoundMap } from './SteamUtils'
-import { Alarms, AlarmSetting, SettingsProps, thresholdTypes, triggerActions } from './Interfaces'
+import { Alarms, AlarmSetting, SettingsProps, thresholdLevels, thresholdTypes, triggerActions } from './Interfaces'
 
 // #region Default application settings
 export const defaultSettings: SettingsProps = {
@@ -31,12 +31,12 @@ export const defaultSettings: SettingsProps = {
     }
   } 
 }
-export const thresholdLevelDefaults:{[key:string]: number} = {
-  discharge: 0,
-  overcharge: 85,
-  bedtime: 100000,
-  dailyPlaytime: 100000,
-  sessionPlaytime: 100000
+export const thresholdLevelDefaults: thresholdLevels = {
+  discharge: 20,
+  overcharge: 80,
+  bedtime: 79200000, // 10pm
+  dailyPlaytime: 14400000, // 4 hours
+  sessionPlaytime: 7200000 // 2 hours
 }
 const exampleAlarmSettings: AlarmSetting = {
   showToast: true,
