@@ -1,4 +1,4 @@
-import { DialogButton, DropdownItem, NotchLabel, SliderField, TextField, ToggleField } from "decky-frontend-lib"
+import { DialogButton, DropdownItem, DropdownOption, NotchLabel, SingleDropdownOption, SliderField, TextField, ToggleField } from "decky-frontend-lib"
 import { AlarmItemSettingsProps, LoginUser, thresholdLevels, thresholdTypes, triggerActions } from "../Utils/Interfaces"
 import { NavSoundMap, SteamCss, SteamUtils } from "../Utils/SteamUtils"
 import { useSettingsContext } from "../Utils/Context"
@@ -86,7 +86,7 @@ export const AlarmItemSettings = (props: AlarmItemSettingsProps) => {
         { !enabled && (thresholdType === thresholdTypes.discharge || thresholdType === thresholdTypes.overcharge) ? 
           <SliderField
             label="Threshold Level"
-            description="Add thy threshold level description here ##FIXME##"
+            description="Battery percentage threshold to pass before triggering alarm"
             value={getThresholdValue(componentState, thresholdType)}
             min={0}
             max={100}
@@ -113,19 +113,39 @@ export const AlarmItemSettings = (props: AlarmItemSettingsProps) => {
             }}
             />
         : null}
-        { thresholdType === thresholdTypes.bedtime || thresholdType === thresholdTypes.dailyPlaytime || thresholdType === thresholdTypes.sessionPlaytime ?
-          <DropdownItem
-            rgOptions={[{label: '', data: ''}]}
-            selectedOption={''}
-            label="Threshold Level"
-            description="Add thy threshold level description here ##FIXME##"
-            disabled={enabled}
-            focusable={!enabled}/>
-        : null}
         { enabled && (thresholdType === thresholdTypes.discharge || thresholdType === thresholdTypes.overcharge) ? 
           <div style={{display: "flex", flexDirection: "row", justifyContent: "space-between"}}>
-            <span>Threshold Level: <span>Add thy threshold level description here ##FIXME##</span></span>
+            <span>Threshold Level: <span>Battery percentage threshold to pass before triggering alarm</span></span>
             <span>{getThresholdValue(componentState, thresholdType)}</span>
+          </div>
+        : null}
+        { thresholdType === thresholdTypes.bedtime || thresholdType === thresholdTypes.dailyPlaytime || thresholdType === thresholdTypes.sessionPlaytime ?
+          <div style={{display: "flex", flexDirection: "row", alignItems: "center"}}>
+            <span>Threshold Level:</span>
+            <div style={{display: "flex", flexDirection: "row"}}>
+              <DropdownItem
+                rgOptions={ (()=>{
+                  let options:DropdownOption[] = []
+                  for (let i=0;i<24;i++){ options.push({label: `${i}`, data: i}) }
+                  return options
+                  })()
+                }
+                selectedOption={0}
+                label="Hour"
+                disabled={enabled}
+                focusable={!enabled}/>
+              <DropdownItem
+                rgOptions={ (()=>{
+                  let options:DropdownOption[] = []
+                  for (let i=0;i<60;i++){ options.push({label: `${i}`, data: i}) }
+                  return options
+                  })()
+                }
+                selectedOption={0}
+                label="Minute"
+                disabled={enabled}
+                focusable={!enabled}/>
+            </div>
           </div>
         : null}
       </div>
