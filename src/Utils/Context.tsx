@@ -146,11 +146,13 @@ export const AppContextProvider: FC<ProviderProps> = ({children, appContextState
       let newCtx = {...appCtx}
       newCtx.settings.alarms[alarmID] = alarmSettings
       setSettings(newCtx)
+      Logger.info(`Created alarm [${alarmID}]:\n${JSON.stringify(alarmSettings, null, 2)}`)
     },
     deleteAlarm: (alarmID) => {
       let newCtx = {...appCtx}
       delete newCtx.settings.alarms[alarmID]
       setSettings(newCtx)
+      Logger.info(`Deleted alarm [${alarmID}]`)
     }
   }
   let context = useMemo(()=>appCtx, [appCtx])
