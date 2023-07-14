@@ -4,7 +4,7 @@ import { AppContextState } from "./Context"
 interface IObjectKeys {
   [key: string]: any
 }
-
+// #region SteamClient
 export interface BatteryState {
   bHasBattery: boolean,
   bShutdownRequested: boolean,
@@ -12,6 +12,62 @@ export interface BatteryState {
   flLevel: number,
   nSecondsRemaining: number,
 }
+export interface SteamSettings extends IObjectKeys {
+  bCefRemoteDebuggingEnabled: boolean
+  bChangeBetaEnabled: boolean
+  bCheckScreenshotsEnabled: boolean
+  bCloudEnabled: boolean
+  bCompatEnabled: boolean
+  bCompatEnabledForOtherTitles: boolean
+  bDisplayIsExternal: boolean
+  bDisplayIsUsingAutoScale: boolean
+  bEnableGamepadUIOverlay: boolean
+  bEnableSoftProcessKill: boolean
+  bEnableTabbedAppDetails: boolean
+  bEnableTestUpdaters: boolean
+  bForceOOBE: boolean
+  bIsInClientBeta: boolean
+  bIsInDesktopUIBeta: boolean
+  bIsOfflineMode: boolean
+  bIsSteamSideload: boolean
+  bIsValveEmail: boolean
+  bLibraryWhatsNewShowOnlyProductUpdates: boolean
+  bOOBETestModeEnabled: boolean
+  bShowMobxDevTools: boolean
+  bShowStoreContentOnHome: boolean
+  bSmallMode: boolean
+  bUISoundsEnabled: boolean
+  bUnderscanEnabled: boolean
+  eClientBetaState: number //enumeration?
+  eOverrideBrowserComposerMode: number //enumeration?
+  flAutoDisplayScaleFactor: number
+  flCurrentDisplayScaleFactor: number
+  flCurrentUnderscanLevel: number
+  flMaxDisplayScaleFactor: number
+  flMinDisplayScaleFactor: number
+  nAvailableBetas: number
+  nSelectedBetaID: number
+  strCompatTool: string
+  strDisplayName: string
+  strSelectedBetaName: string
+  vecAvailableClientBetas: AvailableClientBeta[]
+  vecNightModeScheduledHours: Hour[]
+  vecValidAutoUpdateRestrictHours: Hour[]
+  vecValidDownloadRegions: DownloadRegion[]
+}
+interface AvailableClientBeta {
+  nBetaID: number
+  strName: string
+}
+export interface Hour {
+  nHour: number
+  strDisplay: string
+}
+interface DownloadRegion {
+  nRegionID: number
+  strRegionName: string
+}
+// #endregion
 export interface AppInfo {
   initialized: boolean
   name: string
@@ -30,6 +86,8 @@ export interface Context {
   serverApi: ServerAPI
   activeHooks: SteamHook[]
   activeRoutes: string[]
+  timeformat24: boolean
+  vecHours: Hour[]
   registerRoute: (path: string, component: React.ComponentType) => void
   unregisterRoute: (path: string) => void
 }
