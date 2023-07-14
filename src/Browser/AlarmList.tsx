@@ -6,7 +6,6 @@ import { SteamCssVariables } from "../Utils/SteamUtils"
 import { FaCog, FaPlusSquare } from "react-icons/fa"
 import { BsInfoSquareFill } from "react-icons/bs"
 import { Alarms, EntryProps } from "../Utils/Interfaces"
-import Spinner from "../InputControls/Spinner"
 
 const buttonCss: CSSProperties = {
   minWidth: "0px",
@@ -53,7 +52,6 @@ export const AlarmList: VFC = () => {
             <DialogButton style={buttonCss}><BsInfoSquareFill/></DialogButton>
           </Focusable>
         </div>
-        <Spinner value={0} />
         {alarmList}
       </DialogControlsSection>
     </DialogBody>

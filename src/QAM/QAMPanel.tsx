@@ -4,7 +4,6 @@ import {
   Navigation
 } from "decky-frontend-lib"
 import { VFC } from "react"
-import Spinner from "../InputControls/Spinner"
 
 
 const NavigateToAlarms = () => {
@@ -15,7 +14,6 @@ export const QAMPanel: VFC = () => {
   return (
     <Focusable>
       <DialogButton onOKButton={NavigateToAlarms}>Settings</DialogButton>
-      <Spinner value={0} />
     </Focusable>
   )
 }
