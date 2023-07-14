@@ -1,11 +1,11 @@
-import { FaBatteryFull, FaBatteryQuarter, FaBed, FaExclamationCircle, FaMoon, FaPowerOff, FaStopwatch, FaSun, FaUser, FaUsers, FaVolumeMute, FaVolumeUp } from "react-icons/fa"
+import { FaBatteryFull, FaBatteryQuarter, FaBed, FaExclamationCircle, FaMinusSquare, FaMoon, FaPowerOff, FaStopwatch, FaSun, FaUser, FaUsers, FaVolumeMute, FaVolumeUp } from "react-icons/fa"
 import { FaArrowRotateRight } from "react-icons/fa6"
 import { BiNotification, BiNotificationOff } from "react-icons/bi"
 import { IconContext } from "react-icons"
 import { useState, SVGProps, useEffect } from "react"
 import { DialogButton, ToggleField } from "decky-frontend-lib"
 import { applyDefaults } from "../Utils/Settings"
-import { SteamCss } from "../Utils/SteamUtils"
+import { SteamCss, SteamCssVariables } from "../Utils/SteamUtils"
 import { useSettingsContext } from "../Utils/Context"
 import { AlarmItemProps, EntryProps, LoginUser, ProfileData } from "../Utils/Interfaces"
 import { AlarmItemSettings } from "./AlarmSettings"
@@ -16,7 +16,8 @@ const SteamChevronDown = (props:SVGProps<SVGSVGElement>) => {
 
 export const AlarmItem = (props: AlarmItemProps<EntryProps>) => {
   let alarmID = props.entry.data!.alarmID
-  let { getSettings, getAlarmSettings, setAlarmSetting } = useSettingsContext()
+  let setAlarms = props.setAlarms
+  let { getSetting, getSettings, getAlarmSettings, setAlarmSetting, deleteAlarm } = useSettingsContext()
   let { enabled, alarmName, profile, showToast, playSound, alarmRepeat, thresholdType, triggeredAction } = applyDefaults(getAlarmSettings(alarmID), getSettings())
   let [selected, setSelected] = useState<boolean>(false)
   let [loginUsers, setLoginUsers] = useState<LoginUser[]>([])
@@ -49,6 +50,14 @@ export const AlarmItem = (props: AlarmItemProps<EntryProps>) => {
     case 'shutdown':  triggerActionIcon = <FaPowerOff/>; break
     case 'none':      triggerActionIcon = null; break
   }
+
+  let onDeleteAlarm = () => {
+    setSelected(false)
+    // ##FIXME## Open a confirmation modal before deleting
+    deleteAlarm(alarmID)
+    setAlarms(getSetting('alarms'))
+  }
+
   return (
     <div style={selected ? SteamCss.NotificationGroupExpanded : SteamCss.NotificationGroup}>
       <div style={SteamCss.NotificationSection}>
@@ -76,6 +85,13 @@ export const AlarmItem = (props: AlarmItemProps<EntryProps>) => {
           </div>
         </IconContext.Provider>
         </div>
+        { selected ?
+          <DialogButton
+            style={{minWidth: "0px", width: "4em", backgroundColor: SteamCssVariables.gpColorRed}}
+            onClick={()=>onDeleteAlarm()}>
+            <FaMinusSquare/>
+          </DialogButton>
+        : null}
         <DialogButton
           onOKButton={() => setSelected(!selected)}
           style={{width: "7.5%"}}>

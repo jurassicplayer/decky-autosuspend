@@ -162,6 +162,7 @@ export interface AlarmHistory {
 }
 export type AlarmItemProps<T> = {
   entry: ReorderableEntry<T>
+  setAlarms: CallableFunction
 }
 export interface EntryProps {
   alarmID: string
