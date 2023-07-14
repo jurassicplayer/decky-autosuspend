@@ -1,7 +1,7 @@
 import { createContext, FC, useContext, useMemo, useState } from 'react'
 import { ServerAPI } from "decky-frontend-lib"
 import { BackendCtx } from "./Backend"
-import { BatteryState, SettingsProps } from "./Interfaces"
+import { BatteryState, Hour, SettingsProps, SteamSettings } from "./Interfaces"
 import { SettingsManager } from "./Settings"
 import { events } from "./Events"
 import { Logger } from "./Logger"
@@ -41,6 +41,8 @@ export class AppContextState implements Context {
   public eventBus: EventTarget = new EventTarget()
   public activeHooks: SteamHook[] = []
   public activeRoutes: string[] = []
+  public timeformat24!: boolean
+  public vecHours!: Hour[]
   private intervalID!: NodeJS.Timer
 
   public onDismount() {
@@ -66,6 +68,7 @@ export class AppContextState implements Context {
     this.activeRoutes.forEach((route) => { this.unregisterRoute(route) })
   }
   private registerHooks() {
+    this.activeHooks.push(SteamClient.Settings.RegisterForSettingsChanges((value: SteamSettings) => {this.onSettings(value)}))
     this.activeHooks.push(SteamClient.System.RegisterForOnSuspendRequest(() => {this.onSuspend()}))
     this.activeHooks.push(SteamClient.System.RegisterForOnResumeFromSuspend(() => {this.onResume()}))
     this.activeHooks.push(SteamClient.User.RegisterForShutdownDone(() => {this.onShutdown()}))
@@ -76,6 +79,18 @@ export class AppContextState implements Context {
   private updateBatteryState(batteryState: BatteryState) {
     this.batteryState = batteryState
     this.eventBus.dispatchEvent(new events.BatteryStateEvent(this.batteryState))
+  }
+  private onSettings(value: SteamSettings) {
+    let { vecValidAutoUpdateRestrictHours } = value
+    this.vecHours = vecValidAutoUpdateRestrictHours
+    let { strDisplay } = vecValidAutoUpdateRestrictHours[0]
+    if (strDisplay == "0:00") {
+      this.timeformat24 = true
+    } else if (strDisplay == "12AM") {
+      this.timeformat24 = false
+    } else {
+      Logger.warning("Unable to determine if time format is 12-hour or 24-hour format.")
+    }
   }
   private onSuspend() {
     this.eventBus.dispatchEvent(new events.SuspendEvent())
