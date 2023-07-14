@@ -33,8 +33,7 @@ export const AlarmList: VFC = () => {
     })
   }
   entries.sort((a, b) => {
-    // @ts-ignore
-    let sort = a.position.sortOrder - b.position.sortOrder
+    let sort = a.position - b.position
     if (sort) { return sort }
     // @ts-ignore
     sort = a.data.alarmName <= b.data.alarmName ? -1 : 1
