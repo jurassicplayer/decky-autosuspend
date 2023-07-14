@@ -1,7 +1,7 @@
-import { DialogButton, DropdownItem, DropdownOption, NotchLabel, SingleDropdownOption, SliderField, TextField, ToggleField } from "decky-frontend-lib"
+import { DialogButton, DropdownItem, DropdownOption, NotchLabel, SliderField, TextField, ToggleField } from "decky-frontend-lib"
 import { AlarmItemSettingsProps, LoginUser, thresholdLevels, thresholdTypes, triggerActions } from "../Utils/Interfaces"
 import { NavSoundMap, SteamCss, SteamUtils } from "../Utils/SteamUtils"
-import { useSettingsContext } from "../Utils/Context"
+import { useAppContext, useSettingsContext } from "../Utils/Context"
 import { applyDefaults, thresholdLevelDefaults } from "../Utils/Settings"
 import { CSSProperties, useState } from "react"
 
@@ -31,6 +31,7 @@ const getThresholdValue = (thresholdLevels: thresholdLevels, thresholdType: thre
 }
 
 export const AlarmItemSettings = (props: AlarmItemSettingsProps) => {
+  let { vecHours } = useAppContext()
   let { getSettings, getSetting, getAlarmSettings, setAlarmSettings, setAlarmSetting, deleteAlarmSetting } = useSettingsContext()
   let { enabled, showToast, playSound, sound, alarmName, alarmMessage, repeatToast, repeatSound, alarmRepeat, thresholdLevel, thresholdType, triggeredAction, profile, sortOrder } = applyDefaults(getAlarmSettings(props.alarmID), getSettings())
   let loginUsers: {label: string, data: LoginUser | null}[] = props.loginUsers.map((userData: LoginUser) => {
@@ -120,29 +121,45 @@ export const AlarmItemSettings = (props: AlarmItemSettingsProps) => {
           </div>
         : null}
         { thresholdType === thresholdTypes.bedtime || thresholdType === thresholdTypes.dailyPlaytime || thresholdType === thresholdTypes.sessionPlaytime ?
-          <div style={{display: "flex", flexDirection: "row", alignItems: "center"}}>
+          <div style={{display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between"}}>
             <span>Threshold Level:</span>
-            <div style={{display: "flex", flexDirection: "row"}}>
+            <div style={{display: "flex", flexDirection: "row", columnGap: "0.4em"}}>
               <DropdownItem
                 rgOptions={ (()=>{
                   let options:DropdownOption[] = []
-                  for (let i=0;i<24;i++){ options.push({label: `${i}`, data: i}) }
+                  for (let i=0;i<24;i++){ options.push({label: `${vecHours[i].strDisplay}`, data: vecHours[i].nHour*60*60*1000}) }
                   return options
                   })()
                 }
-                selectedOption={0}
+                selectedOption={Math.trunc(getThresholdValue(componentState, thresholdType) / (60*60*1000)) * (60*60*1000)}
                 label="Hour"
+                onChange={(value) => {
+                  let hours = value.data
+                  let minutes = getThresholdValue(componentState, thresholdType) % (60*60*1000)
+                  let thresholdValue = hours + minutes
+                  setAlarmSetting(props.alarmID, 'thresholdLevel', thresholdValue)
+                  let state = applyThresholdValue(componentState, thresholdType, thresholdValue)
+                  setComponentState(state)
+                }}
                 disabled={enabled}
                 focusable={!enabled}/>
               <DropdownItem
                 rgOptions={ (()=>{
                   let options:DropdownOption[] = []
-                  for (let i=0;i<60;i++){ options.push({label: `${i}`, data: i}) }
+                  for (let i=0;i<60;i++){ options.push({label: `${i}`, data: i*60*1000}) }
                   return options
                   })()
                 }
-                selectedOption={0}
+                selectedOption={Math.trunc( (getThresholdValue(componentState, thresholdType) % (60*60*1000)) / (60*1000)) * (60*1000)}
                 label="Minute"
+                onChange={(value) => {
+                  let hours = Math.trunc(getThresholdValue(componentState, thresholdType) / (60*60*1000)) * (60*60*1000)
+                  let minutes = value.data
+                  let thresholdValue = hours + minutes
+                  setAlarmSetting(props.alarmID, 'thresholdLevel', thresholdValue)
+                  let state = applyThresholdValue(componentState, thresholdType, thresholdValue)
+                  setComponentState(state)
+                }}
                 disabled={enabled}
                 focusable={!enabled}/>
             </div>
