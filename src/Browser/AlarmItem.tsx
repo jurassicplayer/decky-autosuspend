@@ -93,7 +93,7 @@ export const AlarmItem = (props: AlarmItemProps<EntryProps>) => {
           </DialogButton>
         : null}
         <DialogButton
-          onOKButton={() => setSelected(!selected)}
+          onClick={() => setSelected(!selected)}
           style={{width: "7.5%"}}>
           <SteamChevronDown style={selected ? {...SteamCss.PrefDetailsToggle, ...SteamCss.PrefDetailsSelected} : SteamCss.PrefDetailsToggle }/>
         </DialogButton>

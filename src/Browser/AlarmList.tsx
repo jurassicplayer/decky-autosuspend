@@ -70,7 +70,7 @@ export const AlarmList: VFC = () => {
         <div style={{display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between", rowGap: "1em"}}>
           <span style={{fontSize: "2em"}}>Alarms</span>
           <Focusable style={{display: "flex", flexDirection: "row", alignItems: "center", columnGap: "0.4em"}}>
-            <DialogButton style={buttonCss} onOKButton={()=>onAddAlarm()}><FaPlusSquare/></DialogButton>
+            <DialogButton style={buttonCss} onClick={()=>onAddAlarm()}><FaPlusSquare/></DialogButton>
             <DialogButton style={buttonCss}><FaCog/></DialogButton>
             <DialogButton style={buttonCss}><BsInfoSquareFill/></DialogButton>
           </Focusable>

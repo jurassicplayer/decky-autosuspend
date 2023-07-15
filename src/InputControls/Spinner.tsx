@@ -64,8 +64,8 @@ const Spinner: VFC<SpinnerProps> = (props) => {
         style={{flex: 1, minWidth: "64px", borderRadius: "3px", padding: "4px 8px 4px 8px"}}
         disabled={disabled}/>
       <DialogButton style={buttonStyle} disabled={disabled}
-        onOKButton={(e)=>onIncrement(e)}><FaArrowUp/></DialogButton>
-      <DialogButton style={buttonStyle} disabled={disabled} onOKButton={(e)=>onDecrement(e)}><FaArrowDown/></DialogButton>
+        onClick={(e)=>onIncrement(e)}><FaArrowUp/></DialogButton>
+      <DialogButton style={buttonStyle} disabled={disabled} onClick={(e)=>onDecrement(e)}><FaArrowDown/></DialogButton>
     </div>
   </div>
   )

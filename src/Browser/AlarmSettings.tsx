@@ -219,7 +219,7 @@ export const AlarmItemSettings = (props: AlarmItemSettingsProps) => {
         strDefaultLabel="Error" />
       <DialogButton
         style={{minWidth: "0px", width: "10em", alignSelf: "flex-end"}}
-        onOKButton={()=>{SteamUtils.notify(alarmName, alarmMessage, showToast, playSound, sound, 1000)}}>Test</DialogButton>
+        onClick={()=>{SteamUtils.notify(alarmName, alarmMessage, showToast, playSound, sound, 1000)}}>Test</DialogButton>
       { getSetting('debuggingMode') ?
       <div style={{display: "flex", flexDirection: "row"}}>
         <ToggleField
@@ -247,7 +247,7 @@ export const AlarmItemSettings = (props: AlarmItemSettingsProps) => {
           label={<span>Repeat notification:<span style={descriptionCss}>Number of times to repeat notification</span></span>}
           bottomSeparator="none"
           strDefaultLabel="Error" />
-        <DialogButton onOKButton={()=>{console.log(getAlarmSettings(props.alarmID))}}>Context Settings</DialogButton>
+        <DialogButton onClick={()=>{console.log(getAlarmSettings(props.alarmID))}}>Context Settings</DialogButton>
       </div>
       : null }
     </div>
