@@ -4,6 +4,7 @@ import { NavSoundMap, SteamCss, SteamUtils } from "../Utils/SteamUtils"
 import { useAppContext, useSettingsContext } from "../Utils/Context"
 import { applyDefaults, thresholdLevelDefaults } from "../Utils/Settings"
 import { CSSProperties, useState } from "react"
+import { applyMessageSubstitutions } from "../Utils/Alarms"
 
 // #region Constants
 const minute = 1000 * 60
@@ -37,7 +38,7 @@ const getThresholdValue = (thresholdLevels: thresholdLevels, thresholdType: thre
 }
 
 export const AlarmItemSettings = (props: AlarmItemSettingsProps) => {
-  let { vecHours } = useAppContext()
+  let { batteryState, vecHours } = useAppContext()
   let { getSettings, getSetting, getAlarmSettings, setAlarmSettings, setAlarmSetting, deleteAlarmSetting } = useSettingsContext()
   let { enabled, showToast, playSound, sound, alarmName, alarmMessage, repeatToast, repeatSound, alarmRepeat, thresholdLevel, thresholdType, triggeredAction, profile, sortOrder } = applyDefaults(getAlarmSettings(props.alarmID), getSettings())
   let loginUsers: {label: string, data: LoginUser | null}[] = props.loginUsers.map((userData: LoginUser) => {
@@ -227,7 +228,10 @@ export const AlarmItemSettings = (props: AlarmItemSettingsProps) => {
         strDefaultLabel="Error" />
       <DialogButton
         style={{minWidth: "0px", width: "10em", alignSelf: "flex-end"}}
-        onClick={()=>{SteamUtils.notify(alarmName, alarmMessage, showToast, playSound, sound, 1000)}}>Test</DialogButton>
+        onClick={()=>{
+          let name = applyMessageSubstitutions(alarmName, batteryState, props.alarmID)
+          let message = applyMessageSubstitutions(alarmMessage, batteryState, props.alarmID)
+          SteamUtils.notify(name, message, showToast, playSound, sound, 1000)}}>Test</DialogButton>
       { getSetting('debuggingMode') ?
       <div style={{display: "flex", flexDirection: "row"}}>
         <ToggleField
