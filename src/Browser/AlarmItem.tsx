@@ -62,6 +62,7 @@ export const AlarmItem = (props: AlarmItemProps<EntryProps>) => {
     setSelected(false)
     deleteAlarm(alarmID)
     setAlarms(getSetting('alarms'))
+    setAlarmHistory(alarmID)
   }
 
   const confirmationModal = (alarmID: string) => {
