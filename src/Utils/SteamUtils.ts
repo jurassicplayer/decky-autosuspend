@@ -27,6 +27,10 @@ export class SteamUtils {
     await Logger.debug('Sending suspend request to SteamOS')
     SleepParent.OnSuspendRequest()
   }
+  static async shutdown() {
+    await Logger.debug('Sending shutdown request to SteamOS')
+    SteamClient.System.ShutdownPC()
+  }
 
   //#region Notification Wrapper
   static async notify(title: string, message: string, showToast?: boolean, playSound?: boolean, sound?: string, duration?: number) {
