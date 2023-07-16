@@ -75,10 +75,10 @@ export function applyMessageSubstitutions(message: string, batteryState: Battery
   let seconds = Math.trunc((currentPlayTime % hour % minute) / second)
   // Substitute general variables
   let result = message
-    .replaceAll('{batteryPercent}', `${batteryPercent-batteryOffset}`)
-    .replaceAll('{playHours}',`${hours}`)
-    .replaceAll('{playMinutes}',`${minutes}`)
-    .replaceAll('{playSeconds}',`${seconds}`)
+    .replaceAll('{batt%}', `${batteryPercent-batteryOffset}`)
+    .replaceAll('{playHrs}',`${hours}`)
+    .replaceAll('{playMin}',`${minutes}`)
+    .replaceAll('{playSec}',`${seconds}`)
   // Substitute date
   let match
   let date = new Date()
