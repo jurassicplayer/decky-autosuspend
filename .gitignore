@@ -44,3 +44,6 @@ yalc.lock
 # Ignore output folder
 
 backend/out
+
+# Ignore example reference code
+reference

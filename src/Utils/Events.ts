@@ -1,4 +1,4 @@
-import { BatteryState } from "../lib/SteamClient"
+import { BatteryState } from "./Interfaces"
 export namespace events {
   export class AppStateEvent extends Event {
     public static eType: string = 'AppStateEvent'
@@ -14,6 +14,24 @@ export namespace events {
     constructor(batteryState: BatteryState, eventInitDict?: EventInit) {
       super(BatteryStateEvent.eType, eventInitDict)
       this.batteryState = batteryState
+    }
+  }
+  export class ResumeEvent extends Event {
+    public static eType: string = 'ResumeEvent'
+    constructor(eventInitDict?: EventInit) {
+      super(ResumeEvent.eType, eventInitDict)
+    }
+  }
+  export class SuspendEvent extends Event {
+    public static eType: string = 'SuspendEvent'
+    constructor(eventInitDict?: EventInit) {
+      super(SuspendEvent.eType, eventInitDict)
+    }
+  }
+  export class ShutdownEvent extends Event {
+    public static eType: string = 'ShutdownEvent'
+    constructor(eventInitDict?: EventInit) {
+      super(ShutdownEvent.eType, eventInitDict)
     }
   }
 }
