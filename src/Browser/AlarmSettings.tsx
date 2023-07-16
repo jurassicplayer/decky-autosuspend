@@ -178,11 +178,9 @@ export const AlarmItemSettings = (props: AlarmItemSettingsProps) => {
         ]}
         selectedOption={triggeredAction}
         onChange={(value)=> setAlarmSetting(props.alarmID, 'triggeredAction', value.data)}
-        disabled={enabled}
         label={<span>Trigger Action:<span style={descriptionCss}>Action to perform when alarm triggered</span></span>}
         bottomSeparator="none"
-        strDefaultLabel="Error"
-        focusable={!enabled} />
+        strDefaultLabel="Error" />
       <DropdownItem
         rgOptions={loginUsers}
         selectedOption={loginUsers.find((user)=>user.data && user.data.accountName == profile)?.data || null}
