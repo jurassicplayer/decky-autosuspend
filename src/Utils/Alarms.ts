@@ -139,12 +139,12 @@ export const evaluateAlarm = async (alarmID: string, settings: AlarmSetting, con
   switch (triggeredAction) {
     case triggerActions.suspend:
       sleep(5500)
-      //SteamUtils.suspend()
+      SteamUtils.suspend()
       console.log(`[${alarmName}]: action triggered, suspending`)
       break
     case triggerActions.shutdown:
       sleep(5500)
-      //SteamUtils.shutdown()
+      SteamUtils.shutdown()
       console.log(`[${alarmName}]: action triggered, shutting down`)
       break
     default:
