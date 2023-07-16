@@ -11,17 +11,18 @@ const hour = minute * 60
 const day = hour * 24
 // #endregion
 
-export function getAlarmHistory(alarmID: string): AlarmHistory | null {
+function getAlarmHistories(): {[key: string]: AlarmHistory} {
   let s_histories = localStorage.getItem('autosuspend-alarms')
-  let histories: {[key: string]: AlarmHistory} = JSON.parse(s_histories ? s_histories : '{}')
-  let history = null
-  if (alarmID in histories) { history = histories[alarmID] }
-  return history
+  return JSON.parse(s_histories ? s_histories : '{}')
 }
-export function setAlarmHistory(alarmID: string, history: AlarmHistory) {
-  let s_histories = localStorage.getItem('autosuspend-alarms')
-  let histories = JSON.parse(s_histories ? s_histories : '{}')
-  histories[alarmID] = history
+export function getAlarmHistory(alarmID: string): AlarmHistory {
+  let histories = getAlarmHistories()
+  return (alarmID in histories) ? histories[alarmID] : { triggered: false, lastTriggered: 0 }
+}
+export function setAlarmHistory(alarmID: string, history?: AlarmHistory) {
+  let histories = getAlarmHistories()
+  if (history === undefined) { delete histories[alarmID] }
+  else if (history) { histories[alarmID] = history }
   localStorage.setItem('autosuspend-alarms', JSON.stringify(histories))
 }
 
@@ -30,7 +31,7 @@ export const evaluateAlarm = async (alarmID: string, settings: AlarmSetting, con
   if (!enabled) { return }
   // @ts-ignore
   if (profile && profile != loginStore.m_strAccountName) { return }
-  let history = getAlarmHistory(alarmID) || { triggered: false }
+  let history = getAlarmHistory(alarmID)
   showToast = showToast
   let triggerAction = false
   let date = new Date()
@@ -51,7 +52,7 @@ export const evaluateAlarm = async (alarmID: string, settings: AlarmSetting, con
           triggerAction = true
         } else if (batteryPercent > thresholdLevel+offset && history.triggered) { // Reset discharge trigger
           history.triggered = false
-        }  
+        }
       }())
       break
     case thresholdTypes.overcharge:
@@ -74,39 +75,31 @@ export const evaluateAlarm = async (alarmID: string, settings: AlarmSetting, con
       break
     case thresholdTypes.bedtime:
       (function () {
-        let currentDateUTC = Math.floor(date.getTime() / day) * day
-        let currentDate = currentDateUTC + (date.getTimezoneOffset() * minute)
+        let currentDateHourZero = new Date(date.toLocaleDateString())
+        let currentDate = currentDateHourZero.getTime() + thresholdLevel
         // thresholdLevel = time delta in ms from 12:00am
-        if (date.getTime() >= (currentDate + thresholdLevel) && !history.triggered) { // Trigger bedtime
+        if (date.getTime() >= currentDate && !history.triggered) { // Trigger bedtime
           history.lastTriggered = date.getTime()
           history.triggered = true
           triggerAction = true
-        } else if (date.getTime() < (currentDate + thresholdLevel) && history.triggered) { // Reset overcharge trigger
+        } else if (date.getTime() < currentDate && history.triggered) { // Reset overcharge trigger
           history.triggered = false
         }
       }())
       break
     case thresholdTypes.dailyPlaytime:
       (function () {
-        history.currentPlayTime = history.currentPlayTime || 0
-        history.sessionStartTime = history.sessionStartTime || date.getTime()
         history.lastTriggered = history.lastTriggered || 0
-        let currentDate = (Math.floor(date.getTime() / day) * day) + (date.getTimezoneOffset() * minute)
-        let lastTriggeredDate = (Math.floor((history.lastTriggered || 0) / day) * day) + (date.getTimezoneOffset() * minute)
-        let currentPlaytime = date.getTime() - (history.sessionStartTime || date.getTime())
-        // console.log(`dailyPlaytime evaluate:\n
-        //   \tcurrentDate ${currentDate}\n
-        //   \tlastTriggeredDate ${lastTriggeredDate}\n
-        //   \tcurrentPlaytime ${currentPlaytime}\n
-        //   \tthreshold ${thresholdLevel}\n
-        //   \ttriggered ${history.triggered}\n
-        //   \thistory `, history)
-        if (currentPlaytime >= thresholdLevel && !history.triggered) {
+        history.currentPlayTime = history.currentPlayTime || 0
+        history.currentPlayTime = (date.getTime() - (history.lastUpdatedTime || date.getTime())) + history.currentPlayTime // current_playtime + past_playtime
+        history.lastUpdatedTime = date.getTime()
+        let currentDateHourZero = new Date(date.toLocaleDateString())
+        if (currentDateHourZero.getTime() > history.lastTriggered && history.triggered) { history.currentPlayTime = 0 }
+        if (history.currentPlayTime >= thresholdLevel && !history.triggered) {
           history.lastTriggered = date.getTime()
           history.triggered = true
           triggerAction = true
-        } else if ((currentPlaytime < thresholdLevel || currentDate > lastTriggeredDate) && history.triggered) {
-          delete history.currentPlayTime
+        } else if (history.currentPlayTime < thresholdLevel && history.triggered) {
           history.triggered = false
         }
       }())
@@ -151,7 +144,7 @@ export const evaluateAlarm = async (alarmID: string, settings: AlarmSetting, con
       break
     case triggerActions.shutdown:
       sleep(5500)
-      //SteamUtils.suspend()
+      //SteamUtils.shutdown()
       console.log(`[${alarmName}]: action triggered, shutting down`)
       break
     default:
@@ -173,11 +166,11 @@ const OnSuspend = (context: AppContextState) => {
   for (let alarmID in alarms) {
     let {thresholdType} = alarms[alarmID]
     if (thresholdType != thresholdTypes.dailyPlaytime) { continue }
-    let history = getAlarmHistory(alarmID) || { triggered: false }
-    let date = Date.now()
-    //console.log(`OnSuspend alarm processing [${alarmID}]:\n\tcurrentPlayTime: ${history.currentPlayTime}\n\tlastTriggeredDate ${history.sessionStartTime}\n\tnew currentPlayTime ${(history.currentPlayTime || 0) + (date - (history.sessionStartTime || date))}\n\thistory `, history)
-    history.currentPlayTime = (history.currentPlayTime || 0) + (date - (history.sessionStartTime || date))
-    delete history.sessionStartTime
+    let history = getAlarmHistory(alarmID)
+    let date = new Date()
+    history.currentPlayTime = history.currentPlayTime || 0
+    history.currentPlayTime = (date.getTime() - (history.lastUpdatedTime || date.getTime())) + history.currentPlayTime // current_playtime + past_playtime
+    history.lastUpdatedTime = date.getTime()
     setAlarmHistory(alarmID, history)
   }
 }
@@ -188,27 +181,28 @@ const OnResume = (context: AppContextState) => {
     switch (thresholdType) {
       case thresholdTypes.dailyPlaytime:
         (function () {
-          let history = getAlarmHistory(alarmID) || { triggered: false }
+          let history = getAlarmHistory(alarmID)
           let date = new Date()
-          history.sessionStartTime = date.getTime()
-          let currentDate = (Math.floor(date.getTime() / day) * day) + (date.getTimezoneOffset() * minute)
-          let lastTriggeredDate = (Math.floor((history.lastTriggered || 0) / day) * day) + (date.getTimezoneOffset() * minute)
-          //console.log(`OnResume alarm processing [${alarmID}]:\n\tcurrentDate: ${currentDate}\n\tlastTriggeredDate ${lastTriggeredDate}\n\tnew session start time ${history.sessionStartTime}\n\thistory `, history)
-          if (currentDate > lastTriggeredDate && history.triggered) {
+          history.lastUpdatedTime = date.getTime()
+          let currentDateHourZero = new Date(date.toLocaleDateString())
+          let lastTriggeredDate = history.lastTriggered || 0
+          if (currentDateHourZero.getTime() > lastTriggeredDate && history.triggered) {
             delete history.currentPlayTime
             history.triggered = false
           }
           setAlarmHistory(alarmID, history)
         }())
+        break
       case thresholdTypes.sessionPlaytime:
         (function () {
-          let history = getAlarmHistory(alarmID) || { triggered: false }
+          let history = getAlarmHistory(alarmID)
           let date = new Date()
           history.sessionStartTime = date.getTime()
           delete history.currentPlayTime
           history.triggered = false
           setAlarmHistory(alarmID, history)
         }())
+        break
       default:
     }
   }
