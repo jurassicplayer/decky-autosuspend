@@ -20,6 +20,8 @@ export function setAlarmHistory(alarmID: string, history?: AlarmHistory) {
   localStorage.setItem('autosuspend-alarms', JSON.stringify(histories))
 }
 
+const batteryOffset = 0.5 // Fix rounding (visually changes at 0.5%)
+
 export const evaluateAlarm = async (alarmID: string, settings: AlarmSetting, context: AppContextState) => {
   let { showToast, playSound, sound, repeatToast, repeatSound, alarmRepeat, alarmName, alarmMessage, thresholdLevel, thresholdType, triggeredAction, enabled, profile } = applyDefaults(settings, context.settings)
   if (!enabled) { return }
@@ -38,13 +40,12 @@ export const evaluateAlarm = async (alarmID: string, settings: AlarmSetting, con
           SettingsManager.saveToFile(context.settings)
           return
         }
-        let offset = 0.5 // Fix rounding (visually changes at 0.5%)
         let batteryPercent = Math.round(context.batteryState.flLevel * 10000) / 100
-        if (batteryPercent <= thresholdLevel+offset && !history.triggered) { // Trigger discharge
+        if (batteryPercent <= thresholdLevel+batteryOffset && !history.triggered) { // Trigger discharge
           history.lastTriggered = date.getTime()
           history.triggered = true
           triggerAction = true
-        } else if (batteryPercent > thresholdLevel+offset && history.triggered) { // Reset discharge trigger
+        } else if (batteryPercent > thresholdLevel+batteryOffset && history.triggered) { // Reset discharge trigger
           history.triggered = false
         }
       }())
@@ -56,13 +57,12 @@ export const evaluateAlarm = async (alarmID: string, settings: AlarmSetting, con
           SettingsManager.saveToFile(context.settings)
           return
         }
-        let offset = 0.5 // Fix rounding (visually changes at 0.5%)
         let batteryPercent = Math.round(context.batteryState.flLevel * 10000) / 100
-        if (batteryPercent >= thresholdLevel+offset && !history.triggered) { // Trigger overcharge
+        if (batteryPercent >= thresholdLevel+batteryOffset && !history.triggered) { // Trigger overcharge
           history.lastTriggered = date.getTime()
           history.triggered = true
           triggerAction = true
-        } else if (batteryPercent < thresholdLevel+offset && history.triggered) { // Reset overcharge trigger
+        } else if (batteryPercent < thresholdLevel+batteryOffset && history.triggered) { // Reset overcharge trigger
           history.triggered = false
         }
       }())
