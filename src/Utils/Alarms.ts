@@ -5,12 +5,6 @@ import { SettingsManager, applyDefaults } from "./Settings"
 import { sleep } from "decky-frontend-lib"
 import { AlarmHistory, AlarmSetting, thresholdTypes, triggerActions } from "./Interfaces"
 
-// #region Constants
-const minute = 1000 * 60
-const hour = minute * 60
-const day = hour * 24
-// #endregion
-
 function getAlarmHistories(): {[key: string]: AlarmHistory} {
   let s_histories = localStorage.getItem('autosuspend-alarms')
   return JSON.parse(s_histories ? s_histories : '{}')

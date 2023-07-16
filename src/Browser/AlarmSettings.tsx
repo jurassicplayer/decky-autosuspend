@@ -5,6 +5,12 @@ import { useAppContext, useSettingsContext } from "../Utils/Context"
 import { applyDefaults, thresholdLevelDefaults } from "../Utils/Settings"
 import { CSSProperties, useState } from "react"
 
+// #region Constants
+const minute = 1000 * 60
+const hour = minute * 60
+// const day = hour * 24
+// #endregion
+
 const descriptionCss: CSSProperties = {
   fontSize: "0.8em",
   marginLeft: "0.8em"
@@ -130,16 +136,16 @@ export const AlarmItemSettings = (props: AlarmItemSettingsProps) => {
                   for (let i=0;i<24;i++){
                     let optionLabel = i.toString()
                     if (thresholdType === thresholdTypes.bedtime) { optionLabel = vecHours[i].strDisplay }
-                    options.push({label: optionLabel, data: vecHours[i].nHour*60*60*1000})
+                    options.push({label: optionLabel, data: vecHours[i].nHour*hour})
                   }
                   return options
                   })()
                 }
-                selectedOption={Math.trunc(getThresholdValue(componentState, thresholdType) / (60*60*1000)) * (60*60*1000)}
+                selectedOption={Math.trunc(getThresholdValue(componentState, thresholdType) / hour) * hour}
                 label="Hour"
                 onChange={(value) => {
                   let hours = value.data
-                  let minutes = getThresholdValue(componentState, thresholdType) % (60*60*1000)
+                  let minutes = getThresholdValue(componentState, thresholdType) % hour
                   let thresholdValue = hours + minutes
                   setAlarmSetting(props.alarmID, 'thresholdLevel', thresholdValue)
                   let state = applyThresholdValue(componentState, thresholdType, thresholdValue)
@@ -150,14 +156,14 @@ export const AlarmItemSettings = (props: AlarmItemSettingsProps) => {
               <DropdownItem
                 rgOptions={ (()=>{
                   let options:DropdownOption[] = []
-                  for (let i=0;i<60;i++){ options.push({label: `${i}`, data: i*60*1000}) }
+                  for (let i=0;i<60;i++){ options.push({label: `${i}`, data: i*minute}) }
                   return options
                   })()
                 }
-                selectedOption={Math.trunc( (getThresholdValue(componentState, thresholdType) % (60*60*1000)) / (60*1000)) * (60*1000)}
+                selectedOption={Math.trunc( (getThresholdValue(componentState, thresholdType) % hour) / minute) * minute}
                 label="Minute"
                 onChange={(value) => {
-                  let hours = Math.trunc(getThresholdValue(componentState, thresholdType) / (60*60*1000)) * (60*60*1000)
+                  let hours = Math.trunc(getThresholdValue(componentState, thresholdType) / hour) * hour
                   let minutes = value.data
                   let thresholdValue = hours + minutes
                   setAlarmSetting(props.alarmID, 'thresholdLevel', thresholdValue)
