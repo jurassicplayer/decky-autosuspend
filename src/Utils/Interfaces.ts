@@ -154,11 +154,17 @@ export interface AlarmSetting extends IObjectKeys {
 export interface Alarms {
   [uniqueid: string]: AlarmSetting
 }
-export interface AlarmHistory {
+export interface AlarmHistory extends AlarmHistoryBase, AlarmHistoryDailySession, AlarmHistoryPlaySession {}
+export interface AlarmHistoryBase {
   triggered: boolean
-  lastTriggered?: number
-  sessionStartTime?: number
+  lastTriggered: number
+}
+export interface AlarmHistoryDailySession extends AlarmHistoryBase {
+  lastUpdatedTime?: number
   currentPlayTime?: number
+}
+export interface AlarmHistoryPlaySession extends AlarmHistoryBase {
+  sessionStartTime?: number
 }
 export type AlarmItemProps<T> = {
   entry: ReorderableEntry<T>
