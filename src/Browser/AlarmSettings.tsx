@@ -127,7 +127,11 @@ export const AlarmItemSettings = (props: AlarmItemSettingsProps) => {
               <DropdownItem
                 rgOptions={ (()=>{
                   let options:DropdownOption[] = []
-                  for (let i=0;i<24;i++){ options.push({label: `${vecHours[i].strDisplay}`, data: vecHours[i].nHour*60*60*1000}) }
+                  for (let i=0;i<24;i++){
+                    let optionLabel = i.toString()
+                    if (thresholdType === thresholdTypes.bedtime) { optionLabel = vecHours[i].strDisplay }
+                    options.push({label: optionLabel, data: vecHours[i].nHour*60*60*1000})
+                  }
                   return options
                   })()
                 }
