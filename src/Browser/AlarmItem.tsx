@@ -3,7 +3,7 @@ import { FaArrowRotateRight } from "react-icons/fa6"
 import { BiNotification, BiNotificationOff } from "react-icons/bi"
 import { IconContext } from "react-icons"
 import { useState, SVGProps, useEffect } from "react"
-import { DialogButton, ToggleField } from "decky-frontend-lib"
+import { ConfirmModal, DialogButton, ToggleField, showModal } from "decky-frontend-lib"
 import { applyDefaults } from "../Utils/Settings"
 import { SteamCss, SteamCssVariables } from "../Utils/SteamUtils"
 import { useSettingsContext } from "../Utils/Context"
@@ -58,11 +58,22 @@ export const AlarmItem = (props: AlarmItemProps<EntryProps>) => {
     case 'none':      triggerActionIcon = null; break
   }
 
-  let onDeleteAlarm = () => {
+  let onDeleteAlarm = (alarmID: string) => {
     setSelected(false)
-    // ##FIXME## Open a confirmation modal before deleting
     deleteAlarm(alarmID)
     setAlarms(getSetting('alarms'))
+  }
+
+  const confirmationModal = (alarmID: string) => {
+    return (
+      <ConfirmModal
+        strTitle="Delete Alarm"
+        strDescription="Are you sure you want to delete this alarm?"
+        strOKButtonText="Delete"
+        bMiddleDisabled={true}
+        bDestructiveWarning={true}
+        onOK={()=>onDeleteAlarm(alarmID)}/>
+    )
   }
 
   return (
@@ -103,7 +114,7 @@ export const AlarmItem = (props: AlarmItemProps<EntryProps>) => {
         { selected ?
           <DialogButton
             style={{minWidth: "0px", width: "4em", backgroundColor: SteamCssVariables.gpColorRed}}
-            onClick={()=>onDeleteAlarm()}>
+            onClick={()=>{ showModal(confirmationModal(alarmID)) }}>
             <FaMinusSquare/>
           </DialogButton>
         : null}
