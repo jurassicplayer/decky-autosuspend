@@ -1,4 +1,4 @@
-import { FaBatteryFull, FaBatteryQuarter, FaBed, FaExclamationCircle, FaMinusSquare, FaMoon, FaPowerOff, FaStopwatch, FaSun, FaUser, FaUsers, FaVolumeMute, FaVolumeUp } from "react-icons/fa"
+import { FaBatteryFull, FaBatteryQuarter, FaBed, FaDotCircle, FaExclamationCircle, FaMinusSquare, FaMoon, FaPowerOff, FaStopwatch, FaSun, FaUser, FaUsers, FaVolumeMute, FaVolumeUp } from "react-icons/fa"
 import { FaArrowRotateRight } from "react-icons/fa6"
 import { BiNotification, BiNotificationOff } from "react-icons/bi"
 import { IconContext } from "react-icons"
@@ -9,6 +9,7 @@ import { SteamCss, SteamCssVariables } from "../Utils/SteamUtils"
 import { useSettingsContext } from "../Utils/Context"
 import { AlarmItemProps, EntryProps, LoginUser, ProfileData } from "../Utils/Interfaces"
 import { AlarmItemSettings } from "./AlarmSettings"
+import { getAlarmHistory, setAlarmHistory } from "../Utils/Alarms"
 
 const SteamChevronDown = (props:SVGProps<SVGSVGElement>) => {
   return <svg {...props} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" fill="none" direction="down"><path fill="currentColor" d="M31 20.3606L18.0204 33L5 20.3606L8.60376 16.8568L18.0204 25.9924L27.4166 16.8568L31 20.3606ZM27.3962 3L18.0204 12.1356L8.62412 3L5 6.50379L18.0204 19.1432L31 6.50379L27.3962 3Z"></path></svg>
@@ -22,6 +23,8 @@ export const AlarmItem = (props: AlarmItemProps<EntryProps>) => {
   let [selected, setSelected] = useState<boolean>(false)
   let [loginUsers, setLoginUsers] = useState<LoginUser[]>([])
   let [profileData, setProfileData] = useState<ProfileData>()
+  let debuggingMode = getSetting('debuggingMode')
+  let [triggered, setTriggered] = useState(getAlarmHistory(alarmID).triggered)
   useEffect(()=>{
     async function init(){
       let loginUsers: LoginUser[] = await SteamClient.User.GetLoginUsers()
@@ -35,6 +38,10 @@ export const AlarmItem = (props: AlarmItemProps<EntryProps>) => {
     }
     init()
   },[])
+  useEffect(()=>{
+    // This is a lame hacky way to update the debugging "alarm already fired" icon on most UI changes
+    setTriggered(getAlarmHistory(alarmID).triggered)
+  },[selected, loginUsers, profileData, enabled])
   
   let thresholdTypeIcon = <FaExclamationCircle/>
   switch (thresholdType) {
@@ -62,7 +69,14 @@ export const AlarmItem = (props: AlarmItemProps<EntryProps>) => {
     <div style={selected ? SteamCss.NotificationGroupExpanded : SteamCss.NotificationGroup}>
       <div style={SteamCss.NotificationSection}>
         <div style={SteamCss.NotificationFeedToggle}>
-          <ToggleField layout="below" bottomSeparator="none" checked={enabled} onChange={(value) => setAlarmSetting(alarmID, 'enabled', value) }/>
+          <ToggleField
+            layout="below"
+            bottomSeparator="none"
+            checked={enabled}
+            onChange={(value) => {
+              setAlarmSetting(alarmID, 'enabled', value) 
+              if (value) { setAlarmHistory(alarmID) }
+            }}/>
         </div>
         <div style={SteamCss.NotificationDescription}>
         {alarmName || alarmID}
@@ -82,6 +96,7 @@ export const AlarmItem = (props: AlarmItemProps<EntryProps>) => {
             {alarmRepeat ? <FaArrowRotateRight/> : null}
             {thresholdTypeIcon}
             {triggerActionIcon}
+            {triggered && debuggingMode ? <FaDotCircle />: null}
           </div>
         </IconContext.Provider>
         </div>
