@@ -37,7 +37,7 @@ export const AlarmList: VFC = () => {
   let onAddAlarm = () => {
     let alarmID = uuidv4()
     let sortOrders = Object.entries(alarms).map(([alarmID, alarmSettings]) => alarmSettings.sortOrder)
-    let lastSortOrder = Math.max(...sortOrders)
+    let lastSortOrder = sortOrders.length > 0 ? Math.max(...sortOrders) : 0
     let alarmSettings = {...newAlarmSettings, sortOrder: lastSortOrder+1}
     addAlarm(alarmID, alarmSettings)
     setAlarms(getSetting('alarms'))
