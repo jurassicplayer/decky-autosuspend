@@ -7,7 +7,7 @@ import { Alarms, AlarmSetting, SettingsProps, thresholdLevels, thresholdTypes, t
 export const defaultSettings: SettingsProps = {
   defaultShowToast: true,
   defaultPlaySound: true,
-  defaultSound: NavSoundMap.ToastMisc,
+  defaultSound: NavSoundMap[6],
   defaultRepeatToast: false,
   defaultRepeatSound: false,
   defaultAlarmRepeat: 0,
