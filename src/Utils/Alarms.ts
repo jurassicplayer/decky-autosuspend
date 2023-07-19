@@ -68,11 +68,12 @@ export function applyMessageSubstitutions(message: string, batteryState: Battery
   const hour = minute * 60
   // const day = hour * 24
   let batteryPercent = Math.round(batteryState.flLevel * 10000) / 100
-  let { currentPlayTime } = getAlarmHistory(alarmID)
-  currentPlayTime = currentPlayTime || 0
-  let hours = Math.trunc(currentPlayTime / hour)
-  let minutes = Math.trunc((currentPlayTime % hour) / minute)
-  let seconds = Math.trunc((currentPlayTime % hour % minute) / second)
+  let { currentPlayTime, sessionStartTime } = getAlarmHistory(alarmID)
+  let date = new Date()
+  let playTime = currentPlayTime || (date.getTime() - (sessionStartTime || date.getTime()))
+  let hours = Math.trunc(playTime / hour)
+  let minutes = Math.trunc((playTime % hour) / minute)
+  let seconds = Math.trunc((playTime % hour % minute) / second)
   // Substitute general variables
   let result = message
     .replaceAll('{batt%}', `${batteryPercent-batteryOffset}`)
@@ -81,7 +82,6 @@ export function applyMessageSubstitutions(message: string, batteryState: Battery
     .replaceAll('{playSec}',`${seconds}`)
   // Substitute date
   let match
-  let date = new Date()
   const regex = /{date:(.*?)}/g
   while ( (match = regex.exec(message)) !== null ) {
     let formattedDate = applyDateSubstitutions(match[1], date)
