@@ -69,10 +69,14 @@ interface DownloadRegion {
 }
 // #endregion
 export interface AppInfo {
+  name?: string
+  version?: string
   initialized: boolean
+  processAlarms: boolean
+}
+export interface PluginInfo {
   name: string
   version: string
-  processAlarms: boolean
 }
 export interface SteamHook {
   unregister: () => void

@@ -14,8 +14,6 @@ export class AppContextState implements Context {
     this.serverApi = serverAPI
     this.appInfo = {
       initialized: false,
-      name: 'AutoSuspend',
-      version: 'v2.0.1',
       processAlarms: false
     }
     BackendCtx.initialize(serverAPI)
@@ -31,8 +29,14 @@ export class AppContextState implements Context {
       this.registerRoutes()
       registerAlarmEvents(this)
       this.onResume() // Trigger OnResume alarm events on "boot" to setup alarms
-      this.appInfo.processAlarms = true
-      this.appInfo.initialized = true
+      BackendCtx.getPluginInfo().then((pluginInfo)=>{
+        this.appInfo = {
+          ...this.appInfo,
+          ...pluginInfo,
+          initialized: true,
+          processAlarms: true
+        }
+      })
       Logger.info('Initialization complete')
     })
   }

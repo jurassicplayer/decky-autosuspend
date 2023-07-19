@@ -16,6 +16,18 @@ settings = SettingsManager(name="settings", settings_directory=settingsDir)
 settings.read()
 
 class Plugin:
+  async def plugin_info(self):
+    # Call plugin_info only once preferably
+    logger.debug('[backend] PluginInfo:\n\tPluginName: {}\n\tPluginVersion: {}\n\tDeckyVersion: {}'.format(
+      decky_plugin.DECKY_PLUGIN_NAME,
+      decky_plugin.DECKY_PLUGIN_VERSION,
+      decky_plugin.DECKY_VERSION
+    ))
+    pluginInfo = {
+      "name": decky_plugin.DECKY_PLUGIN_NAME,
+      "version": decky_plugin.DECKY_PLUGIN_VERSION
+    }
+    return pluginInfo
   async def logger(self, logLevel:str, msg:str):
     msg = '[frontend] {}'.format(msg)
     match logLevel.lower():

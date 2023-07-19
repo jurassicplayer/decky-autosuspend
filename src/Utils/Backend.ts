@@ -1,4 +1,5 @@
 import { ServerAPI } from "decky-frontend-lib"
+import { PluginInfo } from "./Interfaces"
 
 export class BackendCtx {
   static initialize(serverApi: ServerAPI) {
@@ -22,5 +23,9 @@ export class BackendCtx {
   static async commitSettings() {
     let output = await this.bridge("settings_commit")
     return output
+  }
+  static async getPluginInfo(){
+    let output = await this.bridge("plugin_info")
+    return output as PluginInfo
   }
 }
