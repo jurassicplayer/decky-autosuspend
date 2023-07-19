@@ -72,6 +72,7 @@ export interface AppInfo {
   initialized: boolean
   name: string
   version: string
+  processAlarms: boolean
 }
 export interface SteamHook {
   unregister: () => void

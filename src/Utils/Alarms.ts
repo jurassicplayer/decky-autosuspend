@@ -235,6 +235,7 @@ const OnSuspend = (context: AppContextState) => {
     history.currentPlayTime = history.currentPlayTime || 0
     history.currentPlayTime = (date.getTime() - (history.lastUpdatedTime || date.getTime())) + history.currentPlayTime // current_playtime + past_playtime
     history.lastUpdatedTime = date.getTime()
+    context.appInfo.processAlarms = false
     setAlarmHistory(alarmID, history)
   }
 }
@@ -270,4 +271,5 @@ const OnResume = (context: AppContextState) => {
       default:
     }
   }
+  context.appInfo.processAlarms = true
 }
