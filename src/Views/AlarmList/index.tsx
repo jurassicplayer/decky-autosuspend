@@ -1,11 +1,11 @@
 import { DialogBody, DialogButton, DialogControlsSection, Focusable, ReorderableEntry } from "decky-frontend-lib"
 import { CSSProperties, VFC, useState } from "react"
-import { useSettingsContext } from "../Utils/Context"
+import { useSettingsContext } from "../../Utils/Context"
 import { AlarmItem } from "./AlarmItem"
-import { SteamCssVariables } from "../Utils/SteamUtils"
+import { SteamCssVariables } from "../../Utils/SteamUtils"
 import { FaCog, FaPlusSquare } from "react-icons/fa"
 import { BsInfoSquareFill } from "react-icons/bs"
-import { AlarmSetting, Alarms, EntryProps, thresholdTypes, triggerActions } from "../Utils/Interfaces"
+import { AlarmSetting, Alarms, EntryProps, thresholdTypes, triggerActions } from "../../Utils/Interfaces"
 
 const buttonCss: CSSProperties = {
   minWidth: "0px",
@@ -18,7 +18,6 @@ const newAlarmSettings: AlarmSetting = {
   thresholdLevel: 15,
   thresholdType: thresholdTypes.discharge,
   triggeredAction: triggerActions.none,
-  sound: 'ToastMisc',
   sortOrder: 0
 }
 
@@ -29,14 +28,14 @@ function uuidv4() {
   )
 }
 
-export const AlarmList: VFC = () => {
+const AlarmList: VFC = () => {
   let { getSetting, getAlarmSettings, getAlarmSetting, addAlarm } = useSettingsContext()
   let [alarms, setAlarms] = useState<Alarms>(getSetting('alarms'))
   let entries:ReorderableEntry<EntryProps>[] = []
   
   let onAddAlarm = () => {
     let alarmID = uuidv4()
-    let sortOrders = Object.entries(alarms).map(([alarmID, alarmSettings]) => alarmSettings.sortOrder)
+    let sortOrders = Object.entries(alarms).map(([, alarmSettings]) => alarmSettings.sortOrder)
     let lastSortOrder = sortOrders.length > 0 ? Math.max(...sortOrders) : 0
     let alarmSettings = {...newAlarmSettings, sortOrder: lastSortOrder+1}
     addAlarm(alarmID, alarmSettings)
@@ -80,3 +79,5 @@ export const AlarmList: VFC = () => {
     </DialogBody>
   )
 }
+
+export default AlarmList

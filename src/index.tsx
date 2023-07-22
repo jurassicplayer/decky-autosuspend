@@ -4,6 +4,8 @@ import { QAMPanel } from "./QAM/QAMPanel"
 import { events } from "./Utils/Events"
 import { AppContextProvider, AppContextState } from "./Utils/Context"
 import { evaluateAlarm } from "./Utils/Alarms"
+import QAM from "./Views/QAM"
+import AlarmList from "./Views/AlarmList"
 
 
 
@@ -17,10 +19,11 @@ export default definePlugin((serverApi: ServerAPI) => {
     }
   }
   appCtx.eventBus.addEventListener(events.BatteryStateEvent.eType, IntervalCheck)
+  appCtx.registerRoute("/autosuspend/alarms", AlarmList)
   
   return {
     title: <div className={staticClasses.Title}>AutoSuspend</div>,
-    content:  <AppContextProvider appContextState={appCtx}><QAMPanel /></AppContextProvider>,
+    content:  <AppContextProvider appContextState={appCtx}><QAM /></AppContextProvider>,
     icon: <FaBatteryQuarter />,
     onDismount: () => {
       appCtx.eventBus.removeEventListener(events.BatteryStateEvent.eType, IntervalCheck)

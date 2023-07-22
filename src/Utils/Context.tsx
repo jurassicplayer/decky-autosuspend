@@ -6,7 +6,6 @@ import { SettingsManager } from "./Settings"
 import { events } from "./Events"
 import { Logger } from "./Logger"
 import { registerAlarmEvents, unregisterAlarmEvents } from './Alarms'
-import { AlarmList } from '../Browser/AlarmList'
 import { AppInfo, Context, ProviderProps, SettingsContext, SteamHook } from './Interfaces'
 
 export class AppContextState implements Context {
@@ -26,7 +25,7 @@ export class AppContextState implements Context {
         if (currentState != this.batteryState) this.updateBatteryState(currentState)
       }, 1000)
       this.registerHooks()
-      this.registerRoutes()
+      // this.registerRoutes()
       registerAlarmEvents(this)
       this.onResume() // Trigger OnResume alarm events on "boot" to setup alarms
       BackendCtx.getPluginInfo().then((pluginInfo)=>{
@@ -67,9 +66,9 @@ export class AppContextState implements Context {
     this.serverApi.routerHook.removeRoute(path)
     this.activeRoutes = this.activeRoutes.filter(route => route !== path)
   }
-  private registerRoutes() {
-    this.registerRoute("/autosuspend/alarms", AlarmList)
-  }
+  // private registerRoutes() {
+  //   this.registerRoute("/autosuspend/alarms", AlarmList)
+  // }
   private unregisterRoutes() {
     this.activeRoutes.forEach((route) => { this.unregisterRoute(route) })
   }

@@ -214,3 +214,10 @@ export const SteamCss: {[key:string]: CSSProperties} = {
     flexWrap: "wrap"
   }
 }
+
+export const CustomCss: {[key: string]: CSSProperties } = {
+  Description: {
+    fontSize: "0.8em",
+    marginLeft: "0.8em"
+  }
+}

@@ -1,10 +1,10 @@
 import { DialogButton, DropdownItem, DropdownOption, NotchLabel, SliderField, TextField, ToggleField } from "decky-frontend-lib"
-import { AlarmItemSettingsProps, LoginUser, thresholdLevels, thresholdTypes, triggerActions } from "../Utils/Interfaces"
-import { NavSoundMap, SteamCss, SteamUtils } from "../Utils/SteamUtils"
-import { useAppContext, useSettingsContext } from "../Utils/Context"
-import { applyDefaults, thresholdLevelDefaults } from "../Utils/Settings"
-import { CSSProperties, useState } from "react"
-import { applyMessageSubstitutions } from "../Utils/Alarms"
+import { AlarmItemSettingsProps, LoginUser, thresholdLevels, thresholdTypes, triggerActions } from "../../Utils/Interfaces"
+import { CustomCss, NavSoundMap, SteamCss, SteamUtils } from "../../Utils/SteamUtils"
+import { useAppContext, useSettingsContext } from "../../Utils/Context"
+import { applyDefaults, thresholdLevelDefaults } from "../../Utils/Settings"
+import { useState } from "react"
+import { applyMessageSubstitutions } from "../../Utils/Alarms"
 
 // #region Constants
 const minute = 1000 * 60
@@ -12,10 +12,7 @@ const hour = minute * 60
 // const day = hour * 24
 // #endregion
 
-const descriptionCss: CSSProperties = {
-  fontSize: "0.8em",
-  marginLeft: "0.8em"
-}
+
 
 const applyThresholdValue = (thresholdLevels: thresholdLevels, thresholdType: thresholdTypes, value: number): thresholdLevels => {
   switch (thresholdType) {
@@ -40,7 +37,8 @@ const getThresholdValue = (thresholdLevels: thresholdLevels, thresholdType: thre
 export const AlarmItemSettings = (props: AlarmItemSettingsProps) => {
   let { batteryState, vecHours } = useAppContext()
   let { getSettings, getSetting, getAlarmSettings, setAlarmSettings, setAlarmSetting, deleteAlarmSetting } = useSettingsContext()
-  let { enabled, showToast, playSound, sound, alarmName, alarmMessage, repeatToast, repeatSound, alarmRepeat, thresholdLevel, thresholdType, triggeredAction, profile, sortOrder } = applyDefaults(getAlarmSettings(props.alarmID), getSettings())
+  let configSettings = getAlarmSettings(props.alarmID)
+  let { enabled, showToast, playSound, sound, alarmName, alarmMessage, repeatToast, repeatSound, alarmRepeat, thresholdLevel, thresholdType, triggeredAction, profile, sortOrder } = applyDefaults(configSettings, getSettings())
   let loginUsers: {label: string, data: LoginUser | null}[] = props.loginUsers.map((userData: LoginUser) => {
     return {label: userData.personaName, data: userData}
   })
@@ -86,7 +84,7 @@ export const AlarmItemSettings = (props: AlarmItemSettingsProps) => {
           setAlarmSettings(props.alarmID, alarmSettings)
         }}
         disabled={enabled}
-        label={<span>Threshold Type:<span style={descriptionCss}>Type of threshold to trigger alarm</span></span>}
+        label={<span>Threshold Type:<span style={CustomCss.Description}>Type of threshold to trigger alarm</span></span>}
         bottomSeparator="none"
         strDefaultLabel="Error"
         focusable={!enabled} />
@@ -185,26 +183,26 @@ export const AlarmItemSettings = (props: AlarmItemSettingsProps) => {
         ]}
         selectedOption={triggeredAction}
         onChange={(value)=> setAlarmSetting(props.alarmID, 'triggeredAction', value.data)}
-        label={<span>Trigger Action:<span style={descriptionCss}>Action to perform when alarm triggered</span></span>}
+        label={<span>Trigger Action:<span style={CustomCss.Description}>Action to perform when alarm triggered</span></span>}
         bottomSeparator="none"
         strDefaultLabel="Error" />
       <DropdownItem
         rgOptions={loginUsers}
         selectedOption={loginUsers.find((user)=>user.data && user.data.accountName == profile)?.data || null}
         onChange={(value)=> value.data ? setAlarmSetting(props.alarmID, 'profile', value.data.accountName): deleteAlarmSetting(props.alarmID, 'profile') }
-        label={<span>Profile:<span style={descriptionCss}>Apply this alarm only for the specified Steam user</span></span>}
+        label={<span>Profile:<span style={CustomCss.Description}>Apply this alarm only for the specified Steam user</span></span>}
         bottomSeparator="none"
         strDefaultLabel="Error"/>
       <h3>Notification</h3>
       <ToggleField
         onChange={(value) => setAlarmSetting(props.alarmID, 'showToast', value)}
-        label="Toast"
+        label={"Toast"+(configSettings.showToast ? "": " (Global)")}
         description="Enable toast on notification"
         bottomSeparator="none"
         checked={showToast} />
       <ToggleField
         onChange={(value) => setAlarmSetting(props.alarmID, 'playSound', value)}
-        label="Sound"
+        label={"Sound"+(configSettings.playSound ? "": " (Global)")}
         description="Enable sound on notification"
         bottomSeparator="none"
         checked={playSound} />
@@ -223,7 +221,7 @@ export const AlarmItemSettings = (props: AlarmItemSettingsProps) => {
         })()}
         selectedOption={sound}
         onChange={(value)=> { setAlarmSetting(props.alarmID, 'sound', value.data) }}
-        label={<span>Notification Sound:<span style={descriptionCss}>SteamOS navigation sound effect to play on notification</span></span>}
+        label={<span>Notification Sound{configSettings.sound ? "" : " (Global)" }:<span style={CustomCss.Description}>SteamOS navigation sound to play on notification</span></span>}
         bottomSeparator="none"
         strDefaultLabel="Error" />
       <DialogButton
@@ -236,13 +234,13 @@ export const AlarmItemSettings = (props: AlarmItemSettingsProps) => {
       <div style={{display: "flex", flexDirection: "row"}}>
         <ToggleField
             onChange={(value) => setAlarmSetting(props.alarmID, 'repeatToast', value)}
-            label="Repeat Toast"
+            label={"Repeat Toast"+(configSettings.repeatToast ? "": " (Global)")}
             description="Repeat toast notification"
             bottomSeparator="none"
             checked={repeatToast} />
         <ToggleField
           onChange={(value) => setAlarmSetting(props.alarmID, 'repeatSound', value)}
-          label="Repeat Sound"
+          label={"Repeat Sound"+(configSettings.repeatSound ? "": " (Global)")}
           description="Repeat sound notification"
           bottomSeparator="none"
           checked={repeatSound} />
@@ -256,7 +254,7 @@ export const AlarmItemSettings = (props: AlarmItemSettingsProps) => {
           })()}
           selectedOption={alarmRepeat || 0}
           onChange={(value)=> { setAlarmSetting(props.alarmID, 'alarmRepeat', value.data) }}
-          label={<span>Repeat notification:<span style={descriptionCss}>Number of times to repeat notification</span></span>}
+          label={<span>Repeat notification{configSettings.alarmRepeat ? "" : " (Global)" }:<span style={CustomCss.Description}>Number of times to repeat notification</span></span>}
           bottomSeparator="none"
           strDefaultLabel="Error" />
         <DialogButton onClick={()=>{console.log(getAlarmSettings(props.alarmID))}}>Context Settings</DialogButton>
