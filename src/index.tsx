@@ -5,8 +5,7 @@ import { AppContextProvider, AppContextState } from "./Utils/Context"
 import { evaluateAlarm } from "./Utils/Alarms"
 import QAM from "./Views/QAM"
 import AlarmList from "./Views/AlarmList"
-
-
+import GlobalSettings from "./Views/GlobalSettings"
 
 export default definePlugin((serverApi: ServerAPI) => {
   let appCtx = new AppContextState(serverApi)
@@ -19,6 +18,7 @@ export default definePlugin((serverApi: ServerAPI) => {
   }
   appCtx.eventBus.addEventListener(events.BatteryStateEvent.eType, IntervalCheck)
   appCtx.registerRoute("/autosuspend/alarms", AlarmList)
+  appCtx.registerRoute("/autosuspend/settings", GlobalSettings)
   
   return {
     title: <div className={staticClasses.Title}>AutoSuspend</div>,
