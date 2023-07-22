@@ -1,6 +1,5 @@
 import { definePlugin, ServerAPI, staticClasses } from "decky-frontend-lib"
 import { FaBatteryQuarter } from "react-icons/fa"
-import { QAMPanel } from "./QAM/QAMPanel"
 import { events } from "./Utils/Events"
 import { AppContextProvider, AppContextState } from "./Utils/Context"
 import { evaluateAlarm } from "./Utils/Alarms"
