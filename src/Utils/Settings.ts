@@ -36,7 +36,8 @@ export const thresholdLevelDefaults: thresholdLevels = {
   overcharge: 80,
   bedtime: 79200000, // 10pm
   dailyPlaytime: 14400000, // 4 hours
-  sessionPlaytime: 7200000 // 2 hours
+  sessionPlaytime: 7200000, // 2 hours
+  downloadComplete: 600000 // 10 minutes
 }
 const exampleAlarmSettings: AlarmSetting = {
   showToast: true,
