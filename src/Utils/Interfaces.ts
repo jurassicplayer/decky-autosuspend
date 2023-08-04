@@ -12,6 +12,65 @@ export interface BatteryState {
   flLevel: number,
   nSecondsRemaining: number,
 }
+export interface DownloadsStore {
+  m_DownloadOverview: DownloadOverview
+  CompletedTransfers: TransferItem[]
+  AllTransfers: TransferItem[]
+  QueuedTransfers: TransferItem[]
+  RecentlyCompleted: TransferItem[]
+  ScheduledTransfers: TransferItem[]
+  UnqueuedTransfers: TransferItem[]
+}
+export interface TransferItem {
+  active: boolean
+  appid: number
+  buildid: number
+  completed: boolean
+  completed_time: number
+  deferred_time: number
+  downloaded_bytes: number
+  launch_on_completion: boolean
+  paused: boolean
+  queue_index: number
+  target_buildid: number
+  total_bytes: number
+  update_error: string
+  update_result: number
+  update_type_info: UpdateTypeInfo[]
+}
+export interface UpdateTypeInfo {
+  has_update: boolean
+  completed_update: boolean
+  total_bytes: number
+  downloaded_bytes: number
+}
+export interface DownloadOverview extends IObjectKeys {
+  lan_peer_hostname: string
+  paused: boolean
+  throttling_suspended: boolean
+  update_appid: number
+  update_bytes_downloaded: number
+  update_bytes_processed: number
+  update_bytes_staged: number
+  update_bytes_to_download: number
+  update_bytes_to_process: number
+  update_bytes_to_stage: number
+  update_disc_bytes_per_second: number
+  update_is_install: boolean
+  update_is_prefetch_estimate: boolean
+  update_is_shader: boolean
+  update_is_upload: boolean
+  update_is_workshop: boolean
+  update_network_bytes_per_second: number
+  update_peak_network_bytes_per_second: number
+  update_seconds_remaining: number
+  update_start_time: number
+  update_state: string
+}
+export interface DownloadItems extends IObjectKeys {
+  isDownloading: boolean
+  downloadItems: TransferItem[]
+}
 export interface SteamSettings extends IObjectKeys {
   bCefRemoteDebuggingEnabled: boolean
   bChangeBetaEnabled: boolean
@@ -79,7 +138,16 @@ export interface PluginInfo {
   version: string
 }
 export interface SteamHook {
-  unregister: () => void
+  name: SteamHooks
+  unregister: CallableFunction
+}
+export enum SteamHooks {
+  RegisterForSettingsChanges = 'RegisterForSettingsChanges',
+  RegisterForOnSuspendRequest = 'RegisterForOnSuspendRequest',
+  RegisterForOnResumeFromSuspend = 'RegisterForOnResumeFromSuspend',
+  RegisterForShutdownDone = 'RegisterForShutdownDone',
+  RegisterForDownloadItems = 'RegisterForDownloadItems',
+  RegisterForControllerInputMessages = 'RegisterForControllerInputMessages'
 }
 
 // #region Context
@@ -95,6 +163,9 @@ export interface Context {
   vecHours: Hour[]
   registerRoute: (path: string, component: React.ComponentType) => void
   unregisterRoute: (path: string) => void
+  registerHook: (hookName: SteamHooks) => void
+  unregisterHook: (hookName: SteamHooks) => void
+  getActiveAlarmTypes: () => thresholdTypes[]
 }
 export interface SettingsContext {
   getSettings: () => SettingsProps
@@ -130,7 +201,8 @@ export enum thresholdTypes {
   discharge = 'discharge',
   dailyPlaytime = 'dailyPlaytime',
   sessionPlaytime = 'sessionPlaytime',
-  bedtime = 'bedtime'
+  bedtime = 'bedtime',
+  downloadComplete = 'downloadComplete'
 }
 export enum triggerActions {
   none = 'none',
@@ -197,5 +269,6 @@ export interface thresholdLevels extends IObjectKeys {
   bedtime: number
   dailyPlaytime: number
   sessionPlaytime: number
+  downloadComplete: number
 }
 // #endregion
