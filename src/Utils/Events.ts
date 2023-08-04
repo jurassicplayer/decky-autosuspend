@@ -1,4 +1,4 @@
-import { BatteryState } from "./Interfaces"
+import { BatteryState, DownloadItems, SteamSettings } from "./Interfaces"
 export namespace events {
   export class AppStateEvent extends Event {
     public static eType: string = 'AppStateEvent'
@@ -14,6 +14,14 @@ export namespace events {
     constructor(batteryState: BatteryState, eventInitDict?: EventInit) {
       super(BatteryStateEvent.eType, eventInitDict)
       this.batteryState = batteryState
+    }
+  }
+  export class SettingsChangeEvent extends Event {
+    public static eType: string = 'SettingsChangeEvent'
+    public settingsChanges: SteamSettings
+    constructor(settingsChanges: SteamSettings, eventInitDict?: EventInit) {
+      super(SettingsChangeEvent.eType, eventInitDict)
+      this.settingsChanges = settingsChanges
     }
   }
   export class ResumeEvent extends Event {
@@ -32,6 +40,20 @@ export namespace events {
     public static eType: string = 'ShutdownEvent'
     constructor(eventInitDict?: EventInit) {
       super(ShutdownEvent.eType, eventInitDict)
+    }
+  }
+  export class DownloadItemsEvent extends Event {
+    public static eType: string = 'DownloadItemsEvent'
+    public downloadItems: DownloadItems
+    constructor(downloadItems: DownloadItems, eventInitDict?: EventInit) {
+      super(DownloadItemsEvent.eType, eventInitDict)
+      this.downloadItems = downloadItems
+    }
+  }
+  export class ControllerInputEvent extends Event {
+    public static eType: string = 'ControllerInputEvent'
+    constructor(eventInitDict?: EventInit) {
+      super(ControllerInputEvent.eType, eventInitDict)
     }
   }
 }
