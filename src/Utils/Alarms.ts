@@ -3,7 +3,7 @@ import { AppContextState } from "./Context"
 import { events } from "./Events"
 import { SettingsManager, applyDefaults } from "./Settings"
 import { sleep } from "decky-frontend-lib"
-import { AlarmHistory, AlarmSetting, BatteryState, thresholdTypes, triggerActions } from "./Interfaces"
+import { AlarmHistory, AlarmSetting, BatteryState, SteamHooks, thresholdTypes, triggerActions } from "./Interfaces"
 
 function getAlarmHistories(): {[key: string]: AlarmHistory} {
   let s_histories = localStorage.getItem('autosuspend-alarms')
@@ -96,8 +96,8 @@ export const evaluateAlarm = async (alarmID: string, settings: AlarmSetting, con
   // @ts-ignore
   if (profile && profile != loginStore.m_strAccountName) { return }
   let history = getAlarmHistory(alarmID)
-  showToast = showToast
   let triggerAction = false
+
   let date = new Date()
   // Evaluate triggers
   switch (thresholdType) {
@@ -215,15 +215,53 @@ export const evaluateAlarm = async (alarmID: string, settings: AlarmSetting, con
   }
 }
 
+export function registerAlarmHooks(context: AppContextState) {
+  let alarmTypes = context.getActiveAlarmTypes()
+  if (alarmTypes.includes(thresholdTypes.sessionPlaytime) || alarmTypes.includes(thresholdTypes.dailyPlaytime)) {
+    context.registerHook(SteamHooks.RegisterForOnResumeFromSuspend)
+  } else {
+    context.unregisterHook(SteamHooks.RegisterForOnResumeFromSuspend)
+  }
+  if (alarmTypes.includes(thresholdTypes.dailyPlaytime)) {
+    context.registerHook(SteamHooks.RegisterForOnSuspendRequest)
+    context.registerHook(SteamHooks.RegisterForShutdownDone)
+  } else {
+    context.unregisterHook(SteamHooks.RegisterForOnSuspendRequest)
+    context.unregisterHook(SteamHooks.RegisterForShutdownDone)
+  }
+  if (alarmTypes.includes(thresholdTypes.downloadComplete)) {
+    context.registerHook(SteamHooks.RegisterForDownloadItems)
+    context.registerHook(SteamHooks.RegisterForControllerInputMessages)
+  } else {
+    context.unregisterHook(SteamHooks.RegisterForDownloadItems)
+    context.unregisterHook(SteamHooks.RegisterForControllerInputMessages)
+  }
+}
 export function registerAlarmEvents(context: AppContextState) {
   context.eventBus.addEventListener(events.SuspendEvent.eType, () => OnSuspend(context))
   context.eventBus.addEventListener(events.ShutdownEvent.eType, () => OnSuspend(context))
   context.eventBus.addEventListener(events.ResumeEvent.eType, () => OnResume(context))
+  context.eventBus.addEventListener(events.DownloadItemsEvent.eType, (evt) => OnDownloadItems(evt as events.DownloadItemsEvent, context))
+  context.eventBus.addEventListener(events.ControllerInputEvent.eType, () => OnControllerInput(context))
 }
 export function unregisterAlarmEvents(context: AppContextState) {
   context.eventBus.removeEventListener(events.SuspendEvent.eType, () => OnSuspend(context))
   context.eventBus.removeEventListener(events.ShutdownEvent.eType, () => OnSuspend(context))
   context.eventBus.removeEventListener(events.ResumeEvent.eType, () => OnResume(context))
+  context.eventBus.removeEventListener(events.DownloadItemsEvent.eType, (evt) => OnDownloadItems(evt as events.DownloadItemsEvent, context))
+  context.eventBus.removeEventListener(events.ControllerInputEvent.eType, () => OnControllerInput(context))
+}
+const OnDownloadItems = (evt: events.DownloadItemsEvent, context: AppContextState) => {
+  console.log(evt, context)
+  // let dlStore: DownloadsStore = downloadsStore
+  // console.log(
+  //   '\nQueuedTransfers: ', dlStore.QueuedTransfers,
+  //   '\nScheduledTransfers: ', dlStore.ScheduledTransfers,
+  //   '\nUnqueuedTransfers: ', dlStore.UnqueuedTransfers,
+  //   '\nRecentlyCompleted: ', dlStore.RecentlyCompleted
+  // )
+}
+const OnControllerInput = (context: AppContextState) => {
 }
 const OnSuspend = (context: AppContextState) => {
   let alarms = context.settings.alarms

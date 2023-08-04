@@ -1,11 +1,11 @@
 import { createContext, FC, useContext, useMemo, useState } from 'react'
 import { ServerAPI } from "decky-frontend-lib"
 import { BackendCtx } from "./Backend"
-import { BatteryState, Hour, SettingsProps, SteamSettings } from "./Interfaces"
+import { BatteryState, Hour, SettingsProps, SteamSettings, DownloadItems, SteamHooks } from "./Interfaces"
 import { SettingsManager } from "./Settings"
 import { events } from "./Events"
 import { Logger } from "./Logger"
-import { registerAlarmEvents, unregisterAlarmEvents } from './Alarms'
+import { registerAlarmEvents, registerAlarmHooks, unregisterAlarmEvents } from './Alarms'
 import { AppInfo, Context, ProviderProps, SettingsContext, SteamHook } from './Interfaces'
 
 export class AppContextState implements Context {
@@ -24,7 +24,9 @@ export class AppContextState implements Context {
         let currentState = window.SystemPowerStore.batteryState
         if (currentState != this.batteryState) this.updateBatteryState(currentState)
       }, 1000)
-      this.registerHooks()
+      this.registerHook(SteamHooks.RegisterForSettingsChanges)
+      registerAlarmHooks(this)
+      // this.registerHooks()
       // this.registerRoutes()
       registerAlarmEvents(this)
       this.onResume() // Trigger OnResume alarm events on "boot" to setup alarms
@@ -56,10 +58,14 @@ export class AppContextState implements Context {
     this.unregisterRoutes()
     this.unregisterHooks()
   }
-  public registerRoute = (path: string, component: React.ComponentType) => {
+  public registerRoute = (path: string, component: React.ComponentType, exact?: boolean) => {
     let Component = component
     let ctxWrapper = <AppContextProvider appContextState={this}><Component /></AppContextProvider>
-    this.serverApi.routerHook.addRoute(path, () => ctxWrapper)
+    if (exact) {
+      this.serverApi.routerHook.addRoute(path, () => ctxWrapper, {exact: true})
+    } else {
+      this.serverApi.routerHook.addRoute(path, () => ctxWrapper)
+    }
     this.activeRoutes.push(path)
   }
   public unregisterRoute = (path: string) => {
@@ -70,16 +76,51 @@ export class AppContextState implements Context {
   //   this.registerRoute("/autosuspend/alarms", AlarmList)
   // }
   private unregisterRoutes() {
-    this.activeRoutes.forEach((route) => { this.unregisterRoute(route) })
+    this.activeRoutes.forEach(route => { this.unregisterRoute(route) })
   }
-  private registerHooks() {
-    this.activeHooks.push(SteamClient.Settings.RegisterForSettingsChanges((value: SteamSettings) => {this.onSettings(value)}))
-    this.activeHooks.push(SteamClient.System.RegisterForOnSuspendRequest(() => {this.onSuspend()}))
-    this.activeHooks.push(SteamClient.System.RegisterForOnResumeFromSuspend(() => {this.onResume()}))
-    this.activeHooks.push(SteamClient.User.RegisterForShutdownDone(() => {this.onShutdown()}))
+  // private registerHooks() {
+  //   // Only for hooks that should always be registered  
+  // }
+  public getActiveAlarmTypes() {
+    let alarms = Object.entries(this.settings.alarms).map(([, setting]) => setting.thresholdType)
+    let alarmTypes = [...new Set(alarms)]
+    return alarmTypes
+  }
+  public registerHook(hookName: SteamHooks) {
+    Logger.debug(`Attempting to register hook: ${hookName}\tFilterCheck: ${this.activeHooks.filter(hook => hook.name == hookName).length == 0}`)
+    let callback: CallableFunction | undefined
+    if (this.activeHooks.filter(hook => hook.name == SteamHooks.RegisterForSettingsChanges).length == 0) {
+      callback = SteamClient.Settings.RegisterForSettingsChanges((value: SteamSettings) => this.onSettings(value))
+    } else
+    if (this.activeHooks.filter(hook => hook.name == SteamHooks.RegisterForOnSuspendRequest).length == 0) {
+      callback = SteamClient.System.RegisterForOnSuspendRequest(() => this.onSuspend())
+    } else
+    if (this.activeHooks.filter(hook => hook.name == SteamHooks.RegisterForOnResumeFromSuspend).length == 0) {
+      callback = SteamClient.System.RegisterForOnResumeFromSuspend(() => this.onResume())
+    } else
+    if (this.activeHooks.filter(hook => hook.name == SteamHooks.RegisterForShutdownDone).length == 0) {
+      callback = SteamClient.User.RegisterForShutdownDone(() => this.onShutdown())
+    } else
+    if (this.activeHooks.filter(hook => hook.name == SteamHooks.RegisterForDownloadItems).length == 0) {
+      callback = SteamClient.Downloads.RegisterForDownloadItems((value: DownloadItems)=> this.onDownloadItems(value))
+    } else
+    if (this.activeHooks.filter(hook => hook.name == SteamHooks.RegisterForControllerInputMessages).length == 0) {
+      callback = SteamClient.Input.RegisterForControllerInputMessages(() => this.onControllerInput())
+    }
+    if (typeof callback != 'undefined') {
+      this.activeHooks.push({name: hookName, unregister: callback})
+      Logger.info(`Registered hook: ${hookName}`)
+    }
+  }
+  public unregisterHook(hookName: SteamHooks) {
+    let hook = this.activeHooks.find(hook => hook.name == hookName)
+    if (!hook) { return }
+    hook.unregister()
+    this.activeHooks = this.activeHooks.filter(hook => hook.name !== hookName)
+    Logger.info(`Unregistered hook: ${hookName}`)
   }
   private unregisterHooks() {
-    this.activeHooks.forEach((hook) => { hook.unregister() })
+    this.activeHooks.forEach(hook => { hook.unregister() })
   }
   private updateBatteryState(batteryState: BatteryState) {
     this.batteryState = batteryState
@@ -96,6 +137,7 @@ export class AppContextState implements Context {
     } else {
       Logger.warning("Unable to determine if time format is 12-hour or 24-hour format.")
     }
+    this.eventBus.dispatchEvent(new events.SettingsChangeEvent(value))
   }
   private onSuspend() {
     this.eventBus.dispatchEvent(new events.SuspendEvent())
@@ -105,6 +147,12 @@ export class AppContextState implements Context {
   }
   private onShutdown() {
     this.eventBus.dispatchEvent(new events.ShutdownEvent())
+  }
+  private onDownloadItems(value: DownloadItems) {
+    this.eventBus.dispatchEvent(new events.DownloadItemsEvent(value))
+  }
+  private onControllerInput() {
+    this.eventBus.dispatchEvent(new events.ControllerInputEvent())
   }
 }
 // #endregion
@@ -118,7 +166,6 @@ export const useSettingsContext = () => useContext(SettingsContext)
 export const AppContextProvider: FC<ProviderProps> = ({children, appContextState}) => {
   const [appCtx, setAppCtx] = useState<Context>(appContextState)
   const setSettings = (context: Context) => {
-    // SettingsManager.saveToFile(SettingsManager.validateSettings(context.settings))
     SettingsManager.saveToFile(context.settings)
     setAppCtx(context)
   }
