@@ -21,6 +21,7 @@ const applyThresholdValue = (thresholdLevels: thresholdLevels, thresholdType: th
     case thresholdTypes.bedtime: thresholdLevels.bedtime = value; break
     case thresholdTypes.dailyPlaytime: thresholdLevels.dailyPlaytime = value; break
     case thresholdTypes.sessionPlaytime: thresholdLevels.sessionPlaytime = value; break
+    case thresholdTypes.downloadComplete: thresholdLevels.downloadComplete = value; break
   }
   return thresholdLevels
 }
@@ -31,6 +32,7 @@ const getThresholdValue = (thresholdLevels: thresholdLevels, thresholdType: thre
     case thresholdTypes.bedtime: return thresholdLevels.bedtime
     case thresholdTypes.dailyPlaytime: return thresholdLevels.dailyPlaytime
     case thresholdTypes.sessionPlaytime: return thresholdLevels.sessionPlaytime
+    case thresholdTypes.downloadComplete: return thresholdLevels.downloadComplete
   }
 }
 
@@ -74,7 +76,8 @@ export const AlarmItemSettings = (props: AlarmItemSettingsProps) => {
           {label: 'Overcharge',       data: thresholdTypes.overcharge},
           {label: 'Bedtime',          data: thresholdTypes.bedtime},
           {label: 'Daily Playtime',   data: thresholdTypes.dailyPlaytime},
-          {label: 'Session Playtime', data: thresholdTypes.sessionPlaytime}
+          {label: 'Session Playtime', data: thresholdTypes.sessionPlaytime},
+          {label: 'Download Complete', data: thresholdTypes.downloadComplete}
         ]}
         selectedOption={thresholdType}
         onChange={(value) => {
