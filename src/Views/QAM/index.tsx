@@ -16,8 +16,7 @@ const QAMPanel: VFC = () => {
   
   return (
     <Focusable>
-      <DialogButton onClick={()=>NavigateToPage("/autosuspend/alarms")}>Alarm List</DialogButton>
-      <DialogButton onClick={()=>NavigateToPage("/autosuspend/settings")}>Global Settings</DialogButton>
+      <DialogButton onClick={()=>NavigateToPage("/autosuspend")}>Configuration</DialogButton>
       {/* <DialogButton onClick={()=>NavigateToPage("/autosuspend/information")}>Information</DialogButton>
       <DialogButton onClick={()=>NavigateToPage("/autosuspend/about")}>About</DialogButton> */}
     </Focusable>
