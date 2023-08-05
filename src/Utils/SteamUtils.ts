@@ -21,6 +21,7 @@ const findModule = (property: string) => {
 
 const SleepParent = findModule("InitiateSleep")
 export const NavSoundMap = findModule("ToastMisc")
+export const downloadsStore = findModule("m_DownloadOverview")
 
 export class SteamUtils {
   static async suspend() {
