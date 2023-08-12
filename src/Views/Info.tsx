@@ -1,7 +1,6 @@
 import { CSSProperties, VFC, useEffect, useRef, useState } from "react"
-import { useAppContext } from "../Utils/Context"
-import { DialogBody, DialogButton, DialogControlsSection, DialogControlsSectionHeader, Field, Focusable } from "decky-frontend-lib"
-import { SteamCssVariables } from "../Utils/SteamUtils"
+import { DialogBody, DialogControlsSection, Field, Focusable } from "decky-frontend-lib"
+import { FaBatteryFull, FaBatteryQuarter, FaBed, FaDotCircle, FaExclamationCircle, FaMinusSquare, FaMoon, FaPowerOff, FaStopwatch, FaSun, FaUser, FaUsers, FaVolumeMute, FaVolumeUp } from "react-icons/fa"
 
 const TopColorBar = () => {
   const topColorBarCSS: CSSProperties = {
@@ -27,46 +26,58 @@ const ContentRenderer = (content: contentElement[]) => {
   const elements = content.map((item: contentElement, i: number) => {
     let onAction = () => {
       setShowToC(true)
-      tocRefs.current.find(tocRef => item.id == tocRef.id)?.ref?.focus()
+      tocRefs.current.find(tocRef => tocRef && item.id == tocRef.id)?.ref?.focus()
     }
     let itemProps:any = {
       onClick: onAction
     }
-    if (item.data) { itemProps.description = item.data }
-    if (item.title && !item.sectionTitle) { itemProps.label = item.title }
+    if (item.indentLevel === undefined) { item.indentLevel = 0 }
+    if (!item.sectionTitle) {
+      if (item.data) { itemProps.description = item.data }
+      if (item.title) { itemProps.label = item.title }
+    }
     if (item.sectionTitle) { 
-      if (item.indentLevel === undefined) { item.indentLevel = 0 }
-      itemProps.children = (<span>{item.data}<TopColorBar /></span>)
+      
+      itemProps.children = (
+        <span>
+          <span style={{marginLeft: `${(item.indentLevel)*indentation}px`}}>{item.data}</span>
+          <TopColorBar />
+        </span>
+      )
       itemProps.onOKButton = onAction
       return (
         <Focusable
           key={i}
           // @ts-ignore
           focusableIfNoChildren={true}
-          style={{marginLeft: `${(item.indentLevel+1)*indentation}px`}}
           ref={el => {
             if (item.id) { itemRefs.current[i] = {id: item.id, ref: el} }
           }}
-          onOKButton={()=>tocRefs.current.find(itemRef => item.id == itemRef.id)?.ref?.focus()}
-          onClick={()=>tocRefs.current.find(itemRef => item.id == itemRef.id)?.ref?.focus()}
+          onOKButton={()=>tocRefs.current.find(itemRef => itemRef && item.id == itemRef.id)?.ref?.focus()}
+          onClick={()=>tocRefs.current.find(itemRef => itemRef && item.id == itemRef.id)?.ref?.focus()}
           {...itemProps} />
       )
     } else if (!item.id) { 
       return (
+        <div style={{marginLeft: `${(item.indentLevel)*indentation}px`}}>
         <Field
           key={i}
           focusable={true}
           {...itemProps} />
+        </div>
       )
     } else {
       return (
+        <div style={{marginLeft: `${(item.indentLevel)*indentation}px`}}>
         <Field
           key={i}
           focusable={true}
+          style={{marginLeft: `${(item.indentLevel)*indentation}px`}}
           ref={el => {
             if (item.id) { itemRefs.current[i] = {id: item.id, ref: el} }
           }}
           {...itemProps} />
+        </div>
       )
     }
   })
@@ -84,8 +95,8 @@ const ContentRenderer = (content: contentElement[]) => {
         ref={el => {
           if (item.id) { tocRefs.current[i] = {id: item.id, ref: el} }
         }}
-        onOKButton={()=>itemRefs.current.find(itemRef => item.id == itemRef.id)?.ref?.focus()}
-        onClick={()=>itemRefs.current.find(itemRef => item.id == itemRef.id)?.ref?.focus()}>
+        onOKButton={()=>itemRefs.current.find(itemRef => itemRef && item.id == itemRef.id)?.ref?.focus()}
+        onClick={()=>itemRefs.current.find(itemRef => itemRef && item.id == itemRef.id)?.ref?.focus()}>
         {item.title}
       </Focusable>
     )
@@ -95,13 +106,16 @@ const ContentRenderer = (content: contentElement[]) => {
     <Focusable
       // @ts-ignore
       focusableIfNoChildren={true}
+      style={{fontSize: "1.2em"}}
       onOKButton={()=>setShowToC(!showToC)}
       onClick={()=>setShowToC(!showToC)}>
       Table of Contents
+      <TopColorBar />
     </Focusable>
     {showToC ? tableOfContents : null }
     </div>
   )
+  console.log('ToC references: ', tocRefs, '\nContent references: ', itemRefs)
   return [tocTitle, ...elements]
 }
 
@@ -116,46 +130,117 @@ interface contentElement {
 const Info: VFC = () => {
   const contents: contentElement[] = [
     {
-      data: <h1>Alarm Types</h1>,
+      id: "general",
+      title: "General",
       sectionTitle: true,
-      title: "Alarm Types",
-      id: "alarmTypes"
+      data: <span style={{fontSize: "1.2em"}}>General</span>
     },
     {
-      data: "Discharge alarms are triggered when the battery level has discharged to the designated percentage threshold",
+      id: "alarms-general-alarmname",
+      title: "Alarm Name",
+      indentLevel: 1,
+      data: "Alarm names are user-defined names solely to easily define and differentiate between alarms. Alarms without names will show the UUID associated with the alarm."
+    },
+    {
+      id: "alarms-general-toastmessage",
+      title: "Toast Message",
+      indentLevel: 1,
+      data: "Toast messages are user-defined messages to provide information within the notification sent when the associated alarm is triggered. Refer to the `Message Variables` section for the list of available variable substitutions that can be used within the message."
+    },
+    {
+      id: "alarms-general-profile",
+      title: "Profile",
+      indentLevel: 1,
+      data: "Profile ##FIXME##"
+    },
+    {
+      id: "alarms-thresholdTypes",
+      title: "Threshold Types",
+      sectionTitle: true,
+      data: <span style={{fontSize: "1.2em"}}>Threshold Types</span>
+    },
+    {
+      id: "alarms-thresholdTypes-discharge",
       title: "Discharge",
-      id: "alarmTypes-discharge",
-      indentLevel: 1
+      indentLevel: 1,
+      data: (<span>
+        Discharge alarms (<FaBatteryQuarter />) are triggered when the battery level has discharged to the designated percentage threshold and will not trigger again until the battery has been charged above the threshold. These alarms are automatically disabled if no battery is found to prevent instantly triggering.
+      </span>)
     },
     {
-      data: "Overcharge alarms are triggered when the battery level has charged to the designated percentage threshold",
+      id: "alarms-thresholdTypes-overcharge",
       title: "Overcharge",
-      id: "alarmTypes-overcharge",
-      indentLevel: 1
+      indentLevel: 1,
+      data: "##FIXME## Overcharge alarms are triggered when the battery level has charged to the designated percentage threshold",
     },
     {
-      data: "Bedtime alarms are triggered when the current time has reached a certain time of day",
+      id: "alarms-thresholdTypes-bedtime",
       title: "Bedtime",
-      id: "alarmTypes-bedtime",
-      indentLevel: 1
+      indentLevel: 1,
+      data: "##FIXME## Bedtime alarms are triggered when the current time has reached a certain time of day",
     },
     {
-      data: "Daily playtime alarms are triggered when the console has been actively running until the designated time threshold, resets at midnight, and persists across suspends/reboots",
+      id: "alarms-thresholdTypes-dailyplaytime",
       title: "Daily Playtime",
-      id: "alarmTypes-dailyplaytime",
-      indentLevel: 1
+      indentLevel: 1,
+      data: "##FIXME## Daily playtime alarms are triggered when the console has been actively running until the designated time threshold, resets at midnight, and persists across suspends/reboots",
     },
     {
-      data: "Session playtime alarms are triggered when the accumulated time that the console has been actively running reaches the designated duration threshold, and resets when suspended or rebooted",
+      id: "alarms-thresholdTypes-sessionplaytime",
       title: "Session Playtime",
-      id: "alarmTypes-sessionplaytime",
-      indentLevel: 1
+      indentLevel: 1,
+      data: "##FIXME## Session playtime alarms are triggered when the accumulated time that the console has been actively running reaches the designated duration threshold, and resets when suspended or rebooted",
     },
     {
-      data: "Download complete alarms are triggered when the accumulated time that the console has been actively running reaches the designated duration threshold after finishing a download queue, and resets when suspended or rebooted",
+      id: "alarms-thresholdTypes-downloadComplete",
       title: "Download Complete",
-      id: "alarmTypes-downloadComplete",
-      indentLevel: 1
+      indentLevel: 1,
+      data: "##FIXME## Download complete alarms are triggered when the accumulated time that the console has been actively running reaches the designated duration threshold after finishing a download queue, and resets when suspended or rebooted",
+    },
+    {
+      id: "alarms-thresholdTypes-inactivity",
+      title: "Inactivity",
+      indentLevel: 1,
+      data: "##FIXME## Inactivity alarms are triggered when the accumulated time that the console has been inactively running reaches the designated duration threshold, and resets when suspended or rebooted",
+    },
+    {
+      id: "alarms-triggerActions",
+      title: "Trigger Actions",
+      sectionTitle: true,
+      data: <span style={{fontSize: "1.2em"}}>Trigger Actions</span>
+    },
+    {
+      id: "alarms-triggerActions-suspend",
+      title: "Suspend",
+      indentLevel: 1,
+      data: (<span>
+        The suspend action (<FaMoon/>) signals the device to suspend when the associated alarm is triggered.
+      </span>)
+    },
+    {
+      id: "alarms-triggerActions-shutdown",
+      title: "Shutdown",
+      indentLevel: 1,
+      data: (<span>
+        The shutdown action (<FaPowerOff/>) signals the device to shutdown when the associated alarm is triggered.
+      </span>)
+    },
+    {
+      id: "messageVariables",
+      title: "Message Variables",
+      sectionTitle: true,
+      data: <span style={{fontSize: "1.2em"}}>Message Variables</span>
+    },
+    {
+      indentLevel: 1,
+      data: (<table>
+        <tr><td><b>Variable</b></td><td><b>Description</b></td><td><b>Example</b></td></tr>
+        <tr><td>batt%</td><td>Displays the battery percentage</td><td>{`"Battery level \{batt%\}%"`}</td></tr>
+        <tr><td>playHrs</td><td>Displays the daily/session hour playtime</td><td>{`"You've been playing for {playHrs}h"`}</td></tr>
+        <tr><td>playMin</td><td>Displays the daily/session minute playtime</td><td>{`"You've been playing for {playMin}m"`}</td></tr>
+        <tr><td>playSec</td><td>Displays the daily/session seconds playtime</td><td>{`"You've been playing for {playSec}s"`}</td></tr>
+        <tr><td>{`date:<fmt>`}</td><td>Displays the date/time (python-like format)</td><td>{`"It's now {date:%I:%M}"`}</td></tr>
+      </table>)
     }
   ]
 
