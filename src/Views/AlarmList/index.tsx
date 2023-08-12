@@ -3,8 +3,7 @@ import { CSSProperties, VFC, useState } from "react"
 import { useSettingsContext } from "../../Utils/Context"
 import { AlarmItem } from "./AlarmItem"
 import { SteamCssVariables } from "../../Utils/SteamUtils"
-import { FaCog, FaPlusSquare } from "react-icons/fa"
-import { BsInfoSquareFill } from "react-icons/bs"
+import { FaPlusSquare } from "react-icons/fa"
 import { AlarmSetting, Alarms, EntryProps, thresholdTypes, triggerActions } from "../../Utils/Interfaces"
 
 const buttonCss: CSSProperties = {
@@ -70,8 +69,6 @@ const AlarmList: VFC = () => {
           <span style={{fontSize: "2em"}}>Alarms</span>
           <Focusable style={{display: "flex", flexDirection: "row", alignItems: "center", columnGap: "0.4em"}}>
             <DialogButton style={buttonCss} onClick={()=>onAddAlarm()}><FaPlusSquare/></DialogButton>
-            {/* <DialogButton style={buttonCss}><FaCog/></DialogButton>
-            <DialogButton style={buttonCss}><BsInfoSquareFill/></DialogButton> */}
           </Focusable>
         </div>
         {alarmList}
