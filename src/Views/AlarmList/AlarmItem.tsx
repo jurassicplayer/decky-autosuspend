@@ -80,7 +80,7 @@ export const AlarmItem = (props: AlarmItemProps<EntryProps>) => {
   return (
     <div style={selected ? SteamCss.NotificationGroupExpanded : SteamCss.NotificationGroup}>
       <div style={SteamCss.NotificationSection}>
-        <div style={SteamCss.NotificationFeedToggle}>
+        <div style={{...SteamCss.NotificationFeedToggle, marginRight: "6%"}}>
           <ToggleField
             layout="below"
             bottomSeparator="none"
@@ -121,7 +121,7 @@ export const AlarmItem = (props: AlarmItemProps<EntryProps>) => {
         : null}
         <DialogButton
           onClick={() => setSelected(!selected)}
-          style={{width: "7.5%"}}>
+          style={{minWidth: "0px", width: "15%"}}>
           <SteamChevronDown style={selected ? {...SteamCss.PrefDetailsToggle, ...SteamCss.PrefDetailsSelected} : SteamCss.PrefDetailsToggle }/>
         </DialogButton>
       </div>
