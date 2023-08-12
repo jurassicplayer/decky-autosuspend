@@ -1,5 +1,6 @@
 import { ReorderableEntry, ServerAPI } from "decky-frontend-lib"
 import { AppContextState } from "./Context"
+import { IAlarm } from "./Alarm"
 
 interface IObjectKeys {
   [key: string]: any
@@ -153,6 +154,7 @@ export enum SteamHooks {
 // #region Context
 export interface Context {
   settings: SettingsProps       // When modifying settings, apply modification to this and use for plugin.
+  alarms: IAlarm[]
   appInfo: AppInfo
   batteryState: BatteryState
   eventBus: EventTarget
@@ -197,12 +199,14 @@ export interface SettingsProps extends IObjectKeys {
 
 // #region Alarm Setting Enumerations
 export enum thresholdTypes {
+  notimplemented = 'notimplemented',
   overcharge = 'overcharge',
   discharge = 'discharge',
   dailyPlaytime = 'dailyPlaytime',
   sessionPlaytime = 'sessionPlaytime',
   bedtime = 'bedtime',
-  downloadComplete = 'downloadComplete'
+  downloadComplete = 'downloadComplete',
+  inactivity = 'inactivity'
 }
 export enum triggerActions {
   none = 'none',

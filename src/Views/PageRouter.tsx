@@ -5,6 +5,7 @@ import { VFC } from "react"
 import AlarmList from "./AlarmList"
 import GlobalSettings from "./GlobalSettings"
 import Info from "./Info"
+import Test from "../Utils/Alarms/test"
 import { FaClock, FaCog, FaInfo } from "react-icons/fa"
 
 const PageRouter: VFC = () => {
@@ -26,6 +27,12 @@ const PageRouter: VFC = () => {
     {
       title: 'Information',
       content: <Info/>,
+      icon: <FaInfo/>,
+      hideTitle: true
+    },
+    {
+      title: 'Test',
+      content: <Test/>,
       icon: <FaInfo/>,
       hideTitle: true
     }

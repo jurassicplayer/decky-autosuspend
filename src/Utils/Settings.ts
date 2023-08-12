@@ -145,6 +145,7 @@ export class SettingsManager {
 }
 
 export function applyDefaults(settings: AlarmSetting, defaults: SettingsProps) {
+  console.log(settings)
   let { showToast, playSound, sound, repeatToast, repeatSound, alarmRepeat, alarmMessage } = settings
   let { defaultShowToast, defaultPlaySound, defaultSound, defaultRepeatToast, defaultRepeatSound, defaultAlarmRepeat } = defaults
   let showToastOrDefault    = (typeof showToast     != 'undefined') ? showToast    : defaultShowToast

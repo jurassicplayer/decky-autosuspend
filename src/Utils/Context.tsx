@@ -1,12 +1,13 @@
 import { createContext, FC, useContext, useMemo, useState } from 'react'
 import { ServerAPI } from "decky-frontend-lib"
 import { BackendCtx } from "./Backend"
-import { BatteryState, Hour, SettingsProps, SteamSettings, DownloadItems, SteamHooks } from "./Interfaces"
+import { BatteryState, Hour, SettingsProps, SteamSettings, DownloadItems, SteamHooks, thresholdTypes, triggerActions } from "./Interfaces"
 import { SettingsManager } from "./Settings"
 import { events } from "./Events"
 import { Logger } from "./Logger"
 import { registerAlarmEvents, registerAlarmHooks, unregisterAlarmEvents } from './Alarms'
 import { AppInfo, Context, ProviderProps, SettingsContext, SteamHook } from './Interfaces'
+import { IAlarm, IAlarmSetting, eAlarmType, eTriggerActions, Alarms } from './Alarm'
 
 export class AppContextState implements Context {
   constructor(serverAPI: ServerAPI) {
@@ -19,6 +20,19 @@ export class AppContextState implements Context {
     Logger.info('Initializing frontend')
     SettingsManager.loadFromFile().then((settings)=>{
       this.settings = settings
+      this.alarms = []
+      for (let alarmID in this.settings.alarms) {
+        let alarm: IAlarmSetting = {
+          ...this.settings.alarms[alarmID],
+          thresholdType: eAlarmType[this.settings.alarms[alarmID].thresholdType as keyof typeof eAlarmType],
+          triggeredAction: eTriggerActions[this.settings.alarms[alarmID].triggeredAction as keyof typeof eTriggerActions]
+        }
+        this.alarms.push(Alarms.create(undefined, alarm, alarmID))
+      }
+      //this.alarms.push(Alarms.create(eAlarmType.discharge))
+      //this.alarms.push(Alarms.create(eAlarmType.downloadComplete))
+      // console.log(this.alarms)
+      // console.log(this.alarms.filter(alarm => alarm.type == eAlarmType.bedtime))
       this.intervalID = setInterval(()=>{
         // @ts-ignore
         let currentState = window.SystemPowerStore.batteryState
@@ -43,6 +57,7 @@ export class AppContextState implements Context {
   }
   public serverApi: ServerAPI
   public settings!: SettingsProps
+  public alarms!: IAlarm[]
   public appInfo: AppInfo
   public batteryState!: BatteryState
   public eventBus: EventTarget = new EventTarget()
