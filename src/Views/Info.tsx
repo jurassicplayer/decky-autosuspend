@@ -25,16 +25,33 @@ const ContentRenderer = (content: contentElement[]) => {
 
   const itemRefs = useRef<{id: string, ref: HTMLDivElement|null}[]>([]);
   const elements = content.map((item: contentElement, i: number) => {
+    let onAction = () => {
+      setShowToC(true)
+      tocRefs.current.find(tocRef => item.id == tocRef.id)?.ref?.focus()
+    }
     let itemProps:any = {
-      onClick: ()=>{
-        setShowToC(true)
-        tocRefs.current.find(tocRef => item.id == tocRef.id)?.ref?.focus()
-      }
+      onClick: onAction
     }
     if (item.data) { itemProps.description = item.data }
     if (item.title && !item.sectionTitle) { itemProps.label = item.title }
-    if (item.sectionTitle) {itemProps.children = <TopColorBar />}
-    if (!item.id) { 
+    if (item.sectionTitle) { 
+      if (item.indentLevel === undefined) { item.indentLevel = 0 }
+      itemProps.children = (<span>{item.data}<TopColorBar /></span>)
+      itemProps.onOKButton = onAction
+      return (
+        <Focusable
+          key={i}
+          // @ts-ignore
+          focusableIfNoChildren={true}
+          style={{marginLeft: `${(item.indentLevel+1)*indentation}px`}}
+          ref={el => {
+            if (item.id) { itemRefs.current[i] = {id: item.id, ref: el} }
+          }}
+          onOKButton={()=>tocRefs.current.find(itemRef => item.id == itemRef.id)?.ref?.focus()}
+          onClick={()=>tocRefs.current.find(itemRef => item.id == itemRef.id)?.ref?.focus()}
+          {...itemProps} />
+      )
+    } else if (!item.id) { 
       return (
         <Field
           key={i}
@@ -89,15 +106,14 @@ const ContentRenderer = (content: contentElement[]) => {
 }
 
 interface contentElement {
-  data?: any
-  title?: string
-  sectionTitle?: boolean
-  id?: string // field ID
+  data?: any // react node with any content data
+  title?: string // the label shown above the description and in the table of contents
+  sectionTitle?: boolean // use to disable the label in the content
+  id?: string // field ID (currently not automatically generated, but could be)
   indentLevel?: number  // indentation level
 }
 
 const Info: VFC = () => {
-  // const { appInfo } = useAppContext()
   const contents: contentElement[] = [
     {
       data: <h1>Alarm Types</h1>,
