@@ -91,8 +91,8 @@ export function applyMessageSubstitutions(message: string, batteryState: Battery
 }
 
 export const evaluateAlarm = async (alarmID: string, settings: AlarmSetting, context: AppContextState) => {
-  let { showToast, playSound, sound, repeatToast, repeatSound, alarmRepeat, alarmName, alarmMessage, thresholdLevel, thresholdType, triggeredAction, enabled, profile } = applyDefaults(settings, context.settings)
-  if (!enabled) { return }
+  if (!settings.enabled) { return }
+  let { showToast, playSound, sound, repeatToast, repeatSound, alarmRepeat, alarmName, alarmMessage, thresholdLevel, thresholdType, triggeredAction, profile } = applyDefaults(settings, context.settings)
   // @ts-ignore
   if (profile && profile != loginStore.m_strAccountName) { return }
   let history = getAlarmHistory(alarmID)
