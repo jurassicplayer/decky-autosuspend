@@ -1,6 +1,7 @@
 import { CSSProperties, VFC, useEffect, useRef, useState } from "react"
 import { DialogBody, DialogControlsSection, Field, Focusable } from "decky-frontend-lib"
 import { FaBatteryFull, FaBatteryQuarter, FaBed, FaDotCircle, FaExclamationCircle, FaMinusSquare, FaMoon, FaPowerOff, FaStopwatch, FaSun, FaUser, FaUsers, FaVolumeMute, FaVolumeUp } from "react-icons/fa"
+import { BiNotification, BiNotificationOff } from "react-icons/bi"
 
 const TopColorBar = () => {
   const topColorBarCSS: CSSProperties = {
@@ -145,13 +146,15 @@ const Info: VFC = () => {
       id: "alarms-general-toastmessage",
       title: "Toast Message",
       indentLevel: 1,
-      data: "Toast messages are user-defined messages to provide information within the notification sent when the associated alarm is triggered. Refer to the `Message Variables` section for the list of available variable substitutions that can be used within the message."
+      data: "Toast messages are user-defined messages to provide information within the notification sent when the associated alarm is triggered. Refer to the `Message Directives` section for the list of available directives that can be used within the message."
     },
     {
       id: "alarms-general-profile",
       title: "Profile",
       indentLevel: 1,
-      data: "Profile ##FIXME##"
+      data: (<span>
+        Alarms can be associated with and trigger for a user-defined Steam user (<FaUser/>) or all users (<FaUsers/>).
+      </span>)
     },
     {
       id: "alarms-thresholdTypes",
@@ -171,37 +174,49 @@ const Info: VFC = () => {
       id: "alarms-thresholdTypes-overcharge",
       title: "Overcharge",
       indentLevel: 1,
-      data: "##FIXME## Overcharge alarms are triggered when the battery level has charged to the designated percentage threshold",
+      data: (<span>
+        Overcharge alarms (<FaBatteryFull/>) are triggered when the battery level has charged to the designated percentage threshold and will not trigger again until the battery has been discharged below the threshold. These alarms are automatically disabled if no battery is found to prevent instantly triggering.
+      </span>),
     },
     {
       id: "alarms-thresholdTypes-bedtime",
       title: "Bedtime",
       indentLevel: 1,
-      data: "##FIXME## Bedtime alarms are triggered when the current time has reached a certain time of day",
+      data: (<span>
+        Bedtime alarms (<FaBed/>) are triggered at the user-defined time of the current day and will not trigger again until the date has changed.
+      </span>)
     },
     {
       id: "alarms-thresholdTypes-dailyplaytime",
       title: "Daily Playtime",
       indentLevel: 1,
-      data: "##FIXME## Daily playtime alarms are triggered when the console has been actively running until the designated time threshold, resets at midnight, and persists across suspends/reboots",
+      data: (<span>
+        Daily playtime alarms (<FaSun/>) are triggered when the device has been actively running for a user-defined amount of time and will not trigger again until the date has changed. The actively running duration is persisted across suspends and reboots. Ex: A threshold at 4 hours allows for 4 hours of activity anytime throughout the current day before triggering.
+      </span>)
     },
     {
       id: "alarms-thresholdTypes-sessionplaytime",
       title: "Session Playtime",
       indentLevel: 1,
-      data: "##FIXME## Session playtime alarms are triggered when the accumulated time that the console has been actively running reaches the designated duration threshold, and resets when suspended or rebooted",
+      data: (<span>
+        Session playtime alarms (<FaStopwatch/>) are triggered when the device has been actively running for a user-defined amount of time and will not trigger again until the next session. The actively running duration is reset after suspends and reboots. Ex: A threshold at 2 hours allows for 2 hours of uninterrupted activity (no suspend/shutdown) before triggering.
+      </span>)
     },
     {
       id: "alarms-thresholdTypes-downloadComplete",
       title: "Download Complete",
       indentLevel: 1,
-      data: "##FIXME## Download complete alarms are triggered when the accumulated time that the console has been actively running reaches the designated duration threshold after finishing a download queue, and resets when suspended or rebooted",
+      data: (<span>
+        Download complete alarms () are triggered when no inputs are detected for a user-defined amount of time after finishing a download queue. This alarm is always evaluated when enabled.
+      </span>)
     },
     {
       id: "alarms-thresholdTypes-inactivity",
       title: "Inactivity",
       indentLevel: 1,
-      data: "##FIXME## Inactivity alarms are triggered when the accumulated time that the console has been inactively running reaches the designated duration threshold, and resets when suspended or rebooted",
+      data: (<span>
+        Inactivity alarms () are triggered when no inputs are detected for a user-defined amount of time. This alarm is always evaluated when enabled.
+      </span>)
     },
     {
       id: "alarms-triggerActions",
@@ -226,20 +241,79 @@ const Info: VFC = () => {
       </span>)
     },
     {
-      id: "messageVariables",
-      title: "Message Variables",
+      id: "notifications",
+      title: "Notifications",
+      data: <span style={{fontSize: "1.2em"}}>Notifications</span>
+    },
+    {
+      title: "Show Toast",
+      indentLevel: 1,
+      data: (<span>
+        ##FIXME## (<BiNotification/>/<BiNotificationOff/>)
+      </span>)
+    },
+    {
+      title: "Play Sound",
+      indentLevel: 1,
+      data: (<span>
+        ##FIXME## (<FaVolumeUp/>/<FaVolumeMute/>)
+      </span>)
+    },
+    {
+      id: "messageDirectives",
+      title: "Message Directives",
       sectionTitle: true,
-      data: <span style={{fontSize: "1.2em"}}>Message Variables</span>
+      data: <span style={{fontSize: "1.2em"}}>Message Directives</span>
     },
     {
       indentLevel: 1,
       data: (<table>
-        <tr><td><b>Variable</b></td><td><b>Description</b></td><td><b>Example</b></td></tr>
+        <tr><td><b>Directive</b></td><td><b>Description</b></td><td><b>Example</b></td></tr>
         <tr><td>batt%</td><td>Displays the battery percentage</td><td>{`"Battery level \{batt%\}%"`}</td></tr>
         <tr><td>playHrs</td><td>Displays the daily/session hour playtime</td><td>{`"You've been playing for {playHrs}h"`}</td></tr>
         <tr><td>playMin</td><td>Displays the daily/session minute playtime</td><td>{`"You've been playing for {playMin}m"`}</td></tr>
         <tr><td>playSec</td><td>Displays the daily/session seconds playtime</td><td>{`"You've been playing for {playSec}s"`}</td></tr>
         <tr><td>{`date:<fmt>`}</td><td>Displays the date/time (python-like format)</td><td>{`"It's now {date:%I:%M}"`}</td></tr>
+      </table>)
+    },
+    {
+      id: "dateformat",
+      title: "Date Format",
+      sectionTitle: true,
+      data: <span style={{fontSize: "1.2em"}}>Date Format</span>
+    },
+    {
+      indentLevel: 1,
+      data: (<table>##FIXME##
+        <tr><td><b>Directive</b></td><td><b>Description</b></td><td><b>Example</b></td></tr>
+        <tr><td>%a</td><td>Weekday, short version</td><td>Wed</td></tr>
+        <tr><td>%A</td><td>Weekday, full version</td><td>Wednesday</td></tr>
+        <tr><td>%w</td><td>Weekday as a number 0-6, 0 is Sunday</td><td>3</td></tr>
+        <tr><td>%d</td><td>Day of month 01-31</td><td>31</td></tr>
+        <tr><td>%b</td><td>Month name, short version</td><td>Dec</td></tr>
+        <tr><td>%B</td><td>Month name, full version</td><td>December</td></tr>
+        <tr><td>%m</td><td>Month as a number 01-12</td><td>12</td></tr>
+        <tr><td>%y</td><td>Year, short version without century</td><td>18</td></tr>
+        <tr><td>%Y</td><td>Year, full version</td><td></td>2018</tr>
+        <tr><td>%H</td><td>Hour 00-23</td><td>17</td></tr>
+        <tr><td>%I</td><td>Hour 00-12</td><td>05</td></tr>
+        <tr><td>%p</td><td>AM/PM</td><td>PM</td></tr>
+        <tr><td>%M</td><td>Minute 00-59</td><td>41</td></tr>
+        <tr><td>%S</td><td>Second 00-59</td><td>08</td></tr>
+        <tr><td>%f</td><td>Microsecond 000000-999999</td><td>548513</td></tr>
+        <tr><td>%z</td><td>UTC offset</td><td>+0100</td></tr>
+        <tr><td>%Z</td><td>Timezone</td><td>CST</td></tr>
+        <tr><td>%j</td><td>Day number of year 001-366</td><td>365</td></tr>
+        <tr><td>%U</td><td>Week number of year, Sunday as the first day of week, 00-53</td><td>52</td></tr>
+        <tr><td>%W</td><td>Week number of year, Monday as the first day of week, 00-53</td><td>52</td></tr>
+        <tr><td>%c</td><td>Local version of date and time</td><td></td></tr>
+        <tr><td>%C</td><td>Century</td><td>20</td></tr>
+        <tr><td>%x</td><td>Local version of date</td><td>12/31/18</td></tr>
+        <tr><td>%X</td><td>Local version of time</td><td>17:41:00</td></tr>
+        <tr><td>%%</td><td>A literal "%" character</td><td>%</td></tr>
+        <tr><td>%G</td><td>ISO 8601 year</td><td>2018</td></tr>
+        <tr><td>%u</td><td>ISO 8601 weekday (1-7)</td><td>1</td></tr>
+        <tr><td>%V</td><td>ISO 8601 weeknumber (01-53)</td><td>01</td></tr>
       </table>)
     }
   ]
