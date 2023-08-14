@@ -116,7 +116,6 @@ const ContentRenderer = (content: contentElement[]) => {
     {showToC ? tableOfContents : null }
     </div>
   )
-  console.log('ToC references: ', tocRefs, '\nContent references: ', itemRefs)
   return [tocTitle, ...elements]
 }
 
@@ -137,19 +136,19 @@ const Info: VFC = () => {
       data: <span style={{fontSize: "1.2em"}}>General</span>
     },
     {
-      id: "alarms-general-alarmname",
+      id: "general-alarmname",
       title: "Alarm Name",
       indentLevel: 1,
       data: "Alarm names are user-defined names solely to easily define and differentiate between alarms. Alarms without names will show the UUID associated with the alarm."
     },
     {
-      id: "alarms-general-toastmessage",
+      id: "general-toastmessage",
       title: "Toast Message",
       indentLevel: 1,
       data: "Toast messages are user-defined messages to provide information within the notification sent when the associated alarm is triggered. Refer to the `Message Directives` section for the list of available directives that can be used within the message."
     },
     {
-      id: "alarms-general-profile",
+      id: "general-profile",
       title: "Profile",
       indentLevel: 1,
       data: (<span>
@@ -252,6 +251,7 @@ const Info: VFC = () => {
       data: <span style={{fontSize: "1.2em"}}>Notifications</span>
     },
     {
+      id: "notifications-showtoast",
       title: "Show Toast",
       indentLevel: 1,
       data: (<span>
@@ -259,6 +259,7 @@ const Info: VFC = () => {
       </span>)
     },
     {
+      id: "notifications-playsound",
       title: "Play Sound",
       indentLevel: 1,
       data: (<span>
@@ -266,6 +267,7 @@ const Info: VFC = () => {
       </span>)
     },
     {
+      id: "notifications-notificationsound",
       title: "Notification Sound",
       indentLevel: 1,
       data: (<span>
