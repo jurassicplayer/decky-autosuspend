@@ -1,10 +1,12 @@
 import { DialogBody, DialogControlsSection, Field } from "decky-frontend-lib"
 import { VFC } from "react"
+import { useAppContext } from "../Utils/Context"
 
 const About: VFC = () => {
+  let { appInfo } = useAppContext()
   let fields = [
     {
-      label: "AutoSuspend v2.1.0",
+      label: `${appInfo.name} v${appInfo.version}`,
       description: "Thanks to: AAGaming00, Beebles, EMERALD0874, and all the other plugin devs",
       onClick: () => SteamClient.URL.ExecuteSteamURL("steam://openurl/https://github.com/jurassicplayer/decky-autosuspend")
     },
