@@ -1,6 +1,6 @@
 import { CSSProperties, VFC, useEffect, useRef, useState } from "react"
 import { DialogBody, DialogControlsSection, Field, Focusable } from "decky-frontend-lib"
-import { FaBatteryFull, FaBatteryQuarter, FaBed, FaDotCircle, FaExclamationCircle, FaMinusSquare, FaMoon, FaPowerOff, FaStopwatch, FaSun, FaUser, FaUsers, FaVolumeMute, FaVolumeUp } from "react-icons/fa"
+import { FaBatteryFull, FaBatteryQuarter, FaBed, FaMoon, FaPowerOff, FaStopwatch, FaSun, FaUser, FaUsers, FaVolumeMute, FaVolumeUp } from "react-icons/fa"
 import { BiNotification, BiNotificationOff } from "react-icons/bi"
 
 const TopColorBar = () => {
@@ -202,21 +202,26 @@ const Info: VFC = () => {
         Session playtime alarms (<FaStopwatch/>) are triggered when the device has been actively running for a user-defined amount of time and will not trigger again until the next session. The actively running duration is reset after suspends and reboots. Ex: A threshold at 2 hours allows for 2 hours of uninterrupted activity (no suspend/shutdown) before triggering.
       </span>)
     },
+    // {
+    //   id: "alarms-thresholdTypes-downloadComplete",
+    //   title: "Download Complete",
+    //   indentLevel: 1,
+    //   data: (<span>
+    //     Download complete alarms () are triggered when no inputs are detected for a user-defined amount of time after finishing a download queue. This alarm is always evaluated when enabled.
+    //   </span>)
+    // },
+    // {
+    //   id: "alarms-thresholdTypes-inactivity",
+    //   title: "Inactivity",
+    //   indentLevel: 1,
+    //   data: (<span>
+    //     Inactivity alarms () are triggered when no inputs are detected for a user-defined amount of time. This alarm is always evaluated when enabled.
+    //   </span>)
+    // },
     {
-      id: "alarms-thresholdTypes-downloadComplete",
-      title: "Download Complete",
-      indentLevel: 1,
-      data: (<span>
-        Download complete alarms () are triggered when no inputs are detected for a user-defined amount of time after finishing a download queue. This alarm is always evaluated when enabled.
-      </span>)
-    },
-    {
-      id: "alarms-thresholdTypes-inactivity",
-      title: "Inactivity",
-      indentLevel: 1,
-      data: (<span>
-        Inactivity alarms () are triggered when no inputs are detected for a user-defined amount of time. This alarm is always evaluated when enabled.
-      </span>)
+      id: "alarms-thresholdLevel",
+      title: "Threshold Level",
+      data: "Threshold levels are the user-defined thresholds for each alarm and are either specific battery percentages (discharge/overcharge), time of day (bedtime), or duration (daily/session). Threshold types and levels can only be edited while the alarm is disabled to prevent accidentally triggering while modifying alarms."
     },
     {
       id: "alarms-triggerActions",
@@ -243,20 +248,28 @@ const Info: VFC = () => {
     {
       id: "notifications",
       title: "Notifications",
+      sectionTitle: true,
       data: <span style={{fontSize: "1.2em"}}>Notifications</span>
     },
     {
       title: "Show Toast",
       indentLevel: 1,
       data: (<span>
-        ##FIXME## (<BiNotification/>/<BiNotificationOff/>)
+        Enable (<BiNotification/>)/Disable (<BiNotificationOff/>) toast on notification. This setting will follow the "Toast" global setting until manually configured.
       </span>)
     },
     {
       title: "Play Sound",
       indentLevel: 1,
       data: (<span>
-        ##FIXME## (<FaVolumeUp/>/<FaVolumeMute/>)
+        Enable (<FaVolumeUp/>)/Disable (<FaVolumeMute/>) sound on notification. This setting will follow the "Sound" global setting until manually configured.
+      </span>)
+    },
+    {
+      title: "Notification Sound",
+      indentLevel: 1,
+      data: (<span>
+        The notification sound is the SteamOS navigation sound played when sending an alarm notification. This setting will follow the "Notification Sound" global setting until manually configured.
       </span>)
     },
     {
@@ -267,14 +280,21 @@ const Info: VFC = () => {
     },
     {
       indentLevel: 1,
-      data: (<table>
-        <tr><td><b>Directive</b></td><td><b>Description</b></td><td><b>Example</b></td></tr>
-        <tr><td>batt%</td><td>Displays the battery percentage</td><td>{`"Battery level \{batt%\}%"`}</td></tr>
-        <tr><td>playHrs</td><td>Displays the daily/session hour playtime</td><td>{`"You've been playing for {playHrs}h"`}</td></tr>
-        <tr><td>playMin</td><td>Displays the daily/session minute playtime</td><td>{`"You've been playing for {playMin}m"`}</td></tr>
-        <tr><td>playSec</td><td>Displays the daily/session seconds playtime</td><td>{`"You've been playing for {playSec}s"`}</td></tr>
-        <tr><td>{`date:<fmt>`}</td><td>Displays the date/time (python-like format)</td><td>{`"It's now {date:%I:%M}"`}</td></tr>
-      </table>)
+      data: (()=>{
+        let tableInfo = [
+          ['batt%',       'Displays the battery percentage',              `Battery level {batt%}%`],
+          ['playHrs',     'Displays the daily/session hour playtime',     `You've been playing for {playHrs}h`],
+          ['playMin',     'Displays the daily/session minute playtime',   `You've been playing for {playMin}m`],
+          ['playSec',     'Displays the daily/session seconds playtime',  `You've been playing for {playSec}s`],
+          ['date:<fmt>',  'Displays a formatted current date/time',       `It's now {date:%I:%M}`]
+        ]
+        return (
+          <table>
+            <tr><td><b>Directive</b></td><td><b>Description</b></td><td><b>Example</b></td></tr>
+            {tableInfo.map((info) => <tr><td>{info[0]}</td><td>{info[1]}</td><td>{info[2]}</td></tr>)}
+          </table>
+        )
+      })()
     },
     {
       id: "dateformat",
@@ -284,40 +304,59 @@ const Info: VFC = () => {
     },
     {
       indentLevel: 1,
-      data: (<table>##FIXME##
-        <tr><td><b>Directive</b></td><td><b>Description</b></td><td><b>Example</b></td></tr>
-        <tr><td>%a</td><td>Weekday, short version</td><td>Wed</td></tr>
-        <tr><td>%A</td><td>Weekday, full version</td><td>Wednesday</td></tr>
-        <tr><td>%w</td><td>Weekday as a number 0-6, 0 is Sunday</td><td>3</td></tr>
-        <tr><td>%d</td><td>Day of month 01-31</td><td>31</td></tr>
-        <tr><td>%b</td><td>Month name, short version</td><td>Dec</td></tr>
-        <tr><td>%B</td><td>Month name, full version</td><td>December</td></tr>
-        <tr><td>%m</td><td>Month as a number 01-12</td><td>12</td></tr>
-        <tr><td>%y</td><td>Year, short version without century</td><td>18</td></tr>
-        <tr><td>%Y</td><td>Year, full version</td><td></td>2018</tr>
-        <tr><td>%H</td><td>Hour 00-23</td><td>17</td></tr>
-        <tr><td>%I</td><td>Hour 00-12</td><td>05</td></tr>
-        <tr><td>%p</td><td>AM/PM</td><td>PM</td></tr>
-        <tr><td>%M</td><td>Minute 00-59</td><td>41</td></tr>
-        <tr><td>%S</td><td>Second 00-59</td><td>08</td></tr>
-        <tr><td>%f</td><td>Microsecond 000000-999999</td><td>548513</td></tr>
-        <tr><td>%z</td><td>UTC offset</td><td>+0100</td></tr>
-        <tr><td>%Z</td><td>Timezone</td><td>CST</td></tr>
-        <tr><td>%j</td><td>Day number of year 001-366</td><td>365</td></tr>
-        <tr><td>%U</td><td>Week number of year, Sunday as the first day of week, 00-53</td><td>52</td></tr>
-        <tr><td>%W</td><td>Week number of year, Monday as the first day of week, 00-53</td><td>52</td></tr>
-        <tr><td>%c</td><td>Local version of date and time</td><td></td></tr>
-        <tr><td>%C</td><td>Century</td><td>20</td></tr>
-        <tr><td>%x</td><td>Local version of date</td><td>12/31/18</td></tr>
-        <tr><td>%X</td><td>Local version of time</td><td>17:41:00</td></tr>
-        <tr><td>%%</td><td>A literal "%" character</td><td>%</td></tr>
-        <tr><td>%G</td><td>ISO 8601 year</td><td>2018</td></tr>
-        <tr><td>%u</td><td>ISO 8601 weekday (1-7)</td><td>1</td></tr>
-        <tr><td>%V</td><td>ISO 8601 weeknumber (01-53)</td><td>01</td></tr>
-      </table>)
+      data: (()=>{
+        let tableInfo = [
+          ['%a',  'Weekday, short version',                                       'Wed'],
+          ['%A',  'Weekday, full version',                                        'Wednesday'],
+          ['%w',  'Weekday as a number 0-6, 0 is Sunday',                         '3'],
+          ['%d',  'Day of month 01-31',                                           '08'],
+          ['%-d', 'Day of month 1-31',                                            '8'],
+          ['%b',  'Month name, short version',                                    'Jun'],
+          ['%B',  'Month name, full version',                                     'June'],
+          ['%m',  'Month as a number 01-12',                                      '06'],
+          ['%-m', 'Month as a number 1-12',                                       '6'],
+          ['%y',  'Year, without century as a number 01-99',                      '09'],
+          ['%-y', 'Year, without century as a number 1-99',                       '9'],
+          ['%Y',  'Year, full version',                                           '2009'],
+          ['%H',  'Hour 00-23',                                                   '02'],
+          ['%-H', 'Hour 0-23',                                                    '2'],
+          ['%I',  'Hour 00-12',                                                   '05'],
+          ['%-I', 'Hour 0-12',                                                    '5'],
+          ['%p',  'AM/PM',                                                        'PM'],
+          ['%M',  'Minute 00-59',                                                 '04'],
+          ['%-M', 'Minute 0-59',                                                  '4'],
+          ['%S',  'Second 00-59',                                                 '08'],
+          ['%-S', 'Second 0-59',                                                  '8'],
+          //['%f',  'Microsecond 000000-999999',                                    '548513'],
+          //['%z',  'UTC offset',                                                   '+0100'],
+          //['%Z',  'Timezone',                                                     'CST'],
+          //['%j',  'Day number of year 001-366',                                   '070'],
+          //['%-j',  'Day number of year 1-366',                                    '70'],
+          //['%U',  'Week number of year, Sunday as the first day of week, 00-53',  '52'],
+          //['%W',  'Week number of year, Monday as the first day of week, 00-53',  '52'],
+          ['%c',  'Local version of date and time',                               '8/13/2023, 8:03:23 PM'],
+          //['%C',  'Century',                                                      '20'],
+          ['%x',  'Local version of date',                                        '8/13/2023'],
+          ['%X',  'Local version of time',                                        '8:03:23 PM'],
+          ['%%',  'A literal "%" character',                                      '%'],
+          //['%G',  'ISO 8601 year',                                                '2018'],
+          //['%u',  'ISO 8601 weekday (1-7)',                                       '1'],
+          //['%V',  'ISO 8601 weeknumber (01-53)',                                  '01']
+        ]
+        return (
+          <table>
+            <tr><td><b>Directive</b></td><td><b>Description</b></td><td><b>Example</b></td></tr>
+            {tableInfo.map((info) => <tr><td>{info[0]}</td><td>{info[1]}</td><td>{info[2]}</td></tr>)}
+          </table>
+        )
+      })()
+    },
+    {
+      id: "bottom",
+      sectionTitle: true,
+      data: ""
     }
   ]
-
 
   return (
     <DialogBody>
