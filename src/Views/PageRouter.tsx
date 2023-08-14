@@ -29,6 +29,12 @@ const PageRouter: VFC = () => {
       content: <Info/>,
       icon: <FaInfo/>,
       hideTitle: false
+    },
+    {
+      title: 'About',
+      content: <About/>,
+      icon: <FaPuzzlePiece/>,
+      hideTitle: false
     }
   ]
 
