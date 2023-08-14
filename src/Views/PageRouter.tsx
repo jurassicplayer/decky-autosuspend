@@ -5,7 +5,8 @@ import { VFC } from "react"
 import AlarmList from "./AlarmList"
 import GlobalSettings from "./GlobalSettings"
 import Info from "./Info"
-import { FaClock, FaCog, FaInfo } from "react-icons/fa"
+import About from "./About"
+import { FaClock, FaCog, FaInfo, FaPuzzlePiece } from "react-icons/fa"
 
 const PageRouter: VFC = () => {
   const pages = [
@@ -14,20 +15,20 @@ const PageRouter: VFC = () => {
       content: <AlarmList/>,
       // route: '/autosuspend/alarms',
       icon: <FaClock/>,
-      hideTitle: true
+      hideTitle: false
     },
     {
       title: 'Global Settings',
       content: <GlobalSettings/>,
       // route: '/autosuspend/settings',
       icon: <FaCog/>,
-      hideTitle: true
+      hideTitle: false
     },
     {
       title: 'Information',
       content: <Info/>,
       icon: <FaInfo/>,
-      hideTitle: true
+      hideTitle: false
     }
   ]
 

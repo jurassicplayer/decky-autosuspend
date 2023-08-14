@@ -196,14 +196,12 @@ export const AlarmItemSettings = (props: AlarmItemSettingsProps) => {
       <h3>Notification</h3>
       <ToggleField
         onChange={(value) => setAlarmSetting(props.alarmID, 'showToast', value)}
-        label={"Toast"+(configSettings.showToast ? "": " (Global)")}
-        description="Enable toast on notification"
+        label={"Toast"+(configSettings.showToast ? ":": " (Global):")}
         bottomSeparator="none"
         checked={showToast} />
       <ToggleField
         onChange={(value) => setAlarmSetting(props.alarmID, 'playSound', value)}
-        label={"Sound"+(configSettings.playSound ? "": " (Global)")}
-        description="Enable sound on notification"
+        label={"Sound"+(configSettings.playSound ? ":": " (Global):")}
         bottomSeparator="none"
         checked={playSound} />
       <DropdownItem
@@ -221,7 +219,7 @@ export const AlarmItemSettings = (props: AlarmItemSettingsProps) => {
         })()}
         selectedOption={sound}
         onChange={(value)=> { setAlarmSetting(props.alarmID, 'sound', value.data) }}
-        label={<span>Notification Sound{configSettings.sound ? "" : " (Global)" }:<span style={CustomCss.Description}>SteamOS navigation sound to play on notification</span></span>}
+        label={"Notification Sound" + (configSettings.sound ? ":": " (Global):")}
         bottomSeparator="none"
         strDefaultLabel="Error" />
       <DialogButton
@@ -234,13 +232,13 @@ export const AlarmItemSettings = (props: AlarmItemSettingsProps) => {
       <div style={{display: "flex", flexDirection: "row"}}>
         <ToggleField
             onChange={(value) => setAlarmSetting(props.alarmID, 'repeatToast', value)}
-            label={"Repeat Toast"+(configSettings.repeatToast ? "": " (Global)")}
+            label={"Repeat Toast"+(configSettings.repeatToast ? ":": " (Global):")}
             description="Repeat toast notification"
             bottomSeparator="none"
             checked={repeatToast} />
         <ToggleField
           onChange={(value) => setAlarmSetting(props.alarmID, 'repeatSound', value)}
-          label={"Repeat Sound"+(configSettings.repeatSound ? "": " (Global)")}
+          label={"Repeat Sound"+(configSettings.repeatSound ? ":": " (Global):")}
           description="Repeat sound notification"
           bottomSeparator="none"
           checked={repeatSound} />

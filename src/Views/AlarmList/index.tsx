@@ -1,15 +1,9 @@
-import { DialogBody, DialogButton, DialogControlsSection, Focusable, ReorderableEntry } from "decky-frontend-lib"
-import { CSSProperties, VFC, useState } from "react"
+import { DialogBody, DialogButton, DialogControlsSection, ReorderableEntry } from "decky-frontend-lib"
+import { VFC, useState } from "react"
 import { useSettingsContext } from "../../Utils/Context"
 import { AlarmItem } from "./AlarmItem"
-import { SteamCssVariables } from "../../Utils/SteamUtils"
 import { FaPlusSquare } from "react-icons/fa"
 import { AlarmSetting, Alarms, EntryProps, thresholdTypes, triggerActions } from "../../Utils/Interfaces"
-
-const buttonCss: CSSProperties = {
-  minWidth: "0px",
-  width: "4em"
-}
 
 const newAlarmSettings: AlarmSetting = {
   enabled: false,
@@ -64,13 +58,8 @@ const AlarmList: VFC = () => {
   let alarmList = entries.map((entry) => <AlarmItem entry={entry} setAlarms={setAlarms}/>)
   return (
     <DialogBody>
-      <DialogControlsSection style={{marginTop: "40px", padding: SteamCssVariables.gpSpaceGap, paddingTop: "0px", rowGap: SteamCssVariables.gpSpaceGap, backgroundColor: SteamCssVariables.gpSystemDarkestGrey, overflow: "auto", height: "-webkit-fill-available"}}>
-        <div style={{display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between", rowGap: "1em"}}>
-          <span style={{fontSize: "2em"}}>Alarms</span>
-          <Focusable style={{display: "flex", flexDirection: "row", alignItems: "center", columnGap: "0.4em"}}>
-            <DialogButton style={buttonCss} onClick={()=>onAddAlarm()}><FaPlusSquare/></DialogButton>
-          </Focusable>
-        </div>
+      <DialogControlsSection>
+        <DialogButton onClick={()=>onAddAlarm()}><FaPlusSquare/></DialogButton>
         {alarmList}
       </DialogControlsSection>
     </DialogBody>

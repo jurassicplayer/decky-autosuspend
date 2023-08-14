@@ -7,7 +7,7 @@ import {
 } from "decky-frontend-lib"
 import { VFC } from "react"
 import { useAppContext, useSettingsContext } from "../../Utils/Context"
-import { CustomCss, NavSoundMap, SteamCssVariables } from "../../Utils/SteamUtils"
+import { CustomCss, NavSoundMap } from "../../Utils/SteamUtils"
 
 const GlobalSettings: VFC = () => {
   const {} = useAppContext()
@@ -16,17 +16,16 @@ const GlobalSettings: VFC = () => {
 
   return (
     <DialogBody>
-      <DialogControlsSection style={{marginTop: "40px", padding: SteamCssVariables.gpSpaceGap, paddingTop: "0px", rowGap: SteamCssVariables.gpSpaceGap, backgroundColor: SteamCssVariables.gpSystemDarkestGrey, overflow: "auto", height: "-webkit-fill-available"}}>
-        <h3>Global Settings</h3>
+      <DialogControlsSection> 
         <ToggleField
           onChange={(value) => setSetting('defaultShowToast', value)}
-          label="Toast"
+          label="Toast:"
           description="Enable toast on notification by default"
           bottomSeparator="none"
           checked={defaultShowToast} />
         <ToggleField
           onChange={(value) => setSetting('defaultPlaySound', value)}
-          label="Sound"
+          label="Sound:"
           description="Enable sound on notification by default"
           bottomSeparator="none"
           checked={defaultPlaySound} />
@@ -45,7 +44,8 @@ const GlobalSettings: VFC = () => {
           })()}
           selectedOption={defaultSound}
           onChange={(value)=> setSetting('defaultSound', value.data)}
-          label={<span>Notification Sound:<span style={CustomCss.description}>SteamOS navigation sound effect to play on notification</span></span>}
+          label="Notification Sound:"
+          description="SteamOS navigation sound effect to play on notification by default"
           bottomSeparator="none"
           strDefaultLabel="Error" />
         { debuggingMode ?
@@ -72,7 +72,8 @@ const GlobalSettings: VFC = () => {
             })()}
             selectedOption={defaultAlarmRepeat}
             onChange={(value)=> setSetting('defaultAlarmRepeat', value.data)}
-            label={<span>Repeat notification:<span style={CustomCss.Description}>Number of times to repeat notification</span></span>}
+            label="Repeat notification:"
+            description="Number of times to repeat notification"
             bottomSeparator="none"
             strDefaultLabel="Error" />
         </div>
