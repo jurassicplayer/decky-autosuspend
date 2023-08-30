@@ -77,7 +77,7 @@ export const AlarmItemSettings = (props: AlarmItemSettingsProps) => {
           {label: 'Bedtime',          data: thresholdTypes.bedtime},
           {label: 'Daily Playtime',   data: thresholdTypes.dailyPlaytime},
           {label: 'Session Playtime', data: thresholdTypes.sessionPlaytime},
-          {label: 'Download Complete', data: thresholdTypes.downloadComplete}
+          //{label: 'Download Complete', data: thresholdTypes.downloadComplete}
         ]}
         selectedOption={thresholdType}
         onChange={(value) => {
