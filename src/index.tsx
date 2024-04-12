@@ -1,30 +1,30 @@
 import { definePlugin, ServerAPI, staticClasses } from "decky-frontend-lib"
 import { FaBatteryQuarter } from "react-icons/fa"
-import { events } from "./Utils/Events"
-import { AppContextProvider, AppContextState } from "./Utils/Context"
-import { evaluateAlarm } from "./Utils/Alarms"
+//import { AppContextProvider, AppContextState } from "./Plugin/Context"
 import QAM from "./Views/QAM"
-import PageRouter from "./Views/PageRouter"
+//import PageRouter from "./Views/PageRouter"
 
-export default definePlugin((serverApi: ServerAPI) => {
-  let appCtx = new AppContextState(serverApi)
-  const IntervalCheck = () => {
-    if (!appCtx.appInfo.initialized || !appCtx.appInfo.processAlarms) { return }
-    let alarms = appCtx.settings.alarms
-    for (let alarmID in alarms) {
-      evaluateAlarm(alarmID, alarms[alarmID], appCtx)
-    }
-  }
-  appCtx.eventBus.addEventListener(events.BatteryStateEvent.eType, IntervalCheck)
-  appCtx.registerRoute("/autosuspend", PageRouter, true)
+import { Backend } from "./Plugin/BackendContext"
+import { SettingsContextProvider } from "./Plugin/SettingsContext"
+import { AppContext, AppContextProvider } from "./Plugin/AppContext"
+
+export default definePlugin((serverAPI: ServerAPI) => {
+  Backend.initialize(serverAPI)
+  let appContext = new AppContext()
   
   return {
     title: <div className={staticClasses.Title}>AutoSuspend</div>,
-    content:  <AppContextProvider appContextState={appCtx}><QAM /></AppContextProvider>,
+    content: (
+      <SettingsContextProvider>
+        <AppContextProvider appContext={appContext}>
+          <QAM/>
+        </AppContextProvider>
+      </SettingsContextProvider>
+    ),
     icon: <FaBatteryQuarter />,
+    alwaysRender: true,
     onDismount: () => {
-      appCtx.eventBus.removeEventListener(events.BatteryStateEvent.eType, IntervalCheck)
-      appCtx.onDismount()
+      appContext.onDismount()
     }
   }
 })

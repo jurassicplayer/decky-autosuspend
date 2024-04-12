@@ -24,8 +24,9 @@ class Plugin:
       decky_plugin.DECKY_VERSION
     ))
     pluginInfo = {
-      "name": decky_plugin.DECKY_PLUGIN_NAME,
-      "version": decky_plugin.DECKY_PLUGIN_VERSION
+      "pluginName": decky_plugin.DECKY_PLUGIN_NAME,
+      "pluginVersion": decky_plugin.DECKY_PLUGIN_VERSION,
+      "deckyVersion": decky_plugin.DECKY_VERSION
     }
     return pluginInfo
   async def logger(self, logLevel:str, msg:str):
