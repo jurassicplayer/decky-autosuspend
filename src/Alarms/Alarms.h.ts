@@ -27,7 +27,7 @@ export interface ITriggerAction extends IObjectKeys {
   args: string[] | null
 }
 
-export interface IAlarmSetting extends IObjectKeys {
+export interface IAlarmSettings extends IObjectKeys {
   showToast: boolean
   playSound: boolean
   sound: string
@@ -48,7 +48,9 @@ export interface IMetadata extends IObjectKeys {
   name: string
   type: string
   icon: ReactElement
-  class: any
+  defaults: IAlarmSettings
+  hooks: HookType[]
+  alarm: any
 }
 
 export interface IHistory extends IObjectKeys {
@@ -57,16 +59,13 @@ export interface IHistory extends IObjectKeys {
 }
 
 export interface IAlarm extends IObjectKeys {
-  metadata: IMetadata
-  defaults: IAlarmSetting
-  settings: IAlarmSetting
+  settings: IAlarmSettings
   history: IHistory
-  hooks: HookType[]
   canEval: () => boolean
   evaluate: () => boolean
-  settingsComponent: VFC<{alarmSettings: IAlarmSetting}>
+  settingsComponent: VFC<{alarmSettings: IAlarmSettings}>
 }
 
 export interface IAlarmConstructor {
-  new (alarmSettings?: IAlarmSetting): IAlarm
+  new (alarmSettings?: IAlarmSettings): IAlarm
 }

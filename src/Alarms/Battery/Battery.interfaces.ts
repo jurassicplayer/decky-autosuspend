@@ -1,6 +1,6 @@
 import {IObjectKeys} from "../../Plugin/Common.h"
 
-export interface BatteryState extends IObjectKeys {
+export interface IBatteryStateChange extends IObjectKeys {
   bHasBattery: boolean,
   bShutdownRequested: boolean,
   eACState: number,
@@ -8,4 +8,4 @@ export interface BatteryState extends IObjectKeys {
   nSecondsRemaining: number,
 }
 
-export class BatteryStateEvent extends CustomEvent<BatteryState> {}
+export class BatteryStateChangeEvent extends CustomEvent<IBatteryStateChange> {}

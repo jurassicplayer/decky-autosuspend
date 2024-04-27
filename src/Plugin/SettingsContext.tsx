@@ -1,6 +1,6 @@
-import { IAlarmSetting } from "../Alarms/Alarms.h"
+import { IAlarmSettings } from "../Alarms/Alarms.h"
 import { IAppContextState } from "./AppContext.h"
-import { IDefaultSettings, ISettingsContext, ISettingsContextState } from "./SettingsContext.h"
+import { IAppSettings, IDefaultSettings, ISettingsContext } from "./SettingsContext.h"
 
 export class GlobalDefaults implements IDefaultSettings {
   showToast: boolean = true
@@ -30,7 +30,7 @@ export class Settings {
     return true
   }
   static getAlarmSettings(context: IAppContextState, id: string, key?: string): any {
-    let alarms: IAlarmSetting[] = Settings.getSettings(context, "alarms")
+    let alarms: IAlarmSettings[] = Settings.getSettings(context, "alarms")
     let alarm = alarms.find((alarm)=>alarm.id == id)
     if (alarm === undefined || (key !== undefined && !(key in alarm))) return null
     if (key !== undefined && key in alarm) {

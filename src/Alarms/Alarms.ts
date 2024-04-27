@@ -1,7 +1,7 @@
-import { IAlarm, IAlarmConstructor, IAlarmSetting, IMetadata } from "./Alarms.h";
+import { IAlarm, IAlarmConstructor, IAlarmSettings, IMetadata } from "./Alarms.h";
 import discharge from "./Battery/Discharge/Discharge"
 import overcharge from "./Battery/Overcharge/Overcharge"
-export function createAlarm(ctor: IAlarmConstructor, alarmSettings?: IAlarmSetting): IAlarm {
+export function createAlarm(ctor: IAlarmConstructor, alarmSettings?: IAlarmSettings): IAlarm {
   return new ctor(alarmSettings)
 }
 

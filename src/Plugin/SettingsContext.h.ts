@@ -1,6 +1,5 @@
 import { IObjectKeys } from "./Common.h"
-import { IAlarmSetting } from "../Alarms/Alarms.h"
-import { IContext, IContextState } from "./Context.h"
+import { IAlarmSettings } from "../Alarms/Alarms.h"
 
 // enum NavSoundMap {
 //   LaunchGame,
@@ -41,7 +40,7 @@ export interface IInExclusionRule extends IObjectKeys {
 }
 
 export interface IProfile extends IObjectKeys {
-  name: string
+  username: string
   alarmIDs: string[]
 }
 
@@ -54,19 +53,17 @@ export interface IDefaultSettings extends IObjectKeys {
   repeatAlarm: number
 }
 
-
-
 export interface IAppSettings extends IObjectKeys {
   configVersion: number
   debuggingMode: boolean
   defaults: IDefaultSettings
-  alarms: IAlarmSetting[]
+  alarms: IAlarmSettings[]
   profiles: IProfile[]
   exclusions: IInExclusionRule[]
   inclusions: IInExclusionRule[]
 }
 
-export interface ISettingsContext extends IContext {
+export interface ISettingsContext {
   getSettings: () => any
   getSetting: (key: string) => any
   setSetting: (key: string, value: any) => void
@@ -77,9 +74,4 @@ export interface ISettingsContext extends IContext {
   deleteAlarmSetting: (alarmID: string, key: string) => void
   addAlarm: (alarmID: string, alarmSettings: any) => void
   deleteAlarm: (alarmID: string) => void
-}
-
-export interface ISettingsContextState extends IContextState {
-  context: ISettingsContext
-  setContext: (context:any) => void
 }

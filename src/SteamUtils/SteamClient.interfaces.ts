@@ -1,13 +1,28 @@
 import { Module, findModuleChild } from "decky-frontend-lib"
 import { IObjectKeys } from "../Plugin/Common.h"
 
+export enum EACState {
+  Unknown = 0,
+  Disconnected = 1,
+  Connected = 2,
+  ConnectedSlow = 3,
+}
+
+export enum EBatteryState {
+  Unknown = 0,
+  Discharging = 1,
+  Charging = 2,
+  Full = 3,
+}
+
 //#region BatteryStateEvent
-export interface IBatteryState extends IObjectKeys {
+export interface IBatteryStateChange extends IObjectKeys {
   bHasBattery: boolean,
   bShutdownRequested: boolean,
-  eACState: number,
+  eACState: EACState,
+  eBatteryState: EBatteryState
   flLevel: number,
-  nSecondsRemaining: number,
+  nSecondsRemaining: number
 }
 //#endregion
 

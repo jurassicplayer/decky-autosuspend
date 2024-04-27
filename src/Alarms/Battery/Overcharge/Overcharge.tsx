@@ -1,10 +1,10 @@
 import { VFC, useState } from "react";
 import { HookType } from "../../../Plugin/Hooks";
-import { IAlarm, IAlarmSetting, IHistory, IMetadata } from "../../Alarms.h"
+import { IAlarm, IAlarmSettings, IHistory, IMetadata } from "../../Alarms.h"
 import { FaBatteryFull } from "react-icons/fa";
 import { DialogButton, Focusable } from "decky-frontend-lib";
 
-const defaults: IAlarmSetting = {
+const defaults: IAlarmSettings = {
   showToast: true,
   playSound: true,
   sound: "ToastMisc",
@@ -28,8 +28,8 @@ var history: IHistory = {
 
 export class OverchargeAlarm implements IAlarm {
   metadata: IMetadata = metadata
-  defaults: IAlarmSetting = defaults
-  settings: IAlarmSetting = defaults
+  defaults: IAlarmSettings = defaults
+  settings: IAlarmSettings = defaults
   history: IHistory = history
   hooks: HookType[] = [HookType.RegisterForBatteryStateChangesPseudo]
   canEval: () => boolean = () => {
@@ -38,8 +38,8 @@ export class OverchargeAlarm implements IAlarm {
   evaluate: () => boolean = () => {
     return false
   }
-  settingsComponent: VFC<{alarmSettings: IAlarmSetting}> = settingComponent
-  constructor(alarmSettings?: IAlarmSetting) {
+  settingsComponent: VFC<{alarmSettings: IAlarmSettings}> = settingComponent
+  constructor(alarmSettings?: IAlarmSettings) {
     // Check localStorage for history data and load
     // this.history = 
     // Check if alarm settings passed into constructor
@@ -49,8 +49,8 @@ export class OverchargeAlarm implements IAlarm {
   }
 }
 
-const settingComponent: VFC<{alarmSettings: IAlarmSetting}> = ({alarmSettings}) => {
-  const [settings, setSettings] = useState<IAlarmSetting>(alarmSettings)
+const settingComponent: VFC<{alarmSettings: IAlarmSettings}> = ({alarmSettings}) => {
+  const [settings, setSettings] = useState<IAlarmSettings>(alarmSettings)
   const test = () => {
     console.log(`Alarm settings: `, settings)
   }

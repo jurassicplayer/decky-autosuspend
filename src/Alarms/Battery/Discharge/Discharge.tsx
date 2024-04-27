@@ -1,10 +1,10 @@
 import { VFC, useState } from "react";
 import { HookType } from "../../../Plugin/Hooks";
-import { IAlarm, IAlarmSetting, IHistory, IMetadata } from "../../Alarms.h"
+import { IAlarm, IAlarmSettings, IHistory, IMetadata } from "../../Alarms.h"
 import { FaBatteryQuarter } from "react-icons/fa";
 import { DialogButton, Focusable } from "decky-frontend-lib";
 
-const defaults: IAlarmSetting = {
+const defaults: IAlarmSettings = {
   showToast: true,
   playSound: true,
   sound: "ToastMisc",
@@ -20,6 +20,8 @@ const defaults: IAlarmSetting = {
   sortOrder: 0,
   enabled: true
 }
+const hooks: HookType[] = [HookType.RegisterForBatteryStateChangesPseudo]
+
 
 var history: IHistory = {
   triggered: false,
@@ -27,19 +29,16 @@ var history: IHistory = {
 }
 
 export class DischargeAlarm implements IAlarm {
-  metadata: IMetadata = metadata
-  defaults: IAlarmSetting = defaults
-  settings: IAlarmSetting = defaults
+  settings: IAlarmSettings = defaults
   history: IHistory = history
-  hooks: HookType[] = [HookType.RegisterForBatteryStateChangesPseudo]
   canEval: () => boolean = () => {
     return false
   }
   evaluate: () => boolean = () => {
     return false
   }
-  settingsComponent: VFC<{alarmSettings: IAlarmSetting}> = settingComponent
-  constructor(alarmSettings?: IAlarmSetting) {
+  settingsComponent: VFC<{alarmSettings: IAlarmSettings}> = settingComponent
+  constructor(alarmSettings?: IAlarmSettings) {
     // Check localStorage for history data and load
     // this.history = 
     // Check if alarm settings passed into constructor
@@ -49,8 +48,8 @@ export class DischargeAlarm implements IAlarm {
   }
 }
 
-const settingComponent: VFC<{alarmSettings: IAlarmSetting}> = ({alarmSettings}) => {
-  const [settings, setSettings] = useState<IAlarmSetting>(alarmSettings)
+const settingComponent: VFC<{alarmSettings: IAlarmSettings}> = ({alarmSettings}) => {
+  const [settings, setSettings] = useState<IAlarmSettings>(alarmSettings)
   const test = () => {
     console.log(`Alarm settings: `, settings)
   }
@@ -65,7 +64,10 @@ const metadata: IMetadata = {
   name: "Discharge",
   type: "discharge",
   icon: <FaBatteryQuarter />,
-  class: DischargeAlarm
+  defaults: defaults,
+  hooks: hooks,
+  alarm: DischargeAlarm,
+  component: settingComponent
 }
 
 export default metadata

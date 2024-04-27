@@ -1,6 +1,6 @@
-import { Metadata, History, Settings, Alarm } from "../../Alarms.interfaces"
+import { IMetadata, IHistory, IAlarmSettings, IAlarm } from "../../Alarms.h"
 
-export interface DischargeMetadata extends Metadata {}
-export interface DischargeHistory extends History {}
-export interface DischargeSettings extends Settings {}
-export interface DischargeAlarm extends Alarm {}
+export interface DischargeMetadata extends IMetadata {}
+export interface DischargeHistory extends IHistory {}
+export interface DischargeSettings extends IAlarmSettings {}
+export interface DischargeAlarm extends IAlarm {}
