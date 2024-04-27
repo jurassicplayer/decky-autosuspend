@@ -11,22 +11,31 @@ export class GlobalDefaults implements IDefaultSettings {
   repeatAlarm: number = -1
 }
 
+
+
 export class Settings {
+  static _settings: IAppSettings
+  static loadSettings(): IAppSettings {
+    return this._settings
+  }
+  static saveSettings(settings: IAppSettings) {
+    this._settings = settings
+  }
   static getSettings(context: IAppContextState, key?: string): any {
-    const {context: appContext} = context
-    if (key !== undefined && !(key in appContext.settings)) return null
-    if (key !== undefined && key in appContext.settings) {
-      return appContext.settings[key]
+    const {settings} = context
+    if (key !== undefined && !(key in settings)) return null
+    if (key !== undefined && key in settings) {
+      return settings[key]
     } else {
-      return appContext.settings
+      return settings
     }
   }
   static setSettings(context: IAppContextState, key: string, value: any): boolean {
-    const {context: appContext, setContext: setAppContext} = context
-    if (!(key in appContext.settings)) return false
-    let newSettings = {...appContext.settings}
+    const {settings, setContext} = context
+    if (!(key in settings)) return false
+    let newSettings = {...settings}
     newSettings[key] = value
-    setAppContext({settings: newSettings})
+    setContext({settings: newSettings})
     return true
   }
   static getAlarmSettings(context: IAppContextState, id: string, key?: string): any {
@@ -54,27 +63,28 @@ export class SettingsContext implements ISettingsContext {
   deleteAlarm = async (alarmID: string) => {}
 }
 
+export function validateAppSettings(object: any): object is IAppSettings {
+  console.log(`Validating: `, object)
+  return "configVersion" in object
+}
 
-
-
-import { FC, createContext, useContext, useMemo, useState, useEffect } from "react"
-
-const SettingsCtx = createContext<ISettingsContextState>(null as any)
-export const useSettingsContext = () => useContext(SettingsCtx)
-
-export const SettingsContextProvider: FC = ({children}) => {
-  let settingsContext = new SettingsContext()
-  const [settingsContextState, setSettingsContextState] = useState<ISettingsContext>(settingsContext)
-  const setSettingsContext = (data: any) => { setSettingsContextState({...settingsContextState, ...data}) }
-
-  useEffect(() => {
-    console.log(`Created Settings Context`)
-  }, [])
-
-  const context = {context: settingsContextState, setContext: setSettingsContext}
-  return (
-    <SettingsCtx.Provider value={context}>
-      {useMemo(() => children, [])}
-    </SettingsCtx.Provider>
-  )
+export function validateObject(object: any, defaults: any) {
+  console.log(`Validating`, ` (`, typeof object, `): `, object, ` Default: (`, typeof defaults, `): `, defaults)
+  if (object && typeof object == typeof defaults) {
+    if (typeof object == "number") return true
+    if (typeof object == "string") return true
+    if (typeof object == "boolean") return true
+    if (typeof object == "undefined") return true
+    if (typeof object == "object") {
+      if (Object.entries(object)
+          .map(([key, value]) => {
+            let isValid = validateObject(value, defaults[key])
+            if (isValid) return true
+            return false
+          })
+          .filter((value) => value = false).length = 0) return true
+    }
+  }
+  console.log(`Validation failed (`, typeof object, `): `, object, ` Default: (`, typeof defaults, `): `, defaults)
+  return false
 }

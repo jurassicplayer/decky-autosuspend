@@ -1,19 +1,6 @@
-import { ServerAPI } from "decky-frontend-lib"
 import { IObjectKeys } from "./Common.h"
-import { IPluginInfo } from "./AppContext.h"
 
-export interface IBackend extends IObjectKeys {
-  serverAPI: ServerAPI
-  pluginName: string
-  bridge: (functionName: string, namedArgs?: any) => Promise<string | {}>
-  getSetting: (key: string, defaults: any) => Promise<string | {}>
-  setSetting: (key: string, value: any) => Promise<string | {}>
-  commitSettings: () => Promise<string | {}>
-  getPluginInfo: () => Promise<IPluginInfo>
-}
-
-
-import { IBatteryState, IControllerInputMessage, IDownloadItems, IBaseGameAction, IGameAction, ISteamSettings } from "../SteamUtils/SteamClient.interfaces"
+import { IBatteryStateChange, IControllerInputMessage, IDownloadItems, IBaseGameAction, IGameAction, ISteamSettings } from "../SteamUtils/SteamClient.interfaces"
 
 
 
@@ -30,7 +17,7 @@ export namespace events {
   export enum map {
     AppState                = 'AppState',
     SettingsChange          = 'SettingsChange',
-    BatteryState            = 'BatteryState',
+    BatteryStateChange      = 'BatteryStateChange',
     TimeState               = 'TimeState',
     Suspend                 = 'Suspend',
     Shutdown                = 'Shutdown',
@@ -43,7 +30,7 @@ export namespace events {
   }
   export class AppStateEvent extends CustomEvent<ISteamSettings> {}
   export class SettingsChangeEvent extends CustomEvent<ISteamSettings> {}
-  export class BatteryStateEvent extends CustomEvent<IBatteryState> {}
+  export class BatteryStateChangeEvent extends CustomEvent<IBatteryStateChange> {}
   export class TimeStateEvent extends CustomEvent<ITimeState> {}
   export class SuspendEvent extends CustomEvent<{}> {}
   export class ShutdownEvent extends CustomEvent<{}> {}
@@ -60,7 +47,7 @@ export namespace events {
 // let eventBus = new EventTarget()
 
 // eventBus.addEventListener(events.map.ControllerInputMessage, (evt: Event) => {
-//   let detail:IBatteryState = (evt as CustomEvent).detail
+//   let detail:IBatteryStateChange = (evt as CustomEvent).detail
 //   console.log(detail.flLevel)
 // })
 // eventBus.addEventListener(events.map.GameActionStart, (evt: Event) => {

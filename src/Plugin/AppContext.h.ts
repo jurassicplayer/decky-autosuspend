@@ -2,7 +2,6 @@ import { VFC } from "react"
 import { IObjectKeys } from "./Common.h"
 import { IHook, HookType } from "./Hooks"
 import { IHour } from "../SteamUtils/SteamClient.interfaces"
-import { IContextState } from "./Context.h"
 import { IAppSettings } from "./SettingsContext.h"
 
 //#region Interface Declarations
@@ -28,18 +27,16 @@ export interface IAppContext extends IObjectKeys {
   timeformat24: boolean
   vecHours: IHour[]
   settings: IAppSettings
+}
+export interface IAppContextState extends IAppContext {
   registerRoute: (path: string, component: VFC, exact: boolean) => void
   unregisterRoute: (path: string) => void
-  registerHook: (hookType: HookType) => boolean
+  registerHook: (hookType: HookType) => IHook
   unregisterHook: (hookType: HookType) => boolean
-  getAppInfo: (configVersion: number) => Promise<IAppInfo>
-  onDismount: () => void
   unregisterRoutes: () => void
   unregisterHooks: () => void
-}
-export interface IAppContextState extends IContextState {
-  context: IAppContext
-  setContext: (context:any) => void
+  setContext: (context: Partial<IAppContext>) => void
+  _createPseudoBatteryStateChangeRegistry: () => ()=>void
 }
 
 //#endregion
