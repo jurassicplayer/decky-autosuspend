@@ -1,4 +1,4 @@
-![Decky store](https://img.shields.io/badge/dynamic/json?color=blue&label=release&query=%24[%3F(%40.name%3D%3D%27AutoSuspend%27)].versions[0].name&url=https%3A%2F%2Fplugins.deckbrew.xyz%2Fplugins) ![Decky Loader](https://img.shields.io/badge/dynamic/json?url=https://plugins.deckbrew.xyz/plugins&query=%24[%3F(%40.name%3D%3D%27AutoSuspend%27)].downloads&label=installs&color=3ea6a3) [<img src="https://img.shields.io/badge/kofi-kofi?logo=kofi&logoColor=ffffff&label=donate">](https://ko-fi.com/jurassicplayer)
+![Decky store](https://img.shields.io/badge/dynamic/json?color=blue&label=release&url=https://plugins.deckbrew.xyz/plugins?query=AutoSuspend&query=%24[:1].versions[0].name) ![Decky Loader](https://img.shields.io/badge/dynamic/json?url=https://plugins.deckbrew.xyz/plugins?query=AutoSuspend&query=%24[:1].downloads&label=installs&color=3ea6a3) [<img src="https://img.shields.io/badge/kofi-kofi?logo=kofi&logoColor=ffffff&label=donate">](https://ko-fi.com/jurassicplayer)
 ## Decky-AutoSuspend Plugin
 A plugin to notify and automatically suspend your steamdeck console when passing battery percentage thresholds.
 ![Main View](./assets/thumbnail.png)
