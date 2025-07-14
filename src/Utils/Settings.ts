@@ -20,7 +20,7 @@ export const defaultSettings: SettingsProps = {
       triggeredAction: triggerActions.none,
       enabled: true,
       sortOrder: 0,
-      disableOnCharging: true
+      ignoreWhileCharging: true
     },
     defaultCritical: {
       alarmName: 'Critical 15%',
@@ -29,7 +29,7 @@ export const defaultSettings: SettingsProps = {
       triggeredAction: triggerActions.suspend,
       enabled: true,
       sortOrder: 1,
-      disableOnCharging: true
+      ignoreWhileCharging: true
     }
   } 
 }
@@ -56,7 +56,7 @@ const exampleAlarmSettings: AlarmSetting = {
   enabled: false,
   profile: '',
   sortOrder: 0,
-  disableOnCharging: true
+  ignoreWhileCharging: true
 }
 // #endregion
 

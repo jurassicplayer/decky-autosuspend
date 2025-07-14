@@ -12,7 +12,7 @@ const newAlarmSettings: AlarmSetting = {
   thresholdType: thresholdTypes.discharge,
   triggeredAction: triggerActions.none,
   sortOrder: 0,
-  disableOnCharging: true
+  ignoreWhileCharging: true
 }
 
 function uuidv4() {
