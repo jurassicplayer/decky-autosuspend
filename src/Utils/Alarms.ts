@@ -109,15 +109,6 @@ export const evaluateAlarm = async (alarmID: string, settings: AlarmSetting, con
           return
         }
         if (context.settings.alarms[alarmID].ignoreWhileCharging && context.batteryState.eACState === 2) { 
-        // if (context.settings.alarms[alarmID].ignoreWhileCharging) { 
-          // SteamUtils.notify(
-          //   "Autosuspend blockiert",
-          //   `ignoreWhileCharging=${context.settings.alarms[alarmID].ignoreWhileCharging} bat%=${batteryPercent} state=${context.batteryState.eACState}`,
-          //   true,
-          //   context.settings.defaultPlaySound,
-          //   context.settings.defaultPlaySound ? "notification" : undefined,
-          //   5000
-          // )
           return
         }
         let batteryPercent = Math.round(context.batteryState.flLevel * 10000) / 100
