@@ -110,6 +110,17 @@ export const evaluateAlarm = async (alarmID: string, settings: AlarmSetting, con
         }
         let batteryPercent = Math.round(context.batteryState.flLevel * 10000) / 100
         if (batteryPercent <= thresholdLevel+batteryOffset && !history.triggered) { // Trigger discharge
+          if (context.settings.disableOnCharging && context.batteryState.eACState >= 2) { 
+            // SteamUtils.notify(
+            //   "Autosuspend blockiert",
+            //   `bHasBattery=${context.batteryState.bHasBattery} bat%=${batteryPercent} state=${context.batteryState.eACState}`,
+            //   true,
+            //   context.settings.defaultPlaySound,
+            //   context.settings.defaultPlaySound ? "notification" : undefined,
+            //   5000
+            // )
+            return
+          }
           history.lastTriggered = date.getTime()
           history.triggered = true
           triggerAction = true

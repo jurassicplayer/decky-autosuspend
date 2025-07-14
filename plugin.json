@@ -1,9 +1,14 @@
 {
   "name": "AutoSuspend",
-  "author": "jurassicplayer",
+  "author": "M0dded by Zap0xfce2",
   "flags": [],
   "publish": {
-    "tags": ["battery", "power-management", "utility", "suspend"],
+    "tags": [
+      "battery",
+      "power-management",
+      "utility",
+      "suspend"
+    ],
     "description": "Automatically suspend on low power.",
     "image": "https://raw.githubusercontent.com/jurassicplayer/decky-autosuspend/main/assets/thumbnail.png"
   }

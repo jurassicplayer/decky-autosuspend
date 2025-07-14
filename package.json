@@ -1,6 +1,6 @@
 {
   "name": "decky-autosuspend",
-  "version": "2.1.0",
+  "version": "9.0.0",
   "description": "Automatically suspend on low power",
   "scripts": {
     "build": "shx rm -rf dist && rollup -c",
@@ -17,7 +17,7 @@
     "steam-deck",
     "deck"
   ],
-  "author": "jurassicplayer",
+  "author": "M0dded by Zap0xfce2",
   "license": "BSD-3-Clause",
   "bugs": {
     "url": "https://github.com/jurassicplayer/decky-autosuspend/issues"

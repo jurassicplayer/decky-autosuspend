@@ -12,6 +12,7 @@ export const defaultSettings: SettingsProps = {
   defaultRepeatSound: false,
   defaultAlarmRepeat: 0,
   debuggingMode: false,
+  disableOnCharging: true,
   alarms: {
     defaultWarning: {
       alarmName: 'Warning 20%',
