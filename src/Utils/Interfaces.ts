@@ -227,6 +227,7 @@ export interface AlarmSetting extends IObjectKeys {
   enabled: boolean
   profile?: string
   sortOrder: number
+  disableOnCharging: boolean
 }
 export interface Alarms {
   [uniqueid: string]: AlarmSetting

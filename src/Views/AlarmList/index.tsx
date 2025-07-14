@@ -11,7 +11,8 @@ const newAlarmSettings: AlarmSetting = {
   thresholdLevel: 15,
   thresholdType: thresholdTypes.discharge,
   triggeredAction: triggerActions.none,
-  sortOrder: 0
+  sortOrder: 0,
+  disableOnCharging: true
 }
 
 function uuidv4() {

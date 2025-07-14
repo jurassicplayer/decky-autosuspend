@@ -204,6 +204,11 @@ export const AlarmItemSettings = (props: AlarmItemSettingsProps) => {
         label={"Sound"+(configSettings.playSound ? ":": " (Global):")}
         bottomSeparator="none"
         checked={playSound} />
+      <ToggleField
+          onChange={(value) => setAlarmSetting(props.alarmID, 'disableOnCharging', value)}
+          label={"Deactivate if power supply is connected" + (configSettings.disableOnCharging ? ":" : " (Global):")}
+          bottomSeparator="none"
+          checked={configSettings.disableOnCharging} />
       <DropdownItem
         rgOptions={(()=>{
           let options = []

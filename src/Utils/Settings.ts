@@ -12,7 +12,6 @@ export const defaultSettings: SettingsProps = {
   defaultRepeatSound: false,
   defaultAlarmRepeat: 0,
   debuggingMode: false,
-  disableOnCharging: true,
   alarms: {
     defaultWarning: {
       alarmName: 'Warning 20%',
@@ -20,7 +19,8 @@ export const defaultSettings: SettingsProps = {
       thresholdType: thresholdTypes.discharge,
       triggeredAction: triggerActions.none,
       enabled: true,
-      sortOrder: 0
+      sortOrder: 0,
+      disableOnCharging: true
     },
     defaultCritical: {
       alarmName: 'Critical 15%',
@@ -28,7 +28,8 @@ export const defaultSettings: SettingsProps = {
       thresholdType: thresholdTypes.discharge,
       triggeredAction: triggerActions.suspend,
       enabled: true,
-      sortOrder: 1
+      sortOrder: 1,
+      disableOnCharging: true
     }
   } 
 }
@@ -54,7 +55,8 @@ const exampleAlarmSettings: AlarmSetting = {
   triggeredAction: triggerActions.none,
   enabled: false,
   profile: '',
-  sortOrder: 0
+  sortOrder: 0,
+  disableOnCharging: true
 }
 // #endregion
 
