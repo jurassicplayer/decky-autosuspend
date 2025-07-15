@@ -20,7 +20,7 @@ export const defaultSettings: SettingsProps = {
       triggeredAction: triggerActions.none,
       enabled: true,
       sortOrder: 0,
-      ignoreWhileCharging: true
+      ignoreWhileCharging: false
     },
     defaultCritical: {
       alarmName: 'Critical 15%',
