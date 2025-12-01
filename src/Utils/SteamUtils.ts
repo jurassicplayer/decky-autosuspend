@@ -22,6 +22,7 @@ const findModule = (property: string) => {
 const SleepParent = findModule("InitiateSleep")
 export const NavSoundMap = findModule("ToastMisc")
 export const downloadsStore = findModule("m_DownloadOverview")
+export const SleepManager = findModule("RegisterForNotifyResumeFromSuspend")
 
 export class SteamUtils {
   static async suspend() {
@@ -32,6 +33,22 @@ export class SteamUtils {
     await Logger.debug('Sending shutdown request to SteamOS')
     SteamClient.System.ShutdownPC()
   }
+
+  static registerForOnSuspend(callback: (_: unknown) => void): { unregister: () => void } {
+    const register = SteamClient.System.RegisterForOnSuspendRequest?.bind(SteamClient.System) ?? SleepManager?.RegisterForNotifyRequestSuspend;
+    
+    //Probably log here or something in case they change it again
+    if (!register) return { unregister: () => { } };
+    return register(callback);
+  }
+  static registerForOnResumeFromSuspend(callback: (_: unknown) => void): { unregister: () => void } {
+    const register = SteamClient.System.RegisterForOnResumeFromSuspend?.bind(SteamClient.System) ?? SleepManager?.RegisterForNotifyResumeFromSuspend;
+    if (!register) return { unregister: () => { } };
+
+    //Probably log here or something in case they change it again
+    return register(callback);
+  }
+
 
   //#region Notification Wrapper
   static async notify(title: string, message: string, showToast?: boolean, playSound?: boolean, sound?: string, duration?: number) {
@@ -221,4 +238,8 @@ export const CustomCss: {[key: string]: CSSProperties } = {
     fontSize: "0.8em",
     marginLeft: "0.8em"
   }
+}
+
+export interface Unregisterable {
+  unregister(): void
 }

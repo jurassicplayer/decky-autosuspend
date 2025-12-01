@@ -1,5 +1,6 @@
 import { ReorderableEntry, ServerAPI } from "decky-frontend-lib"
 import { AppContextState } from "./Context"
+import { Unregisterable } from "./SteamUtils"
 
 interface IObjectKeys {
   [key: string]: any
@@ -139,7 +140,7 @@ export interface PluginInfo {
 }
 export interface SteamHook {
   name: SteamHooks
-  unregister: CallableFunction
+  unregisterable: Unregisterable
 }
 export enum SteamHooks {
   RegisterForSettingsChanges = 'RegisterForSettingsChanges',

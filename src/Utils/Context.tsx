@@ -7,6 +7,7 @@ import { events } from "./Events"
 import { Logger } from "./Logger"
 import { registerAlarmEvents, registerAlarmHooks, unregisterAlarmEvents } from './Alarms'
 import { AppInfo, Context, ProviderProps, SettingsContext, SteamHook } from './Interfaces'
+import { SteamUtils, Unregisterable } from './SteamUtils'
 
 export class AppContextState implements Context {
   constructor(serverAPI: ServerAPI) {
@@ -88,39 +89,39 @@ export class AppContextState implements Context {
   }
   public registerHook(hookName: SteamHooks) {
     Logger.debug(`Attempting to register hook: ${hookName}\tFilterCheck: ${this.activeHooks.filter(hook => hook.name == hookName).length == 0}`)
-    let callback: CallableFunction | undefined
-    if (this.activeHooks.filter(hook => hook.name == SteamHooks.RegisterForSettingsChanges).length == 0) {
+    let callback: Unregisterable | undefined
+    if (SteamHooks.RegisterForSettingsChanges == hookName && this.activeHooks.filter(hook => hook.name == SteamHooks.RegisterForSettingsChanges).length == 0) {
       callback = SteamClient.Settings.RegisterForSettingsChanges((value: SteamSettings) => this.onSettings(value))
     } else
-    if (this.activeHooks.filter(hook => hook.name == SteamHooks.RegisterForOnSuspendRequest).length == 0) {
-      callback = SteamClient.System.RegisterForOnSuspendRequest(() => this.onSuspend())
+    if (SteamHooks.RegisterForOnSuspendRequest == hookName && this.activeHooks.filter(hook => hook.name == SteamHooks.RegisterForOnSuspendRequest).length == 0) {
+      callback = SteamUtils.registerForOnSuspend(() => this.onSuspend())
     } else
-    if (this.activeHooks.filter(hook => hook.name == SteamHooks.RegisterForOnResumeFromSuspend).length == 0) {
-      callback = SteamClient.System.RegisterForOnResumeFromSuspend(() => this.onResume())
+    if (SteamHooks.RegisterForOnResumeFromSuspend == hookName && this.activeHooks.filter(hook => hook.name == SteamHooks.RegisterForOnResumeFromSuspend).length == 0) {
+      callback = SteamUtils.registerForOnResumeFromSuspend(() => this.onResume())
     } else
-    if (this.activeHooks.filter(hook => hook.name == SteamHooks.RegisterForShutdownDone).length == 0) {
+    if (SteamHooks.RegisterForShutdownDone == hookName && this.activeHooks.filter(hook => hook.name == SteamHooks.RegisterForShutdownDone).length == 0) {
       callback = SteamClient.User.RegisterForShutdownDone(() => this.onShutdown())
     } else
-    if (this.activeHooks.filter(hook => hook.name == SteamHooks.RegisterForDownloadItems).length == 0) {
+    if (SteamHooks.RegisterForDownloadItems == hookName && this.activeHooks.filter(hook => hook.name == SteamHooks.RegisterForDownloadItems).length == 0) {
       callback = SteamClient.Downloads.RegisterForDownloadItems((value: DownloadItems)=> this.onDownloadItems(value))
     } else
-    if (this.activeHooks.filter(hook => hook.name == SteamHooks.RegisterForControllerInputMessages).length == 0) {
+    if (SteamHooks.RegisterForControllerInputMessages == hookName && this.activeHooks.filter(hook => hook.name == SteamHooks.RegisterForControllerInputMessages).length == 0) {
       callback = SteamClient.Input.RegisterForControllerInputMessages(() => this.onControllerInput())
     }
-    if (typeof callback != 'undefined') {
-      this.activeHooks.push({name: hookName, unregister: callback})
+    if (typeof callback != 'undefined' && typeof callback?.unregister != 'undefined') {
+      this.activeHooks.push({name: hookName, unregisterable: callback})
       Logger.info(`Registered hook: ${hookName}`)
     }
   }
   public unregisterHook(hookName: SteamHooks) {
     let hook = this.activeHooks.find(hook => hook.name == hookName)
     if (!hook) { return }
-    hook.unregister()
+    hook.unregisterable.unregister()
     this.activeHooks = this.activeHooks.filter(hook => hook.name !== hookName)
     Logger.info(`Unregistered hook: ${hookName}`)
   }
   private unregisterHooks() {
-    this.activeHooks.forEach(hook => { hook.unregister() })
+    this.activeHooks.forEach(hook => { hook.unregisterable.unregister() })
   }
   private updateBatteryState(batteryState: BatteryState) {
     this.batteryState = batteryState
