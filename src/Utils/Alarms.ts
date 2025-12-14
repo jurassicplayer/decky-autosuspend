@@ -72,7 +72,7 @@ function applyDateSubstitutions(format: string, date: Date): string {
   return formattedDate
 }
 
-export function applyMessageSubstitutions(message: string, batteryState: BatteryState, alarmID: string): string {
+export function applyMessageSubstitutions(message: string, batteryState: BatteryState, alarmID: string, thresholdType: thresholdTypes, thresholdLevel: number): string {
   const second = 1000
   const minute = second * 60
   const hour = minute * 60
@@ -84,18 +84,51 @@ export function applyMessageSubstitutions(message: string, batteryState: Battery
   let hours = Math.trunc(playTime / hour)
   let minutes = Math.trunc((playTime % hour) / minute)
   let seconds = Math.trunc((playTime % hour % minute) / second)
+  let bedtimeThresholdDate:Date|null = null
+  let threshold:string
+  switch (thresholdType) {
+    case thresholdTypes.discharge:
+    case thresholdTypes.overcharge:
+      threshold = `${thresholdLevel}`
+      break
+    case thresholdTypes.dailyPlaytime:
+    case thresholdTypes.sessionPlaytime:
+      let thresholdHours = Math.trunc(thresholdLevel / hour)
+      let thresholdMinutes = Math.trunc((thresholdLevel % hour) / minute)
+      let sHours = thresholdHours ? `${thresholdHours}h` : ''
+      let sMinutes = thresholdMinutes ? `${thresholdMinutes}m` : ''
+      threshold = [sHours, sMinutes].filter(Boolean).join(' ')
+      break
+    case thresholdTypes.bedtime:
+      let currentDateHourZero = new Date(date.toLocaleDateString())
+      let currentDate = currentDateHourZero.getTime() + thresholdLevel
+      bedtimeThresholdDate = new Date(currentDate)
+      // Default formatting
+      threshold = applyDateSubstitutions('%H:%M', bedtimeThresholdDate)
+      break
+    default:
+      threshold = 'Not yet implemented'
+  }
   // Substitute general variables
   let result = message
     .replaceAll('{batt%}', `${batteryPercent-batteryOffset}`)
     .replaceAll('{playHrs}',`${hours}`)
     .replaceAll('{playMin}',`${minutes}`)
     .replaceAll('{playSec}',`${seconds}`)
+    .replaceAll('{thold}',`${threshold}`)
   // Substitute date
   let match
-  const regex = /{date:(.*?)}/g
+  let regex = /{date:(.*?)}/g
   while ( (match = regex.exec(message)) !== null ) {
     let formattedDate = applyDateSubstitutions(match[1], date)
     result = result.replaceAll(match[0], formattedDate)
+  }
+  if (bedtimeThresholdDate != null) {
+    regex = /{thold:(.*?)}/g
+    while ( (match = regex.exec(message)) !== null ) {
+      let formattedDate = applyDateSubstitutions(match[1], bedtimeThresholdDate)
+      result = result.replaceAll(match[0], formattedDate)
+    }
   }
   return result
 }
@@ -195,8 +228,8 @@ export const evaluateAlarm = async (alarmID: string, settings: AlarmSetting, con
   if (!triggerAction) { return }
   // Send notifications
   alarmMessage = alarmMessage ? alarmMessage : ''
-  let name = applyMessageSubstitutions(alarmName, context.batteryState, alarmID)
-  let message = applyMessageSubstitutions(alarmMessage, context.batteryState, alarmID)
+  let name = applyMessageSubstitutions(alarmName, context.batteryState, alarmID, thresholdType, thresholdLevel)
+  let message = applyMessageSubstitutions(alarmMessage, context.batteryState, alarmID, thresholdType, thresholdLevel)
   SteamUtils.notify(name, message, showToast, playSound, sound, 5000) // First toast
   if (alarmRepeat) {
     let sleepDuration = 3000

@@ -18,13 +18,15 @@ const SteamChevronDown = (props:SVGProps<SVGSVGElement>) => {
 export const AlarmItem = (props: AlarmItemProps<EntryProps>) => {
   let alarmID = props.entry.data!.alarmID
   let setAlarms = props.setAlarms
-  let { getSetting, getSettings, getAlarmSettings, setAlarmSetting, deleteAlarm } = useSettingsContext()
-  let { enabled, alarmName, profile, showToast, playSound, alarmRepeat, thresholdType, triggeredAction } = applyDefaults(getAlarmSettings(alarmID), getSettings())
+  const context = useAppContext()
+  const alarmSettings = applyDefaults(getAlarmSettings(alarmID), getSettings())
+  const { enabled, alarmName, profile, showToast, playSound, alarmRepeat, thresholdLevel, thresholdType, triggeredAction } = alarmSettings
   let [selected, setSelected] = useState<boolean>(false)
   let [loginUsers, setLoginUsers] = useState<LoginUser[]>([])
   let [profileData, setProfileData] = useState<ProfileData>()
   let debuggingMode = getSetting('debuggingMode')
   let [triggered, setTriggered] = useState(getAlarmHistory(alarmID).triggered)
+  const substitutedAlarmName = applyMessageSubstitutions(alarmName, context.batteryState, alarmID, thresholdType, thresholdLevel)
   useEffect(()=>{
     async function init(){
       let loginUsers: LoginUser[] = await SteamClient.User.GetLoginUsers()
@@ -91,7 +93,7 @@ export const AlarmItem = (props: AlarmItemProps<EntryProps>) => {
             }}/>
         </div>
         <div style={SteamCss.NotificationDescription}>
-        {alarmName || alarmID}
+        {substitutedAlarmName || alarmID}
         <IconContext.Provider value={{size: "0.8em"}}>
           <div style={{display:"flex", columnGap: "0.8em"}}>
             {profile ?

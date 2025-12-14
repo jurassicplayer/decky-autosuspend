@@ -284,11 +284,13 @@ const Info: VFC = () => {
       indentLevel: 1,
       data: (()=>{
         let tableInfo = [
-          ['batt%',       'Displays the battery percentage',              `Battery level {batt%}%`],
-          ['playHrs',     'Displays the daily/session hour playtime',     `You've been playing for {playHrs}h`],
-          ['playMin',     'Displays the daily/session minute playtime',   `You've been playing for {playMin}m`],
-          ['playSec',     'Displays the daily/session seconds playtime',  `You've been playing for {playSec}s`],
-          ['date:<fmt>',  'Displays a formatted current date/time',       `It's now {date:%I:%M}`]
+          ['batt%',       'Displays the battery percentage',                  `Battery level {batt%}%`],
+          ['playHrs',     'Displays the daily/session hour playtime',         `You've been playing for {playHrs}h`],
+          ['playMin',     'Displays the daily/session minute playtime',       `You've been playing for {playMin}m`],
+          ['playSec',     'Displays the daily/session seconds playtime',      `You've been playing for {playSec}s`],
+          ['thold',       'Displays the threshold value',                     `Warning {thold}%`],
+          ['thold[:fmt]', 'Displays a formatted bedtime threshold date/time', `Bedtime at {thold:%I:%M}`],
+          ['date:<fmt>',  'Displays a formatted current date/time',           `It's now {date:%I:%M}`]
         ]
         return (
           <table>

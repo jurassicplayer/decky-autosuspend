@@ -225,8 +225,8 @@ export const AlarmItemSettings = (props: AlarmItemSettingsProps) => {
       <DialogButton
         style={{minWidth: "0px", width: "10em", alignSelf: "flex-end"}}
         onClick={()=>{
-          let name = applyMessageSubstitutions(alarmName, batteryState, props.alarmID)
-          let message = applyMessageSubstitutions(alarmMessage, batteryState, props.alarmID)
+          let name = applyMessageSubstitutions(alarmName, batteryState, props.alarmID, thresholdType, thresholdLevel)
+          let message = applyMessageSubstitutions(alarmMessage, batteryState, props.alarmID, thresholdType, thresholdLevel)
           SteamUtils.notify(name, message, showToast, playSound, sound, 1000)}}>Test</DialogButton>
       { getSetting('debuggingMode') ?
       <div style={{display: "flex", flexDirection: "row"}}>
