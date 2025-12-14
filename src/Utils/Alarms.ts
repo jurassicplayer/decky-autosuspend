@@ -1,9 +1,8 @@
 import { SteamUtils } from "./SteamUtils"
-import { AppContextState } from "./Context"
 import { events } from "./Events"
 import { SettingsManager, applyDefaults } from "./Settings"
 import { sleep } from "decky-frontend-lib"
-import { AlarmHistory, AlarmSetting, BatteryState, SettingsProps, SteamHooks, thresholdTypes, triggerActions } from "./Interfaces"
+import { AlarmHistory, AlarmSetting, BatteryState, Context, SettingsProps, SteamHooks, thresholdTypes, triggerActions } from "./Interfaces"
 
 function getAlarmHistories(): {[key: string]: AlarmHistory} {
   let s_histories = localStorage.getItem('autosuspend-alarms')
@@ -133,8 +132,8 @@ export function applyMessageSubstitutions(message: string, batteryState: Battery
   return result
 }
 
-export const evaluateAlarm = async (alarmID: string, settings: AlarmSetting, context: AppContextState) => {
-  if (!settings.enabled) { return }
+export const evaluateAlarm = async (alarmID: string, settings: AlarmSetting, context: Context, silent?:boolean) => {
+  if (!settings.enabled && !silent) { return }
   let { showToast, playSound, sound, repeatToast, repeatSound, alarmRepeat, alarmName, alarmMessage, thresholdLevel, thresholdType, triggeredAction, profile } = applyDefaults(settings, context.settings)
   // @ts-ignore
   if (profile && profile != loginStore.m_strAccountName) { return }
@@ -225,7 +224,7 @@ export const evaluateAlarm = async (alarmID: string, settings: AlarmSetting, con
       break
   }
   setAlarmHistory(alarmID, history)
-  if (!triggerAction) { return }
+  if (!triggerAction || silent) { return }
   // Send notifications
   alarmMessage = alarmMessage ? alarmMessage : ''
   let name = applyMessageSubstitutions(alarmName, context.batteryState, alarmID, thresholdType, thresholdLevel)
@@ -260,7 +259,7 @@ export const evaluateAlarm = async (alarmID: string, settings: AlarmSetting, con
   }
 }
 
-export function registerAlarmHooks(context: AppContextState) {
+export function registerAlarmHooks(context: Context) {
   let alarmTypes = context.getActiveAlarmTypes()
   if (alarmTypes.includes(thresholdTypes.sessionPlaytime) || alarmTypes.includes(thresholdTypes.dailyPlaytime)) {
     context.registerHook(SteamHooks.RegisterForOnResumeFromSuspend)
@@ -282,21 +281,21 @@ export function registerAlarmHooks(context: AppContextState) {
     context.unregisterHook(SteamHooks.RegisterForControllerInputMessages)
   }
 }
-export function registerAlarmEvents(context: AppContextState) {
+export function registerAlarmEvents(context: Context) {
   context.eventBus.addEventListener(events.SuspendEvent.eType, () => OnSuspend(context))
   context.eventBus.addEventListener(events.ShutdownEvent.eType, () => OnSuspend(context))
   context.eventBus.addEventListener(events.ResumeEvent.eType, () => OnResume(context))
   context.eventBus.addEventListener(events.DownloadItemsEvent.eType, (evt) => OnDownloadItems(evt as events.DownloadItemsEvent, context))
   context.eventBus.addEventListener(events.ControllerInputEvent.eType, () => OnControllerInput(context))
 }
-export function unregisterAlarmEvents(context: AppContextState) {
+export function unregisterAlarmEvents(context: Context) {
   context.eventBus.removeEventListener(events.SuspendEvent.eType, () => OnSuspend(context))
   context.eventBus.removeEventListener(events.ShutdownEvent.eType, () => OnSuspend(context))
   context.eventBus.removeEventListener(events.ResumeEvent.eType, () => OnResume(context))
   context.eventBus.removeEventListener(events.DownloadItemsEvent.eType, (evt) => OnDownloadItems(evt as events.DownloadItemsEvent, context))
   context.eventBus.removeEventListener(events.ControllerInputEvent.eType, () => OnControllerInput(context))
 }
-const OnDownloadItems = (evt: events.DownloadItemsEvent, context: AppContextState) => {
+const OnDownloadItems = (evt: events.DownloadItemsEvent, context: Context) => {
   console.log(evt, context)
   // let dlStore: DownloadsStore = downloadsStore
   // console.log(
@@ -306,10 +305,11 @@ const OnDownloadItems = (evt: events.DownloadItemsEvent, context: AppContextStat
   //   '\nRecentlyCompleted: ', dlStore.RecentlyCompleted
   // )
 }
-const OnControllerInput = (context: AppContextState) => {
+const OnControllerInput = (context: Context) => {
 }
-const OnSuspend = (context: AppContextState) => {
+const OnSuspend = (context: Context) => {
   let alarms = context.settings.alarms
+  context.appInfo.processAlarms = false
   for (let alarmID in alarms) {
     let {thresholdType} = alarms[alarmID]
     if (thresholdType != thresholdTypes.dailyPlaytime) { continue }
@@ -318,11 +318,10 @@ const OnSuspend = (context: AppContextState) => {
     history.currentPlayTime = history.currentPlayTime || 0
     history.currentPlayTime = (date.getTime() - (history.lastUpdatedTime || date.getTime())) + history.currentPlayTime // current_playtime + past_playtime
     history.lastUpdatedTime = date.getTime()
-    context.appInfo.processAlarms = false
     setAlarmHistory(alarmID, history)
   }
 }
-const OnResume = (context: AppContextState) => {
+const OnResume = (context: Context) => {
   let alarms = context.settings.alarms
   for (let alarmID in alarms) {
     let {thresholdType} = alarms[alarmID]
@@ -352,6 +351,9 @@ const OnResume = (context: AppContextState) => {
         }())
         break
       default:
+    }
+    if (context.appInfo.initialized){
+      evaluateAlarm(alarmID, alarms[alarmID], context, true)
     }
   }
   context.appInfo.processAlarms = true

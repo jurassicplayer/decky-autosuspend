@@ -6,10 +6,10 @@ import { useState, SVGProps, useEffect } from "react"
 import { ConfirmModal, DialogButton, ToggleField, showModal } from "decky-frontend-lib"
 import { applyDefaults } from "../../Utils/Settings"
 import { SteamCss, SteamCssVariables } from "../../Utils/SteamUtils"
-import { useSettingsContext } from "../../Utils/Context"
+import { useAppContext, useSettingsContext } from "../../Utils/Context"
 import { AlarmItemProps, EntryProps, LoginUser, ProfileData } from "../../Utils/Interfaces"
 import { AlarmItemSettings } from "./AlarmSettings"
-import { getAlarmHistory, setAlarmHistory } from "../../Utils/Alarms"
+import { applyMessageSubstitutions, evaluateAlarm, getAlarmHistory, setAlarmHistory } from "../../Utils/Alarms"
 
 const SteamChevronDown = (props:SVGProps<SVGSVGElement>) => {
   return <svg {...props} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" fill="none" direction="down"><path fill="currentColor" d="M31 20.3606L18.0204 33L5 20.3606L8.60376 16.8568L18.0204 25.9924L27.4166 16.8568L31 20.3606ZM27.3962 3L18.0204 12.1356L8.62412 3L5 6.50379L18.0204 19.1432L31 6.50379L27.3962 3Z"></path></svg>
@@ -18,6 +18,7 @@ const SteamChevronDown = (props:SVGProps<SVGSVGElement>) => {
 export const AlarmItem = (props: AlarmItemProps<EntryProps>) => {
   let alarmID = props.entry.data!.alarmID
   let setAlarms = props.setAlarms
+  const { getSetting, getSettings, getAlarmSettings, setAlarmSetting, deleteAlarm } = useSettingsContext()
   const context = useAppContext()
   const alarmSettings = applyDefaults(getAlarmSettings(alarmID), getSettings())
   const { enabled, alarmName, profile, showToast, playSound, alarmRepeat, thresholdLevel, thresholdType, triggeredAction } = alarmSettings
@@ -88,8 +89,9 @@ export const AlarmItem = (props: AlarmItemProps<EntryProps>) => {
             bottomSeparator="none"
             checked={enabled}
             onChange={(value) => {
-              setAlarmSetting(alarmID, 'enabled', value) 
               if (!value) { setAlarmHistory(alarmID) }
+              if (value) { evaluateAlarm(alarmID, alarmSettings, context, true) }
+              setAlarmSetting(alarmID, 'enabled', value)
             }}/>
         </div>
         <div style={SteamCss.NotificationDescription}>
