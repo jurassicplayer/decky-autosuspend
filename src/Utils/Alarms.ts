@@ -168,7 +168,9 @@ export const evaluateAlarm = async (alarmID: string, settings: AlarmSetting, con
       break
     case thresholdTypes.sessionPlaytime:
       (function () {
-        let currentPlaytime = date.getTime() - (history.sessionStartTime || date.getTime())
+        // Initialize sessionStartTime if none exists
+        history.sessionStartTime = history.sessionStartTime || date.getTime()
+        let currentPlaytime = date.getTime() - history.sessionStartTime
         if (currentPlaytime >= thresholdLevel && !history.triggered) {
           history.lastTriggered = date.getTime()
           history.triggered = true
