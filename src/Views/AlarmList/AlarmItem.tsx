@@ -87,7 +87,7 @@ export const AlarmItem = (props: AlarmItemProps<EntryProps>) => {
             checked={enabled}
             onChange={(value) => {
               setAlarmSetting(alarmID, 'enabled', value) 
-              if (value) { setAlarmHistory(alarmID) }
+              if (!value) { setAlarmHistory(alarmID) }
             }}/>
         </div>
         <div style={SteamCss.NotificationDescription}>
