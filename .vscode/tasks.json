@@ -66,9 +66,27 @@
             "group": "none",
             "dependsOn": [
                 "createfolders",
+                "stopdeckyloader",
+                "chownfolder",
                 "chmodfolders"
             ],
             "command": "rsync -azp --delete --chmod=D0755,F0755 --rsh='ssh -p ${config:deckport} ${config:deckkey}' --exclude='.git/' --exclude='.github/' --exclude='.vscode/' --exclude='node_modules/' --exclude='src/' --exclude='*.log' --exclude='.gitignore' . deck@${config:deckip}:${config:deckdir}/homebrew/plugins/${workspaceFolderBasename}",
+            "problemMatcher": []
+        },
+        {
+            "label": "stopdeckyloader",
+            "detail": "Stop decky-loader from re-applying restrictive permissions",
+            "type": "shell",
+            "group": "none",
+            "command": "ssh deck@${config:deckip} -p ${config:deckport} ${config:deckkey} 'echo '${config:deckpass}' | sudo -S systemctl stop plugin_loader'",
+            "problemMatcher": []
+        },
+        {
+            "label": "chownfolder",
+            "detail": "Stop decky-loader from re-applying restrictive permissions",
+            "type": "shell",
+            "group": "none",
+            "command": "ssh deck@${config:deckip} -p ${config:deckport} ${config:deckkey} 'echo '${config:deckpass}' | sudo -S chown -R deck:deck ${config:deckdir}/homebrew/'",
             "problemMatcher": []
         },
         {
