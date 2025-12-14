@@ -36,16 +36,14 @@ export class SteamUtils {
 
   static registerForOnSuspend(callback: (_: unknown) => void): { unregister: () => void } {
     const register = SteamClient.System.RegisterForOnSuspendRequest?.bind(SteamClient.System) ?? SleepManager?.RegisterForNotifyRequestSuspend;
-    
-    //Probably log here or something in case they change it again
-    if (!register) return { unregister: () => { } };
+    if (!register) console.log("Failed to obtain SleepManager RegisterForNotifyRequestSend")
+    if (!register) return { unregister: () => { } }
     return register(callback);
   }
   static registerForOnResumeFromSuspend(callback: (_: unknown) => void): { unregister: () => void } {
     const register = SteamClient.System.RegisterForOnResumeFromSuspend?.bind(SteamClient.System) ?? SleepManager?.RegisterForNotifyResumeFromSuspend;
-    if (!register) return { unregister: () => { } };
-
-    //Probably log here or something in case they change it again
+    if (!register) console.log("Failed to obtain SleepManager RegisterForNotifyResumeFromSuspend")
+    if (!register) return { unregister: () => { } }
     return register(callback);
   }
 
