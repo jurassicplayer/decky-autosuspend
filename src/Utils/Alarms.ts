@@ -266,7 +266,7 @@ export function registerAlarmHooks(context: Context) {
   } else {
     context.unregisterHook(SteamHooks.RegisterForOnResumeFromSuspend)
   }
-  if (alarmTypes.includes(thresholdTypes.dailyPlaytime)) {
+  if (alarmTypes.includes(thresholdTypes.dailyPlaytime) || alarmTypes.includes(thresholdTypes.bedtime) || alarmTypes.includes(thresholdTypes.discharge)) {
     context.registerHook(SteamHooks.RegisterForOnSuspendRequest)
     context.registerHook(SteamHooks.RegisterForShutdownDone)
   } else {
