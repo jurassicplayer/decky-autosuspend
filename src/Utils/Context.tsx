@@ -20,7 +20,7 @@ export class AppContextState implements Context {
     Logger.info('Initializing frontend')
     SettingsManager.loadFromFile().then((settings)=>{
       this.settings = settings
-      this.intervalID = setInterval(()=>{
+      this.intervalID = window.setInterval(()=>{
         // @ts-ignore
         let currentState = window.SystemPowerStore.batteryState
         if (currentState != this.batteryState) this.updateBatteryState(currentState)
@@ -51,7 +51,7 @@ export class AppContextState implements Context {
   public activeRoutes: string[] = []
   public timeformat24!: boolean
   public vecHours!: Hour[]
-  private intervalID!: NodeJS.Timer
+  private intervalID: number | undefined
 
   public onDismount() {
     clearInterval(this.intervalID)
