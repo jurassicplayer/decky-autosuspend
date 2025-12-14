@@ -3,7 +3,7 @@ import { AppContextState } from "./Context"
 import { events } from "./Events"
 import { SettingsManager, applyDefaults } from "./Settings"
 import { sleep } from "decky-frontend-lib"
-import { AlarmHistory, AlarmSetting, BatteryState, SteamHooks, thresholdTypes, triggerActions } from "./Interfaces"
+import { AlarmHistory, AlarmSetting, BatteryState, SettingsProps, SteamHooks, thresholdTypes, triggerActions } from "./Interfaces"
 
 function getAlarmHistories(): {[key: string]: AlarmHistory} {
   let s_histories = localStorage.getItem('autosuspend-alarms')
@@ -17,6 +17,16 @@ export function setAlarmHistory(alarmID: string, history?: AlarmHistory) {
   let histories = getAlarmHistories()
   if (history === undefined) { delete histories[alarmID] }
   else if (history) { histories[alarmID] = history }
+  localStorage.setItem('autosuspend-alarms', JSON.stringify(histories))
+}
+export function clearOrphanedAlarmHistories(settings:SettingsProps) {
+  let alarmKeys = Object.keys(settings.alarms)
+  let histories = getAlarmHistories()
+  for (let key in histories) {
+    if (!alarmKeys.includes(key)) {
+      delete histories[key];
+    }
+  }
   localStorage.setItem('autosuspend-alarms', JSON.stringify(histories))
 }
 

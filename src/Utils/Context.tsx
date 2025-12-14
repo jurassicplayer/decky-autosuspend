@@ -5,7 +5,7 @@ import { BatteryState, Hour, SettingsProps, SteamSettings, DownloadItems, SteamH
 import { SettingsManager } from "./Settings"
 import { events } from "./Events"
 import { Logger } from "./Logger"
-import { registerAlarmEvents, registerAlarmHooks, unregisterAlarmEvents } from './Alarms'
+import { clearOrphanedAlarmHistories, registerAlarmEvents, registerAlarmHooks, unregisterAlarmEvents } from './Alarms'
 import { AppInfo, Context, ProviderProps, SettingsContext, SteamHook } from './Interfaces'
 import { SteamUtils, Unregisterable } from './SteamUtils'
 
@@ -25,6 +25,7 @@ export class AppContextState implements Context {
         let currentState = window.SystemPowerStore.batteryState
         if (currentState != this.batteryState) this.updateBatteryState(currentState)
       }, 1000)
+      clearOrphanedAlarmHistories(settings)
       this.registerHook(SteamHooks.RegisterForSettingsChanges)
       registerAlarmHooks(this)
       // this.registerHooks()
